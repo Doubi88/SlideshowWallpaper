@@ -25,6 +25,7 @@ public class SlideshowWallpaperService extends WallpaperService {
 
         private Runnable drawRunner;
         private Paint paint;
+        private Paint clearPaint;
         private boolean visible;
 
         public SlideshowWallpaperEngine() {
@@ -32,11 +33,15 @@ public class SlideshowWallpaperService extends WallpaperService {
             drawRunner = new DrawRunner();
             paint = new Paint();
             paint.setAntiAlias(true);
-            paint.setColor(Color.WHITE);
+            paint.setColor(Color.BLACK);
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeJoin(Paint.Join.ROUND);
             paint.setStrokeWidth(10f);
 
+            clearPaint = new Paint();
+            clearPaint.setAntiAlias(true);
+            clearPaint.setColor(Color.WHITE);
+            clearPaint.setStyle(Paint.Style.FILL);
             handler.post(drawRunner);
         }
 
@@ -73,6 +78,7 @@ public class SlideshowWallpaperService extends WallpaperService {
                 try {
                     canvas = holder.lockCanvas();
                     if (canvas != null) {
+                        canvas.drawRect(0, 0, width, height, clearPaint);
                         int x = (int) (width * Math.random());
                         int y = (int) (height * Math.random());
                         canvas.drawCircle(x, y, 20.0f, paint);
