@@ -1,10 +1,8 @@
 <resources>
     <string name="app_name">Slideshow Wallpaper</string>
 
-    <string name="preference_pick_folder">Choose a folder.</string>
-    <string name="preference_pick_folder_key">pick_folder</string>
-    <string name="preference_recursive">Recursive (include subfolders)</string>
-    <string name="preference_recursive_key">recursive</string>
+    <string name="preference_pick_folder">Choose Images to display</string>
+    <string name="preference_pick_folder_key">pick_images</string>
     <string name="preference_ordering">Ordering</string>
     <string name="preference_ordering_key">ordering</string>
     <string-array name="orderings">
