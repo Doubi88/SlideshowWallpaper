@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <Preference android:title="@string/preference_pick_folder"
+        android:key="@string/preference_pick_folder_key"/>
+    <CheckBoxPreference android:key="@string/preference_recursive_key"
+        android:title="@string/preference_recursive" />
+    <ListPreference android:key="@string/preference_ordering_key"
+        android:title="@string/preference_ordering"
+        android:entries="@array/orderings"
+        android:entryValues="@array/ordering_values"
+        />
+</PreferenceScreen>
