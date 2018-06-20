@@ -29,6 +29,12 @@
             android:label="@string/app_name"
             android:theme="@style/PrefereceTheme" >
         </activity>
+        <activity
+            android:name=".ImagePreferencesActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/PrefereceTheme" >
+        </activity>
     </application>
 
 </manifest>
