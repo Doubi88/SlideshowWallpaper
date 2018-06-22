@@ -14,7 +14,7 @@ public class ImagePreference extends Preference {
 
     public ImagePreference(Context context) {
         super(context);
-        setLayoutResource(R.layout.image_list_entry);
+        setWidgetLayoutResource(R.layout.image_list_entry);
     }
 
     @Override

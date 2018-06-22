@@ -1,18 +1,12 @@
 package de.tobi.slideshowwallpaper;
 
-import android.app.Activity;
-import android.content.ClipData;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Debug;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
-import android.util.Log;
 
 import java.util.HashSet;
-import java.util.Set;
 
 public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
 
