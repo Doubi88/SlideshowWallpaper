@@ -1,8 +1,10 @@
-package de.tobi.slideshowwallpaper;
+package de.tobi.slideshowwallpaper.preferences;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+
+import de.tobi.slideshowwallpaper.R;
 
 public class ImagePreferencesActivity extends AppCompatActivity {
 

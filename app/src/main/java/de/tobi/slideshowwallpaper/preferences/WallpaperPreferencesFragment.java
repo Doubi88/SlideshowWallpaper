@@ -1,18 +1,21 @@
-package de.tobi.slideshowwallpaper;
+package de.tobi.slideshowwallpaper.preferences;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Debug;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 
 import java.util.HashSet;
 
+import de.tobi.slideshowwallpaper.R;
+
 public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        //Debug.waitForDebugger();
+        Debug.waitForDebugger();
         addPreferencesFromResource(R.xml.wallpaper_preferences);
 
         Preference preference = findPreference(getResources().getString(R.string.preference_pick_folder_key));
