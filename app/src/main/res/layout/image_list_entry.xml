@@ -10,9 +10,8 @@
         android:id="@+id/image_preference_view"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:layout_marginBottom="2dp"
         android:contentDescription="@string/image_description"
+        android:adjustViewBounds="true"
         />
 
     <ImageView

@@ -15,7 +15,7 @@ public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        Debug.waitForDebugger();
+        //Debug.waitForDebugger();
         addPreferencesFromResource(R.xml.wallpaper_preferences);
 
         Preference preference = findPreference(getResources().getString(R.string.preference_pick_folder_key));
