@@ -8,9 +8,9 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Debug;
 import android.provider.OpenableColumns;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
@@ -18,7 +18,11 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import de.tobi.slideshowwallpaper.R;
@@ -35,7 +39,6 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.images_preferences);
         initList();
-        updateDisplay();
     }
 
     @Override
@@ -71,11 +74,15 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
 
     private void initList() {
         //Debug.waitForDebugger();
-        imagePreferences = new HashSet<>();
+
+        Preference progressBarPreference = new Preference(getContext());
+        progressBarPreference.setWidgetLayoutResource(R.layout.progress_bar_preference);
+        progressBarPreference.setKey("progress_bar");
+        getPreferenceScreen().addPreference(progressBarPreference);
+
         Set<String> uris = getPreferenceManager().getSharedPreferences().getStringSet(getResources().getString(R.string.preference_pick_folder_key), new HashSet<String>());
-        for (String uri : uris) {
-            addPreferenceFromUri(uri);
-        }
+        AsyncTaskLoadImages task = new AsyncTaskLoadImages(progressBarPreference);
+        task.execute(uris.toArray(new String[uris.size()]));
     }
 
     private void addPreferenceFromUri(String uri) {
@@ -171,7 +178,7 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
         }
     }
 
-    private byte[] readStream(InputStream in, int size) throws IOException {
+    private static byte[] readStream(InputStream in, int size) throws IOException {
         byte[] bytes = new byte[size];
         in.read(bytes);
         return bytes;
@@ -216,6 +223,75 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
 
             imagePreferences.remove(view);
             updateDisplay();
+        }
+    }
+
+    private class AsyncTaskLoadImages extends AsyncTask<String, BigDecimal, List<ImagePreference>> {
+
+        private Preference progressBarPreference;
+
+        public AsyncTaskLoadImages(Preference progressBarPreference) {
+            this.progressBarPreference = progressBarPreference;
+        }
+
+        @Override
+        protected List<ImagePreference> doInBackground(String... uris) {
+            List<ImagePreference> bitmaps = new ArrayList<>(uris.length);
+            BigDecimal listSize = BigDecimal.valueOf(uris.length);
+            for (String uri : uris) {
+                bitmaps.add(loadBitmap(uri));
+                publishProgress(BigDecimal.valueOf(bitmaps.size()).divide(listSize, 2, RoundingMode.HALF_UP));
+            }
+            return bitmaps;
+        }
+
+        private ImagePreference loadBitmap(String uri) {
+            ImagePreference preference = new ImagePreference(getContext());
+            preference.setOnDeleteClickListener(new ImagePreferenceDeleteClickListener(uri));
+
+            Cursor fileCursor = getContext().getContentResolver().query(Uri.parse(uri), null, null, null, null);
+            int nameIndex = fileCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+            fileCursor.moveToFirst();
+            String name = fileCursor.getString(nameIndex);
+            preference.setTitle(name);
+
+            int sizeIndex = fileCursor.getColumnIndex(OpenableColumns.SIZE);
+            fileCursor.moveToFirst();
+            int size = Integer.parseInt(fileCursor.getString(sizeIndex));
+
+            InputStream in = null;
+            try {
+                in = getContext().getContentResolver().openInputStream(Uri.parse(uri));
+                if (in != null) {
+                    byte[] bytes = readStream(in, size);
+                    preference.setImageBitmap(readBitmap(bytes));
+                }
+            } catch (IOException e) {
+                Log.e(ImagesPreferenceFragment.class.getSimpleName(), "Error opening file", e);
+                preference.setSummary(getResources().getString(R.string.error_reading_file) + ": " + e.getClass().getName() + ": " + e.getLocalizedMessage());
+            } finally {
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            return preference;
+        }
+
+        @Override
+        protected void onProgressUpdate(BigDecimal... values) {
+
+        }
+
+        @Override
+        protected void onPostExecute(List<ImagePreference> imagePreferences) {
+            ImagesPreferenceFragment.this.imagePreferences = new HashSet<>(imagePreferences);
+            updateDisplay();
+            getPreferenceScreen().removePreference(progressBarPreference);
         }
     }
 }
