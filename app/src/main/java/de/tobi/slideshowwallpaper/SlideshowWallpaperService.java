@@ -100,9 +100,9 @@ public class SlideshowWallpaperService extends WallpaperService {
 
                         uris = new ArrayList<>(preferences.getStringSet(getResources().getString(R.string.preference_pick_folder_key), new HashSet<String>()));
                         Bitmap bitmap = getNextImage();
-                        Matrix matrix = calculateDrawMatrix(bitmap, width, height);
                         if (bitmap != null) {
-                            canvas.drawBitmap(bitmap, matrix, null);
+                            bitmap = scaleAndRotateToFit(bitmap, width, height);
+                            canvas.drawBitmap(bitmap, 0, 0, null);
                         }
                     }
                 } catch (IOException e) {
@@ -122,18 +122,14 @@ public class SlideshowWallpaperService extends WallpaperService {
                 }
             }
 
-            private Matrix calculateDrawMatrix(Bitmap bitmap, int screenWidth, int screenHeight) {
+            private Bitmap scaleAndRotateToFit(Bitmap bitmap, int screenWidth, int screenHeight) {
                 int originalWidth = bitmap.getWidth();
                 int originalHeight = bitmap.getHeight();
 
-                Matrix result = new Matrix();
+                Matrix matrix = new Matrix();
 
-                float scale = (float)screenWidth / (float)originalWidth;
-                float yTranslation = (screenHeight - originalHeight * scale) / 2f;
 
-                result.postScale(scale, scale);
-
-                result.postTranslate(0, yTranslation);
+                Bitmap result = Bitmap.createBitmap(bitmap, 0, 0, screenHeight, screenWidth, matrix, true);
                 return result;
             }
             private Bitmap getNextImage() throws IOException {

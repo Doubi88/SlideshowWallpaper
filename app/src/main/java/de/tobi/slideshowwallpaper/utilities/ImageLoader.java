@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.provider.OpenableColumns;
 import android.util.Log;
@@ -72,7 +73,13 @@ public class ImageLoader {
 
         options.inSampleSize = calculateSampleSize(options.outWidth, options.outHeight, maxWidth, maxHeight);
         options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeByteArray(bytes, 0, size, options);
+        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, size, options);
+        if (bitmap.getWidth() > bitmap.getHeight()) {
+            Matrix matrix = new Matrix();
+            matrix.setRotate(90);
+            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        }
+        return bitmap;
     }
 
     private static int calculateSampleSize(int width, int height, int desiredWidth, int desiredHeight) {
@@ -82,7 +89,7 @@ public class ImageLoader {
             int halfWidth = width / 2;
             int halfHeight = height / 2;
 
-            while ((halfWidth / result) >= desiredWidth || (halfHeight / result >= desiredHeight)) {
+            while ((halfWidth / result) >= desiredWidth && (halfHeight / result >= desiredHeight)) {
                 result *= 2;
             }
         }
