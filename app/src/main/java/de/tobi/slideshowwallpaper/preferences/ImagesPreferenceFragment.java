@@ -16,6 +16,7 @@ import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.util.Log;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -27,6 +28,8 @@ import java.util.Set;
 
 import de.tobi.slideshowwallpaper.R;
 import de.tobi.slideshowwallpaper.listeners.OnDeleteClickListener;
+import de.tobi.slideshowwallpaper.utilities.ImageInfo;
+import de.tobi.slideshowwallpaper.utilities.ImageLoader;
 
 public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
 
@@ -90,36 +93,16 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
 
         preference.setOnDeleteClickListener(new ImagePreferenceDeleteClickListener(uri));
 
-        Cursor fileCursor = getContext().getContentResolver().query(Uri.parse(uri), null, null, null, null);
-        int nameIndex = fileCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-        fileCursor.moveToFirst();
-        String name = fileCursor.getString(nameIndex);
-        preference.setTitle(name);
-
-        int sizeIndex = fileCursor.getColumnIndex(OpenableColumns.SIZE);
-        fileCursor.moveToFirst();
-        int size = Integer.parseInt(fileCursor.getString(sizeIndex));
-
-        InputStream in = null;
+        ImageInfo imageInfo = null;
         try {
-            in = getContext().getContentResolver().openInputStream(Uri.parse(uri));
-            if (in != null) {
-                byte[] bytes = readStream(in, size);
-                preference.setImageBitmap(readBitmap(bytes));
-            }
+            imageInfo = ImageLoader.loadImage(uri, getContext(), 100, 100);
+            preference.setTitle(imageInfo.getName());
+            preference.setImageBitmap(imageInfo.getImage());
         } catch (IOException e) {
             Log.e(ImagesPreferenceFragment.class.getSimpleName(), "Error opening file", e);
-            preference.setSummary(getResources().getString(R.string.error_reading_file) + ": " + e.getClass().getName() + ": " + e.getLocalizedMessage());
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            preference.setTitle(R.string.error_reading_file);
+            preference.setSummary(e.getClass().getName() + ": " + e.getLocalizedMessage());
         }
-
         imagePreferences.add(preference);
     }
 
@@ -132,18 +115,6 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putStringSet(getResources().getString(R.string.preference_pick_folder_key), newValue);
         editor.apply();
-    }
-
-    private Bitmap readBitmap(byte[] bytes) {
-        int size = bytes.length;
-
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeByteArray(bytes,0, size, options);
-
-        options.inSampleSize = calculateSampleSize(options.outWidth, options.outHeight, 100, 100);
-        options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeByteArray(bytes, 0, size, options);
     }
 
     private void updateDisplay() {
@@ -178,26 +149,6 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
         }
     }
 
-    private static byte[] readStream(InputStream in, int size) throws IOException {
-        byte[] bytes = new byte[size];
-        in.read(bytes);
-        return bytes;
-    }
-
-    private int calculateSampleSize(int width, int height, int desiredWidth, int desiredHeight) {
-        int result = 1;
-
-        if (width > desiredWidth || height > desiredHeight) {
-            int halfWidth = width / 2;
-            int halfHeight = height / 2;
-
-            while ((halfWidth / result) >= desiredWidth && (halfHeight / result >= desiredHeight)) {
-                result *= 2;
-            }
-        }
-        return result;
-    }
-
     private class ImagePreferenceDeleteClickListener implements OnDeleteClickListener {
 
         private String uri;
@@ -221,6 +172,9 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
             editor.putStringSet(getResources().getString(R.string.preference_pick_folder_key), newSet);
             editor.apply();
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                getContext().getContentResolver().releasePersistableUriPermission(Uri.parse(uri), Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
             imagePreferences.remove(view);
             updateDisplay();
         }
@@ -249,35 +203,16 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
             ImagePreference preference = new ImagePreference(getContext());
             preference.setOnDeleteClickListener(new ImagePreferenceDeleteClickListener(uri));
 
-            Cursor fileCursor = getContext().getContentResolver().query(Uri.parse(uri), null, null, null, null);
-            int nameIndex = fileCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-            fileCursor.moveToFirst();
-            String name = fileCursor.getString(nameIndex);
-            preference.setTitle(name);
-
-            int sizeIndex = fileCursor.getColumnIndex(OpenableColumns.SIZE);
-            fileCursor.moveToFirst();
-            int size = Integer.parseInt(fileCursor.getString(sizeIndex));
-
-            InputStream in = null;
             try {
-                in = getContext().getContentResolver().openInputStream(Uri.parse(uri));
-                if (in != null) {
-                    byte[] bytes = readStream(in, size);
-                    preference.setImageBitmap(readBitmap(bytes));
-                }
+                ImageInfo info = ImageLoader.loadImage(uri, getContext(), 100, 100);
+                preference.setTitle(info.getName());
+                preference.setImageBitmap(info.getImage());
             } catch (IOException e) {
                 Log.e(ImagesPreferenceFragment.class.getSimpleName(), "Error opening file", e);
-                preference.setSummary(getResources().getString(R.string.error_reading_file) + ": " + e.getClass().getName() + ": " + e.getLocalizedMessage());
-            } finally {
-                if (in != null) {
-                    try {
-                        in.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+                preference.setTitle(R.string.error_reading_file);
+                preference.setSummary(e.getClass().getName() + ": " + e.getLocalizedMessage());
             }
+
 
             return preference;
         }

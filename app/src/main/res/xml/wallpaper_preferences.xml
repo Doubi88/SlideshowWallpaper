@@ -8,4 +8,9 @@
         android:entries="@array/orderings"
         android:entryValues="@array/ordering_values"
         />
+    <EditTextPreference
+        android:inputType="number"
+        android:key="@string/preference_seconds_key"
+        android:title="@string/preference_seconds"
+        android:numeric="integer"/>
 </PreferenceScreen>

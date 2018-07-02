@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Debug;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
+import android.util.Log;
 
 import java.util.HashSet;
 
@@ -16,6 +17,8 @@ public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         //Debug.waitForDebugger();
+        Log.d("SharedPreferencesName", getPreferenceManager().getSharedPreferencesName());
+        Log.d("SharedPreferencesMode", String.valueOf(getPreferenceManager().getSharedPreferencesMode()));
         addPreferencesFromResource(R.xml.wallpaper_preferences);
 
         Preference preference = findPreference(getResources().getString(R.string.preference_pick_folder_key));

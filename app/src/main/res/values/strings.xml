@@ -8,6 +8,8 @@
     <string name="error_reading_file">Error reading file</string>
     <string name="image_description">The Image</string>
     <string name="delete_button_description">Delete</string>
+    <string name="preference_seconds_key">seconds</string>
+    <string name="preference_seconds">Seconds between images</string>
     <string-array name="orderings">
         <item>Order by name</item>
         <item>Random</item>

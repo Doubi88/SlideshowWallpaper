@@ -1,12 +1,26 @@
 package de.tobi.slideshowwallpaper;
 
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Rect;
+import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
 import android.service.wallpaper.WallpaperService;
+import android.util.Log;
 import android.view.SurfaceHolder;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Optional;
+
+import de.tobi.slideshowwallpaper.utilities.ImageInfo;
+import de.tobi.slideshowwallpaper.utilities.ImageLoader;
 
 
 public class SlideshowWallpaperService extends WallpaperService {
@@ -27,6 +41,8 @@ public class SlideshowWallpaperService extends WallpaperService {
         private Paint paint;
         private Paint clearPaint;
         private boolean visible;
+        private ArrayList<String> uris;
+        private int currentImageIndex;
 
         public SlideshowWallpaperEngine() {
             handler = new Handler(Looper.getMainLooper());
@@ -70,27 +86,77 @@ public class SlideshowWallpaperService extends WallpaperService {
             }
         }
 
+
         private class DrawRunner implements Runnable {
             @Override
             public void run() {
                 SurfaceHolder holder = getSurfaceHolder();
                 Canvas canvas = null;
+                SharedPreferences preferences = getSharedPreferences(getPackageName() + "_preferences", MODE_PRIVATE);
                 try {
                     canvas = holder.lockCanvas();
                     if (canvas != null) {
                         canvas.drawRect(0, 0, width, height, clearPaint);
-                        int x = (int) (width * Math.random());
-                        int y = (int) (height * Math.random());
-                        canvas.drawCircle(x, y, 20.0f, paint);
+
+                        uris = new ArrayList<>(preferences.getStringSet(getResources().getString(R.string.preference_pick_folder_key), new HashSet<String>()));
+                        Bitmap bitmap = getNextImage();
+                        Matrix matrix = calculateDrawMatrix(bitmap, width, height);
+                        if (bitmap != null) {
+                            canvas.drawBitmap(bitmap, matrix, null);
+                        }
                     }
+                } catch (IOException e) {
+                    Log.e(SlideshowWallpaperService.class.getSimpleName(), getResources().getString(R.string.error_reading_file), e);
                 } finally {
-                    if (canvas != null)
-                        holder.unlockCanvasAndPost(canvas);
+                    if (canvas != null) {
+                        try {
+                            holder.unlockCanvasAndPost(canvas);
+                        } catch (IllegalArgumentException e) {
+                            Log.e(SlideshowWallpaperService.class.getSimpleName(), "Error unlocking canvas", e);
+                        }
+                    }
                 }
                 handler.removeCallbacks(drawRunner);
                 if (visible) {
-                    handler.postDelayed(drawRunner, 5000);
+                    handler.postDelayed(drawRunner, Integer.parseInt(preferences.getString(getResources().getString(R.string.preference_seconds_key), "5")) * 1000);
                 }
+            }
+
+            private Matrix calculateDrawMatrix(Bitmap bitmap, int screenWidth, int screenHeight) {
+                int originalWidth = bitmap.getWidth();
+                int originalHeight = bitmap.getHeight();
+
+                Matrix result = new Matrix();
+
+                float scale = (float)screenWidth / (float)originalWidth;
+                float yTranslation = (screenHeight - originalHeight * scale) / 2f;
+
+                result.postScale(scale, scale);
+
+                result.postTranslate(0, yTranslation);
+                return result;
+            }
+            private Bitmap getNextImage() throws IOException {
+                String uri = getNextUri();
+                if (uri != null) {
+                    ImageInfo info = ImageLoader.loadImage(uri, SlideshowWallpaperService.this, width, height);
+                    return info.getImage();
+                } else {
+                    return null;
+                }
+            }
+
+            private String getNextUri() {
+                String result = null;
+                if (!uris.isEmpty()) {
+                    currentImageIndex++;
+                    if (currentImageIndex >= uris.size()) {
+                        currentImageIndex = 0;
+                    }
+                    result = uris.get(currentImageIndex);
+                }
+
+                return result;
             }
         }
     }
