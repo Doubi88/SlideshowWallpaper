@@ -4,20 +4,18 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
 import android.view.SurfaceHolder;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Optional;
 
 import de.tobi.slideshowwallpaper.utilities.ImageInfo;
 import de.tobi.slideshowwallpaper.utilities.ImageLoader;
@@ -86,14 +84,17 @@ public class SlideshowWallpaperService extends WallpaperService {
             }
         }
 
+        private SharedPreferences getSharedPreferences() {
+            return SlideshowWallpaperService.this.getSharedPreferences(getPackageName() + "_preferences", MODE_PRIVATE);
+        }
 
         private class DrawRunner implements Runnable {
             @Override
             public void run() {
-                //Debug.waitForDebugger();
+                Debug.waitForDebugger();
                 SurfaceHolder holder = getSurfaceHolder();
                 Canvas canvas = null;
-                SharedPreferences preferences = getSharedPreferences(getPackageName() + "_preferences", MODE_PRIVATE);
+                SharedPreferences preferences = getSharedPreferences();
                 try {
                     canvas = holder.lockCanvas();
                     if (canvas != null) {
@@ -118,7 +119,12 @@ public class SlideshowWallpaperService extends WallpaperService {
                 }
                 handler.removeCallbacks(drawRunner);
                 if (visible) {
-                    handler.postDelayed(drawRunner, Integer.parseInt(preferences.getString(getResources().getString(R.string.preference_seconds_key), "5")) * 1000);
+
+                    handler.postDelayed(drawRunner, getDelaySeconds() * 1000);
+
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putLong("last_update", System.currentTimeMillis());
+                    editor.apply();
                 }
             }
 
@@ -135,13 +141,39 @@ public class SlideshowWallpaperService extends WallpaperService {
             private String getNextUri() {
                 String result = null;
                 if (!uris.isEmpty()) {
-                    currentImageIndex++;
-                    if (currentImageIndex >= uris.size()) {
-                        currentImageIndex = 0;
+                    if (calculateNextUpdateInSeconds() <= 0) {
+                        currentImageIndex++;
+                        if (currentImageIndex >= uris.size()) {
+                            currentImageIndex = 0;
+                        }
                     }
                     result = uris.get(currentImageIndex);
                 }
 
+                return result;
+            }
+
+            private int getDelaySeconds() {
+                int seconds = 5;
+                try {
+                    String secondsString = getSharedPreferences().getString(getResources().getString(R.string.preference_seconds_key), "5");
+                    seconds = Integer.parseInt(secondsString);
+                } catch (NumberFormatException e) {
+                    Log.e(SlideshowWallpaperEngine.class.getSimpleName(), "Invalid number", e);
+                    Toast toast = Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG);
+                    toast.show();
+                }
+                return seconds;
+            }
+
+            private int calculateNextUpdateInSeconds() {
+                long lastUpdate = getSharedPreferences().getLong("last_update", 0);
+                int result = 0;
+                if (lastUpdate > 0) {
+                    int delaySeconds = getDelaySeconds();
+                    long current = System.currentTimeMillis();
+                    result = delaySeconds - (int)((current - lastUpdate) / 1000);
+                }
                 return result;
             }
 
