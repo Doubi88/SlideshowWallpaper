@@ -90,6 +90,7 @@ public class SlideshowWallpaperService extends WallpaperService {
         private class DrawRunner implements Runnable {
             @Override
             public void run() {
+                //Debug.waitForDebugger();
                 SurfaceHolder holder = getSurfaceHolder();
                 Canvas canvas = null;
                 SharedPreferences preferences = getSharedPreferences(getPackageName() + "_preferences", MODE_PRIVATE);
@@ -101,7 +102,7 @@ public class SlideshowWallpaperService extends WallpaperService {
                         uris = new ArrayList<>(preferences.getStringSet(getResources().getString(R.string.preference_pick_folder_key), new HashSet<String>()));
                         Bitmap bitmap = getNextImage();
                         if (bitmap != null) {
-                            canvas.drawBitmap(bitmap, 0, 0, null);
+                            canvas.drawBitmap(bitmap, ImageLoader.calculateMatrixScaleToFit(bitmap, width, height), null);
                         }
                     }
                 } catch (IOException e) {
@@ -143,6 +144,7 @@ public class SlideshowWallpaperService extends WallpaperService {
 
                 return result;
             }
+
         }
     }
 }

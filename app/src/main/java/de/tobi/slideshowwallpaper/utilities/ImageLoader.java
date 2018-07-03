@@ -101,4 +101,15 @@ public class ImageLoader {
         }
         return result;
     }
+
+    public static Matrix calculateMatrixScaleToFit(Bitmap bitmap, int screenWidth, int screenHeight) {
+        Matrix result = new Matrix();
+
+        float scale = Math.max((float)screenWidth / (float)bitmap.getWidth(), (float)screenHeight / (float)bitmap.getHeight());
+        float yTranslate = (screenHeight - bitmap.getHeight() * scale) / 2f;
+
+        result.setScale(scale, scale);
+        result.postTranslate(0, yTranslate);
+        return result;
+    }
 }
