@@ -70,9 +70,15 @@ public class ImageLoader {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeByteArray(bytes,0, size, options);
-
-        options.inSampleSize = calculateSampleSize(options.outWidth, options.outHeight, maxWidth, maxHeight);
+        int imageWidth = options.outWidth;
+        int imageHeight = options.outHeight;
+        if (imageWidth > imageHeight) {
+            imageWidth = options.outHeight;
+            imageHeight = options.outWidth;
+        }
+        options.inSampleSize = calculateSampleSize(imageWidth, imageHeight, maxWidth, maxHeight);
         options.inJustDecodeBounds = false;
+        options.inMutable = true;
         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, size, options);
         if (bitmap.getWidth() > bitmap.getHeight()) {
             Matrix matrix = new Matrix();
