@@ -91,7 +91,7 @@ public class SlideshowWallpaperService extends WallpaperService {
         private class DrawRunner implements Runnable {
             @Override
             public void run() {
-                Debug.waitForDebugger();
+                //Debug.waitForDebugger();
                 SurfaceHolder holder = getSurfaceHolder();
                 Canvas canvas = null;
                 SharedPreferences preferences = getSharedPreferences();
@@ -120,11 +120,7 @@ public class SlideshowWallpaperService extends WallpaperService {
                 handler.removeCallbacks(drawRunner);
                 if (visible) {
 
-                    handler.postDelayed(drawRunner, getDelaySeconds() * 1000);
-
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putLong("last_update", System.currentTimeMillis());
-                    editor.apply();
+                    handler.postDelayed(drawRunner, calculateNextUpdateInSeconds() * 1000);
                 }
             }
 
@@ -146,6 +142,9 @@ public class SlideshowWallpaperService extends WallpaperService {
                         if (currentImageIndex >= uris.size()) {
                             currentImageIndex = 0;
                         }
+                        SharedPreferences.Editor editor = getSharedPreferences().edit();
+                        editor.putLong("last_update", System.currentTimeMillis());
+                        editor.apply();
                     }
                     result = uris.get(currentImageIndex);
                 }
