@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
 import android.service.wallpaper.WallpaperService;
@@ -22,6 +21,9 @@ import de.tobi.slideshowwallpaper.utilities.ImageLoader;
 
 
 public class SlideshowWallpaperService extends WallpaperService {
+    private static final String PREFERENCE_KEY_LAST_UPDATE = "last_update";
+    private static final String PREFERENCE_KEY_LAST_INDEX = "last_index";
+
     @Override
     public Engine onCreateEngine() {
         return new SlideshowWallpaperEngine();
@@ -40,7 +42,6 @@ public class SlideshowWallpaperService extends WallpaperService {
         private Paint clearPaint;
         private boolean visible;
         private ArrayList<String> uris;
-        private int currentImageIndex;
 
         public SlideshowWallpaperEngine() {
             handler = new Handler(Looper.getMainLooper());
@@ -137,13 +138,21 @@ public class SlideshowWallpaperService extends WallpaperService {
             private String getNextUri() {
                 String result = null;
                 if (!uris.isEmpty()) {
-                    if (calculateNextUpdateInSeconds() <= 0) {
-                        currentImageIndex++;
-                        if (currentImageIndex >= uris.size()) {
-                            currentImageIndex = 0;
+                    int currentImageIndex = getSharedPreferences().getInt(PREFERENCE_KEY_LAST_INDEX, 0);
+                    int nextUpdate = calculateNextUpdateInSeconds();
+                    if (nextUpdate <= 0) {
+                        int delay = getDelaySeconds();
+                        while (nextUpdate <= 0) {
+                            currentImageIndex++;
+                            nextUpdate += delay;
+
+                            if (currentImageIndex >= uris.size()) {
+                                currentImageIndex = 0;
+                            }
                         }
                         SharedPreferences.Editor editor = getSharedPreferences().edit();
-                        editor.putLong("last_update", System.currentTimeMillis());
+                        editor.putLong(PREFERENCE_KEY_LAST_UPDATE, System.currentTimeMillis());
+                        editor.putInt(PREFERENCE_KEY_LAST_INDEX, currentImageIndex);
                         editor.apply();
                     }
                     result = uris.get(currentImageIndex);
@@ -159,14 +168,14 @@ public class SlideshowWallpaperService extends WallpaperService {
                     seconds = Integer.parseInt(secondsString);
                 } catch (NumberFormatException e) {
                     Log.e(SlideshowWallpaperEngine.class.getSimpleName(), "Invalid number", e);
-                    Toast toast = Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG);
+                    Toast toast = Toast.makeText(getApplicationContext(), e.getClass().getSimpleName() + " " + e.getMessage(), Toast.LENGTH_LONG);
                     toast.show();
                 }
                 return seconds;
             }
 
             private int calculateNextUpdateInSeconds() {
-                long lastUpdate = getSharedPreferences().getLong("last_update", 0);
+                long lastUpdate = getSharedPreferences().getLong(PREFERENCE_KEY_LAST_UPDATE, 0);
                 int result = 0;
                 if (lastUpdate > 0) {
                     int delaySeconds = getDelaySeconds();
