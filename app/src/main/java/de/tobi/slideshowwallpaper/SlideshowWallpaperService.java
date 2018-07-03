@@ -15,6 +15,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Random;
 
 import de.tobi.slideshowwallpaper.utilities.ImageInfo;
 import de.tobi.slideshowwallpaper.utilities.ImageLoader;
@@ -143,12 +144,17 @@ public class SlideshowWallpaperService extends WallpaperService {
                     if (nextUpdate <= 0) {
                         int delay = getDelaySeconds();
                         while (nextUpdate <= 0) {
-                            currentImageIndex++;
-                            nextUpdate += delay;
+                            String ordering = getSharedPreferences().getString(getResources().getString(R.string.preference_ordering_key), getResources().getStringArray(R.array.ordering_values)[0]);
+                            if (ordering.equals("random")) {
+                                currentImageIndex = new Random().nextInt(uris.size());
+                            } else {
+                                currentImageIndex++;
 
-                            if (currentImageIndex >= uris.size()) {
-                                currentImageIndex = 0;
+                                if (currentImageIndex >= uris.size()) {
+                                    currentImageIndex = 0;
+                                }
                             }
+                            nextUpdate += delay;
                         }
                         SharedPreferences.Editor editor = getSharedPreferences().edit();
                         editor.putLong(PREFERENCE_KEY_LAST_UPDATE, System.currentTimeMillis());

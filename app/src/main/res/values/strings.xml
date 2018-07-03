@@ -11,10 +11,12 @@
     <string name="preference_seconds_key">seconds</string>
     <string name="preference_seconds">Seconds between images</string>
     <string-array name="orderings">
+        <item>Selection order</item>
         <item>Order by name</item>
         <item>Random</item>
     </string-array>
     <string-array name="ordering_values">
+        <item>selection</item>
         <item>name</item>
         <item>random</item>
     </string-array>
