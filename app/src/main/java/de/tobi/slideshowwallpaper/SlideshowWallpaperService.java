@@ -42,7 +42,12 @@ public class SlideshowWallpaperService extends WallpaperService {
 
         private Runnable drawRunner;
         private Paint clearPaint;
+        private Paint textPaint;
         private boolean visible;
+        private int textSize;
+
+        private int currentIndex;
+        private int listLength;
 
         public SlideshowWallpaperEngine() {
             handler = new Handler(Looper.getMainLooper());
@@ -50,8 +55,17 @@ public class SlideshowWallpaperService extends WallpaperService {
 
             clearPaint = new Paint();
             clearPaint.setAntiAlias(true);
-            clearPaint.setColor(Color.WHITE);
+            clearPaint.setColor(Color.BLACK);
             clearPaint.setStyle(Paint.Style.FILL);
+
+            textPaint = new Paint();
+            textPaint.setAntiAlias(true);
+            textPaint.setColor(Color.WHITE);
+            textPaint.setStyle(Paint.Style.FILL);
+
+            float scale = getResources().getDisplayMetrics().density;
+            textSize = (int) (10f * scale + 0.5f);
+            textPaint.setTextSize(textSize);
             handler.post(drawRunner);
         }
 
@@ -98,6 +112,8 @@ public class SlideshowWallpaperService extends WallpaperService {
                         Bitmap bitmap = getNextImage();
                         if (bitmap != null) {
                             canvas.drawBitmap(bitmap, ImageLoader.calculateMatrixScaleToFit(bitmap, width, height), null);
+                            String drawText = currentIndex + "/" + listLength;
+                            canvas.drawText(drawText, 0, drawText.length(), textSize + 10, textSize + 10, textPaint);
                         }
                     }
                 } catch (IOException e) {
@@ -142,7 +158,7 @@ public class SlideshowWallpaperService extends WallpaperService {
                 }
                 if (uris.length > 0) {
                     int currentImageIndex = getSharedPreferences().getInt(PREFERENCE_KEY_LAST_INDEX, 0);
-                    while (currentImageIndex > uris.length) {
+                    while (currentImageIndex >= uris.length) {
                         currentImageIndex -= uris.length;
                     }
                     int nextUpdate = calculateNextUpdateInSeconds();
@@ -163,6 +179,8 @@ public class SlideshowWallpaperService extends WallpaperService {
                         editor.apply();
                     }
                     result = uris[currentImageIndex];
+                    currentIndex = currentImageIndex;
+                    listLength = uris.length;
                 }
 
                 return result;
