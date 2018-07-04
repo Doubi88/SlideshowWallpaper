@@ -4,29 +4,27 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.OpenableColumns;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.util.Log;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import de.tobi.slideshowwallpaper.R;
+import de.tobi.slideshowwallpaper.SlideshowWallpaperService;
 import de.tobi.slideshowwallpaper.listeners.OnDeleteClickListener;
 import de.tobi.slideshowwallpaper.utilities.ImageInfo;
 import de.tobi.slideshowwallpaper.utilities.ImageLoader;
@@ -54,11 +52,13 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
             ClipData clipData = data.getClipData();
             if (clipData == null) {
                 Uri uri = data.getData();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    getContext().getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                if (uri != null) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                        getContext().getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    }
+                    uris.add(uri.toString());
+                    addPreferenceFromUri(uri.toString());
                 }
-                uris.add(uri.toString());
-                addPreferenceFromUri(uri.toString());
             } else {
 
                 for (int index = 0; index < clipData.getItemCount(); index++) {
@@ -112,8 +112,12 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
         Set<String> newValue = new HashSet<>(currentValue);
         newValue.addAll(values);
 
+        List<String> randomList = new ArrayList<>(newValue);
+        Collections.shuffle(randomList);
+
         SharedPreferences.Editor editor = prefs.edit();
         editor.putStringSet(getResources().getString(R.string.preference_pick_folder_key), newValue);
+        editor.putStringSet(SlideshowWallpaperService.PREFERENCE_KEY_RANDOM_LIST, new HashSet<String>(randomList));
         editor.apply();
     }
 

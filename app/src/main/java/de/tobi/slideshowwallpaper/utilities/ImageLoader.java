@@ -1,6 +1,5 @@
 package de.tobi.slideshowwallpaper.utilities;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -8,14 +7,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.provider.OpenableColumns;
-import android.util.Log;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-
-import de.tobi.slideshowwallpaper.R;
-import de.tobi.slideshowwallpaper.preferences.ImagesPreferenceFragment;
 
 public class ImageLoader {
 
@@ -73,7 +67,10 @@ public class ImageLoader {
         int imageWidth = options.outWidth;
         int imageHeight = options.outHeight;
         if (imageWidth > imageHeight) {
+            // swapping width and height is intended here
+            //noinspection SuspiciousNameCombination
             imageWidth = options.outHeight;
+            //noinspection SuspiciousNameCombination
             imageHeight = options.outWidth;
         }
         options.inSampleSize = calculateSampleSize(imageWidth, imageHeight, maxWidth, maxHeight);
