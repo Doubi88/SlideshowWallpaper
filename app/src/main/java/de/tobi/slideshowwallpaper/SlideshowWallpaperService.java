@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.service.wallpaper.WallpaperService;
@@ -120,7 +121,7 @@ public class SlideshowWallpaperService extends WallpaperService {
             private Bitmap getNextImage() throws IOException {
                 String uri = getNextUri();
                 if (uri != null) {
-                    ImageInfo info = ImageLoader.loadImage(uri, SlideshowWallpaperService.this, width, height);
+                    ImageInfo info = ImageLoader.loadImage(Uri.parse(uri), SlideshowWallpaperService.this, width, height);
                     return info.getImage();
                 } else {
                     return null;
@@ -131,11 +132,11 @@ public class SlideshowWallpaperService extends WallpaperService {
                 String result = null;
                 String ordering = getSharedPreferences().getString(getResources().getString(R.string.preference_ordering_key), "selection");
                 String[] uris = null;
-                if (ordering.equals("random")) {
+                if (ordering.equals("random") && getSharedPreferences().contains(PREFERENCE_KEY_RANDOM_LIST)) {
                     Set<String> urisSet = getSharedPreferences().getStringSet(PREFERENCE_KEY_RANDOM_LIST, new HashSet<String>());
                     uris = urisSet.toArray(new String[urisSet.size()]);
                 }
-                if (uris == null) {
+                if (uris == null || uris.length == 0) {
                     Set<String> urisSet = getSharedPreferences().getStringSet(getResources().getString(R.string.preference_pick_folder_key), new HashSet<String>());
                     uris = urisSet.toArray(new String[urisSet.size()]);
                 }

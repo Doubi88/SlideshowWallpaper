@@ -2,7 +2,6 @@ package de.tobi.slideshowwallpaper.preferences;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceViewHolder;
 import android.view.View;
@@ -15,7 +14,6 @@ import de.tobi.slideshowwallpaper.listeners.OnDeleteClickListener;
 
 public class ImagePreference extends Preference {
 
-    private Drawable image;
     private Bitmap imageBitmap;
 
     private ArrayList<OnDeleteClickListener> deleteClickListeners;
@@ -57,16 +55,9 @@ public class ImagePreference extends Preference {
     private void updateImage(PreferenceViewHolder holder) {
         ImageView imageView = (ImageView)holder.findViewById(R.id.image_preference_view);
 
-        if (image != null) {
-            imageView.setImageDrawable(image);
-        } else if (imageBitmap != null) {
+        if (imageBitmap != null) {
             imageView.setImageBitmap(imageBitmap);
         }
-    }
-
-    public void setImage(Drawable image) {
-        this.image = image;
-
     }
 
     public void setImageBitmap(Bitmap bitmap) {

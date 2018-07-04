@@ -16,11 +16,9 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 import de.tobi.slideshowwallpaper.R;
@@ -93,9 +91,8 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
 
         preference.setOnDeleteClickListener(new ImagePreferenceDeleteClickListener(uri));
 
-        ImageInfo imageInfo = null;
         try {
-            imageInfo = ImageLoader.loadImage(uri, getContext(), 100, 100);
+            ImageInfo imageInfo = ImageLoader.loadImage(Uri.parse(uri), getContext(), 100, 100);
             preference.setTitle(imageInfo.getName());
             preference.setImageBitmap(imageInfo.getImage());
         } catch (IOException e) {
@@ -117,7 +114,7 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
 
         SharedPreferences.Editor editor = prefs.edit();
         editor.putStringSet(getResources().getString(R.string.preference_pick_folder_key), newValue);
-        editor.putStringSet(SlideshowWallpaperService.PREFERENCE_KEY_RANDOM_LIST, new HashSet<String>(randomList));
+        editor.putStringSet(SlideshowWallpaperService.PREFERENCE_KEY_RANDOM_LIST, new HashSet<>(randomList));
         editor.apply();
     }
 
@@ -208,7 +205,7 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
             preference.setOnDeleteClickListener(new ImagePreferenceDeleteClickListener(uri));
 
             try {
-                ImageInfo info = ImageLoader.loadImage(uri, getContext(), 100, 100);
+                ImageInfo info = ImageLoader.loadImage(Uri.parse(uri), getContext(), 100, 100);
                 preference.setTitle(info.getName());
                 preference.setImageBitmap(info.getImage());
             } catch (IOException e) {

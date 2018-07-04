@@ -7,13 +7,27 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.provider.OpenableColumns;
+import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 public class ImageLoader {
 
-    public static ImageInfo loadImage(String uri, Context context, int maxWidth, int maxHeight) throws IOException {
+    /**
+     * Loads the {@link Bitmap} from the given file Uri. Turns it by 90 degrees, if it is wider than high (horizontal)
+     * The resulting image will have either {@code desiredHeight} as height or {@code desiredWidth} as width
+     *
+     * @param uri The {@link Uri} to load the image from
+     * @param context The current {@link Context}
+     * @param desiredWidth The width of the element displaying the image
+     * @param desiredHeight The height of the element displaying the image
+     * @return A {@link ImageInfo} containing the info of the image. {@link ImageInfo#getImage()} may be {@code null}, if reading the file fails.
+     * @throws IOException If thrown when trying to read the file
+     */
+    @NonNull
+    public static ImageInfo loadImage(@NonNull Uri uri, @NonNull Context context, int desiredWidth, int desiredHeight) throws IOException {
         Bitmap bitmap = null;
         String name = null;
         int size = 0;
@@ -21,20 +35,27 @@ public class ImageLoader {
         Cursor fileCursor = null;
         InputStream in = null;
         try  {
-            fileCursor = context.getContentResolver().query(Uri.parse(uri), null, null, null, null);
-            int nameIndex = fileCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-            fileCursor.moveToFirst();
-            name = fileCursor.getString(nameIndex);
+            fileCursor = context.getContentResolver().query(uri, null, null, null, null);
+            if (fileCursor != null) {
+                int nameIndex = fileCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                fileCursor.moveToFirst();
+                name = fileCursor.getString(nameIndex);
 
-            int sizeIndex = fileCursor.getColumnIndex(OpenableColumns.SIZE);
-            fileCursor.moveToFirst();
-            size = Integer.parseInt(fileCursor.getString(sizeIndex));
+                int sizeIndex = fileCursor.getColumnIndex(OpenableColumns.SIZE);
+                fileCursor.moveToFirst();
+                size = Integer.parseInt(fileCursor.getString(sizeIndex));
 
 
-            in = context.getContentResolver().openInputStream(Uri.parse(uri));
-            if (in != null) {
-                byte[] bytes = readStream(in, size);
-                bitmap = readBitmap(bytes, maxWidth, maxHeight);
+                in = context.getContentResolver().openInputStream(uri);
+                if (in != null) {
+                    byte[] bytes = readStream(in, size);
+                    bitmap = readBitmap(bytes, desiredWidth, desiredHeight);
+                }
+            } else {
+                Log.e(ImageLoader.class.getSimpleName(), "Could not load file " + uri.toString());
+                name = "Error loading image";
+                size = 0;
+                bitmap = null;
             }
         } finally {
             if (in != null) {
@@ -52,7 +73,8 @@ public class ImageLoader {
         return new ImageInfo(name, size, bitmap);
     }
 
-    private static byte[] readStream(InputStream in, int size) throws IOException {
+    @NonNull
+    private static byte[] readStream(@NonNull InputStream in, int size) throws IOException {
         byte[] bytes = new byte[size];
         in.read(bytes);
         return bytes;
