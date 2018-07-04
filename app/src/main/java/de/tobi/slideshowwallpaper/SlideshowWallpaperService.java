@@ -142,6 +142,9 @@ public class SlideshowWallpaperService extends WallpaperService {
                 }
                 if (uris.length > 0) {
                     int currentImageIndex = getSharedPreferences().getInt(PREFERENCE_KEY_LAST_INDEX, 0);
+                    while (currentImageIndex > uris.length) {
+                        currentImageIndex -= uris.length;
+                    }
                     int nextUpdate = calculateNextUpdateInSeconds();
                     if (nextUpdate <= 0) {
                         int delay = getDelaySeconds();
