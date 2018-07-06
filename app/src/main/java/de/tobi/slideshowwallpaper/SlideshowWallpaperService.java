@@ -15,17 +15,15 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import de.tobi.slideshowwallpaper.preferences.SharedPreferencesManager;
 import de.tobi.slideshowwallpaper.utilities.ImageInfo;
 import de.tobi.slideshowwallpaper.utilities.ImageLoader;
 
 
 public class SlideshowWallpaperService extends WallpaperService {
-    public static final String PREFERENCE_KEY_ALPHABETICAL_LIST = "alphabetical_list";
-    public static final String PREFERENCE_KEY_RANDOM_LIST = "random_list";
-    private static final String PREFERENCE_KEY_LAST_UPDATE = "last_update";
-    private static final String PREFERENCE_KEY_LAST_INDEX = "last_index";
 
     @Override
     public Engine onCreateEngine() {
@@ -49,6 +47,8 @@ public class SlideshowWallpaperService extends WallpaperService {
         private int currentIndex;
         private int listLength;
 
+        private SharedPreferencesManager manager;
+
         public SlideshowWallpaperEngine() {
             handler = new Handler(Looper.getMainLooper());
             drawRunner = new DrawRunner();
@@ -67,6 +67,8 @@ public class SlideshowWallpaperService extends WallpaperService {
             textSize = (int) (10f * scale + 0.5f);
             textPaint.setTextSize(textSize);
             handler.post(drawRunner);
+
+            manager = new SharedPreferencesManager(getSharedPreferences());
         }
 
         @Override
@@ -112,7 +114,7 @@ public class SlideshowWallpaperService extends WallpaperService {
                         Bitmap bitmap = getNextImage();
                         if (bitmap != null) {
                             canvas.drawBitmap(bitmap, ImageLoader.calculateMatrixScaleToFit(bitmap, width, height), null);
-                            String drawText = currentIndex + "/" + listLength;
+                            String drawText = (currentIndex + 1) + "/" + listLength;
                             canvas.drawText(drawText, 0, drawText.length(), textSize + 10, textSize + 10, textPaint);
                         }
                     }
@@ -135,52 +137,40 @@ public class SlideshowWallpaperService extends WallpaperService {
             }
 
             private Bitmap getNextImage() throws IOException {
-                String uri = getNextUri();
+                Uri uri = getNextUri();
                 if (uri != null) {
-                    ImageInfo info = ImageLoader.loadImage(Uri.parse(uri), SlideshowWallpaperService.this, width, height);
+                    ImageInfo info = ImageLoader.loadImage(uri, SlideshowWallpaperService.this, width, height);
                     return info.getImage();
                 } else {
                     return null;
                 }
             }
 
-            private String getNextUri() {
-                String result = null;
-                String ordering = getSharedPreferences().getString(getResources().getString(R.string.preference_ordering_key), "selection");
-                String[] uris = null;
-                if (ordering.equals("random") && getSharedPreferences().contains(PREFERENCE_KEY_RANDOM_LIST)) {
-                    Set<String> urisSet = getSharedPreferences().getStringSet(PREFERENCE_KEY_RANDOM_LIST, new HashSet<String>());
-                    uris = urisSet.toArray(new String[urisSet.size()]);
-                }
-                if (uris == null || uris.length == 0) {
-                    Set<String> urisSet = getSharedPreferences().getStringSet(getResources().getString(R.string.preference_pick_folder_key), new HashSet<String>());
-                    uris = urisSet.toArray(new String[urisSet.size()]);
-                }
-                if (uris.length > 0) {
-                    int currentImageIndex = getSharedPreferences().getInt(PREFERENCE_KEY_LAST_INDEX, 0);
-                    while (currentImageIndex >= uris.length) {
-                        currentImageIndex -= uris.length;
-                    }
+            private Uri getNextUri() {
+                Uri result = null;
+                SharedPreferencesManager.Ordering ordering = manager.getCurrentOrdering(getResources());
+                List<Uri> uris = manager.getImageUris(ordering);
+
+                if (uris.size() > 0) {
+                    int currentImageIndex = manager.getCurrentIndex();
                     int nextUpdate = calculateNextUpdateInSeconds();
                     if (nextUpdate <= 0) {
                         int delay = getDelaySeconds();
                         while (nextUpdate <= 0) {
                             currentImageIndex++;
 
-                            if (currentImageIndex >= uris.length) {
+                            if (currentImageIndex >= uris.size()) {
                                 currentImageIndex = 0;
                             }
 
                             nextUpdate += delay;
                         }
-                        SharedPreferences.Editor editor = getSharedPreferences().edit();
-                        editor.putLong(PREFERENCE_KEY_LAST_UPDATE, System.currentTimeMillis());
-                        editor.putInt(PREFERENCE_KEY_LAST_INDEX, currentImageIndex);
-                        editor.apply();
+                        manager.setCurrentIndex(currentImageIndex);
+                        manager.setLastUpdate(System.currentTimeMillis());
                     }
-                    result = uris[currentImageIndex];
+                    result = uris.get(currentImageIndex);
                     currentIndex = currentImageIndex;
-                    listLength = uris.length;
+                    listLength = uris.size();
                 }
 
                 return result;
@@ -189,8 +179,7 @@ public class SlideshowWallpaperService extends WallpaperService {
             private int getDelaySeconds() {
                 int seconds = 5;
                 try {
-                    String secondsString = getSharedPreferences().getString(getResources().getString(R.string.preference_seconds_key), "5");
-                    seconds = Integer.parseInt(secondsString);
+                    seconds = manager.getSecondsBetweenImages();
                 } catch (NumberFormatException e) {
                     Log.e(SlideshowWallpaperEngine.class.getSimpleName(), "Invalid number", e);
                     Toast toast = Toast.makeText(getApplicationContext(), e.getClass().getSimpleName() + " " + e.getMessage(), Toast.LENGTH_LONG);
@@ -200,7 +189,7 @@ public class SlideshowWallpaperService extends WallpaperService {
             }
 
             private int calculateNextUpdateInSeconds() {
-                long lastUpdate = getSharedPreferences().getLong(PREFERENCE_KEY_LAST_UPDATE, 0);
+                long lastUpdate = manager.getLastUpdate();
                 int result = 0;
                 if (lastUpdate > 0) {
                     int delaySeconds = getDelaySeconds();

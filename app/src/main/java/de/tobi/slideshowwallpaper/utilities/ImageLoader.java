@@ -88,7 +88,7 @@ public class ImageLoader {
         BitmapFactory.decodeByteArray(bytes,0, size, options);
         int imageWidth = options.outWidth;
         int imageHeight = options.outHeight;
-        if (imageWidth > imageHeight) {
+        if ((imageWidth > imageHeight && maxHeight > maxWidth) || (imageHeight > imageWidth) && (maxWidth > maxHeight)) {
             // swapping width and height is intended here
             //noinspection SuspiciousNameCombination
             imageWidth = options.outHeight;
@@ -99,7 +99,7 @@ public class ImageLoader {
         options.inJustDecodeBounds = false;
         options.inMutable = true;
         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, size, options);
-        if (bitmap.getWidth() > bitmap.getHeight()) {
+        if ((bitmap.getWidth() > bitmap.getHeight() && maxHeight > maxWidth) || (bitmap.getHeight() > bitmap.getWidth() && maxWidth > maxHeight)) {
             Matrix matrix = new Matrix();
             matrix.setRotate(90);
             bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);

@@ -31,12 +31,14 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
 
     private static final int REQUEST_CODE_FILE = 1;
 
+    private SharedPreferencesManager manager;
     private Preference addPreference;
     private Set<ImagePreference> imagePreferences;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.images_preferences);
+        manager = new SharedPreferencesManager(getPreferenceManager().getSharedPreferences());
         initList();
     }
 
@@ -46,7 +48,6 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
 
         if (requestCode == REQUEST_CODE_FILE && resultCode == Activity.RESULT_OK) {
 
-            Set<String> uris = new HashSet<>();
             ClipData clipData = data.getClipData();
             if (clipData == null) {
                 Uri uri = data.getData();
@@ -54,8 +55,8 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                         getContext().getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     }
-                    uris.add(uri.toString());
-                    addPreferenceFromUri(uri.toString());
+                    manager.addUri(uri);
+                    addPreferenceFromUri(uri);
                 }
             } else {
 
@@ -64,11 +65,10 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                         getContext().getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     }
-                    uris.add(uri.toString());
-                    addPreferenceFromUri(uri.toString());
+                    manager.addUri(uri);
+                    addPreferenceFromUri(uri);
                 }
             }
-            saveFilesPreference(uris);
             updateDisplay();
         }
     }
@@ -81,18 +81,18 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
         progressBarPreference.setKey("progress_bar");
         getPreferenceScreen().addPreference(progressBarPreference);
 
-        Set<String> uris = getPreferenceManager().getSharedPreferences().getStringSet(getResources().getString(R.string.preference_pick_folder_key), new HashSet<String>());
+        List<Uri> uris = manager.getImageUris(manager.getCurrentOrdering(getResources()));
         AsyncTaskLoadImages task = new AsyncTaskLoadImages(progressBarPreference);
-        task.execute(uris.toArray(new String[uris.size()]));
+        task.execute(uris.toArray(new Uri[uris.size()]));
     }
 
-    private void addPreferenceFromUri(String uri) {
+    private void addPreferenceFromUri(Uri uri) {
         ImagePreference preference = new ImagePreference(getContext());
 
         preference.setOnDeleteClickListener(new ImagePreferenceDeleteClickListener(uri));
 
         try {
-            ImageInfo imageInfo = ImageLoader.loadImage(Uri.parse(uri), getContext(), 100, 100);
+            ImageInfo imageInfo = ImageLoader.loadImage(uri, getContext(), 100, 100);
             preference.setTitle(imageInfo.getName());
             preference.setImageBitmap(imageInfo.getImage());
         } catch (IOException e) {
@@ -101,21 +101,6 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
             preference.setSummary(e.getClass().getName() + ": " + e.getLocalizedMessage());
         }
         imagePreferences.add(preference);
-    }
-
-    private void saveFilesPreference(Set<String> values) {
-        SharedPreferences prefs = getPreferenceManager().getSharedPreferences();
-        Set<String> currentValue = prefs.getStringSet(getResources().getString(R.string.preference_pick_folder_key), new HashSet<String>());
-        Set<String> newValue = new HashSet<>(currentValue);
-        newValue.addAll(values);
-
-        List<String> randomList = new ArrayList<>(newValue);
-        Collections.shuffle(randomList);
-
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putStringSet(getResources().getString(R.string.preference_pick_folder_key), newValue);
-        editor.putStringSet(SlideshowWallpaperService.PREFERENCE_KEY_RANDOM_LIST, new HashSet<>(randomList));
-        editor.apply();
     }
 
     private void updateDisplay() {
@@ -152,36 +137,25 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
 
     private class ImagePreferenceDeleteClickListener implements OnDeleteClickListener {
 
-        private String uri;
+        private Uri uri;
 
-        public ImagePreferenceDeleteClickListener(String uri) {
+        public ImagePreferenceDeleteClickListener(Uri uri) {
             this.uri = uri;
         }
 
         @Override
         public void onDeleteButtonClicked(ImagePreference view) {
-            Set<String> uris = getPreferenceManager().getSharedPreferences().getStringSet(getResources().getString(R.string.preference_pick_folder_key), new HashSet<String>());
-
-            HashSet<String> newSet = new HashSet<>();
-            for (String uri : uris) {
-                if (!uri.equals(this.uri)) {
-                    newSet.add(uri);
-                }
-            }
-
-            SharedPreferences.Editor editor = getPreferenceManager().getSharedPreferences().edit();
-            editor.putStringSet(getResources().getString(R.string.preference_pick_folder_key), newSet);
-            editor.apply();
+            manager.removeUri(uri);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                getContext().getContentResolver().releasePersistableUriPermission(Uri.parse(uri), Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                getContext().getContentResolver().releasePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
             }
             imagePreferences.remove(view);
             updateDisplay();
         }
     }
 
-    private class AsyncTaskLoadImages extends AsyncTask<String, BigDecimal, List<ImagePreference>> {
+    private class AsyncTaskLoadImages extends AsyncTask<Uri, BigDecimal, List<ImagePreference>> {
 
         private Preference progressBarPreference;
 
@@ -190,22 +164,22 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
         }
 
         @Override
-        protected List<ImagePreference> doInBackground(String... uris) {
+        protected List<ImagePreference> doInBackground(Uri... uris) {
             List<ImagePreference> bitmaps = new ArrayList<>(uris.length);
             BigDecimal listSize = BigDecimal.valueOf(uris.length);
-            for (String uri : uris) {
+            for (Uri uri : uris) {
                 bitmaps.add(loadBitmap(uri));
                 publishProgress(BigDecimal.valueOf(bitmaps.size()).divide(listSize, 2, RoundingMode.HALF_UP));
             }
             return bitmaps;
         }
 
-        private ImagePreference loadBitmap(String uri) {
+        private ImagePreference loadBitmap(Uri uri) {
             ImagePreference preference = new ImagePreference(getContext());
             preference.setOnDeleteClickListener(new ImagePreferenceDeleteClickListener(uri));
 
             try {
-                ImageInfo info = ImageLoader.loadImage(Uri.parse(uri), getContext(), 100, 100);
+                ImageInfo info = ImageLoader.loadImage(uri, getContext(), 100, 100);
                 preference.setTitle(info.getName());
                 preference.setImageBitmap(info.getImage());
             } catch (IOException e) {
