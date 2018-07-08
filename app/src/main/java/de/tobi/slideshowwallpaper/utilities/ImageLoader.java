@@ -70,7 +70,7 @@ public class ImageLoader {
             }
         }
 
-        return new ImageInfo(name, size, bitmap);
+        return new ImageInfo(uri, name, size, bitmap);
     }
 
     @NonNull

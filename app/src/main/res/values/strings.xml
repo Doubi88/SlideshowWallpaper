@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Slideshow Wallpaper</string>
-
-    <string name="preference_pick_folder">Choose Images to display</string>
-    <string name="preference_pick_folder_key">pick_images</string>
+    <string name="preference_edit_image_list">Edit image list</string>
+    <string name="preference_add_images_key">pick_images</string>
+    <string name="preference_add_images">Add images</string>
     <string name="preference_ordering">Ordering</string>
     <string name="preference_ordering_key">ordering</string>
     <string name="error_reading_file">Error reading file</string>
@@ -10,6 +10,7 @@
     <string name="delete_button_description">Delete</string>
     <string name="preference_seconds_key">seconds</string>
     <string name="preference_seconds">Seconds between images</string>
+    <string name="images_selected">images selected</string>
     <string-array name="orderings">
         <item>Selection order</item>
         <item>Order by name</item>
