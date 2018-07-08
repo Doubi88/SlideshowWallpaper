@@ -27,7 +27,7 @@ public class ImageLoader {
      * @throws IOException If thrown when trying to read the file
      */
     @NonNull
-    public static ImageInfo loadImage(@NonNull Uri uri, @NonNull Context context, int desiredWidth, int desiredHeight) throws IOException {
+    public static ImageInfo loadImage(@NonNull Uri uri, @NonNull Context context, int desiredWidth, int desiredHeight, boolean considerMemory) throws IOException {
         Bitmap bitmap = null;
         String name = null;
         int size = 0;
@@ -45,11 +45,10 @@ public class ImageLoader {
                 fileCursor.moveToFirst();
                 size = Integer.parseInt(fileCursor.getString(sizeIndex));
 
-
                 in = context.getContentResolver().openInputStream(uri);
                 if (in != null) {
                     byte[] bytes = readStream(in, size);
-                    bitmap = readBitmap(bytes, desiredWidth, desiredHeight);
+                    bitmap = readBitmap(bytes, desiredWidth, desiredHeight, considerMemory);
                 }
             } else {
                 Log.e(ImageLoader.class.getSimpleName(), "Could not load file " + uri.toString());
@@ -80,7 +79,7 @@ public class ImageLoader {
         return bytes;
     }
 
-    private static Bitmap readBitmap(byte[] bytes, int maxWidth, int maxHeight) {
+    private static Bitmap readBitmap(byte[] bytes, int maxWidth, int maxHeight, boolean considerMemory) {
         int size = bytes.length;
 
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -99,10 +98,14 @@ public class ImageLoader {
         options.inJustDecodeBounds = false;
         options.inMutable = true;
         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, size, options);
-        if ((bitmap.getWidth() > bitmap.getHeight() && maxHeight > maxWidth) || (bitmap.getHeight() > bitmap.getWidth() && maxWidth > maxHeight)) {
-            Matrix matrix = new Matrix();
-            matrix.setRotate(90);
-            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        if (considerMemory && Runtime.getRuntime().freeMemory() <= (bitmap.getByteCount() * 2)) {
+            bitmap = null;
+        } else {
+            if ((bitmap.getWidth() > bitmap.getHeight() && maxHeight > maxWidth) || (bitmap.getHeight() > bitmap.getWidth() && maxWidth > maxHeight)) {
+                Matrix matrix = new Matrix();
+                matrix.setRotate(90);
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            }
         }
         return bitmap;
     }

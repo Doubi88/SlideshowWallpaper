@@ -62,7 +62,8 @@ public class AsyncTaskLoadImages extends AsyncTask<Uri, BigDecimal, List<ImageIn
         List<ImageInfo> bitmaps = new ArrayList<>(uris.length);
         BigDecimal listSize = BigDecimal.valueOf(uris.length);
         for (Uri uri : uris) {
-            bitmaps.add(loadBitmap(uri));
+            ImageInfo info = loadBitmap(uri);
+            bitmaps.add(info);
             publishProgress(BigDecimal.valueOf(bitmaps.size()).divide(listSize, 2, RoundingMode.HALF_UP), BigDecimal.valueOf(bitmaps.size()));
         }
         return bitmaps;
@@ -72,7 +73,7 @@ public class AsyncTaskLoadImages extends AsyncTask<Uri, BigDecimal, List<ImageIn
         ImageInfo info = null;
 
         try {
-            info = ImageLoader.loadImage(uri, context, desiredWidth, desiredHeight);
+            info = ImageLoader.loadImage(uri, context, desiredWidth, desiredHeight, true);
         } catch (IOException e) {
             Log.e(ImagesPreferenceFragment.class.getSimpleName(), "Error opening file", e);
             info = new ImageInfo(uri, context.getResources().getString(R.string.error_reading_file) + ": " + e.getClass().getSimpleName() + " " + e.getMessage(), 0, null);
