@@ -3,29 +3,22 @@ package de.tobi.slideshowwallpaper.preferences;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
-import android.util.Log;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import de.tobi.slideshowwallpaper.R;
-import de.tobi.slideshowwallpaper.SlideshowWallpaperService;
 import de.tobi.slideshowwallpaper.listeners.OnDeleteClickListener;
+import de.tobi.slideshowwallpaper.utilities.AsyncTaskLoadImages;
 import de.tobi.slideshowwallpaper.utilities.ImageInfo;
-import de.tobi.slideshowwallpaper.utilities.ImageLoader;
+import de.tobi.slideshowwallpaper.utilities.ProgressListener;
 
 public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
 
@@ -33,21 +26,26 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
 
     private SharedPreferencesManager manager;
     private Preference addPreference;
-    private Set<ImagePreference> imagePreferences;
+
+    private LinkedList<ImagePreference> imagePreferences;
+
+    public ImagesPreferenceFragment() {
+        imagePreferences = new LinkedList<>();
+    }
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.images_preferences);
         manager = new SharedPreferencesManager(getPreferenceManager().getSharedPreferences());
-        initList();
+        loadImages(manager.getImageUris(manager.getCurrentOrdering(getResources())));
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        List<Uri> uris = new LinkedList<>();
         if (requestCode == REQUEST_CODE_FILE && resultCode == Activity.RESULT_OK) {
-
             ClipData clipData = data.getClipData();
             if (clipData == null) {
                 Uri uri = data.getData();
@@ -56,58 +54,76 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
                         getContext().getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     }
                     manager.addUri(uri);
-                    addPreferenceFromUri(uri);
+                    uris.add(uri);
                 }
             } else {
-
                 for (int index = 0; index < clipData.getItemCount(); index++) {
                     Uri uri = clipData.getItemAt(index).getUri();
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                         getContext().getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     }
                     manager.addUri(uri);
-                    addPreferenceFromUri(uri);
+                    uris.add(uri);
                 }
             }
-            updateDisplay();
+
+            loadImages(uris);
         }
     }
 
-    private void initList() {
-        //Debug.waitForDebugger();
-
-        Preference progressBarPreference = new Preference(getContext());
+    private void loadImages(List<Uri> uris) {
+        final Preference progressBarPreference = new Preference(getContext());
         progressBarPreference.setWidgetLayoutResource(R.layout.progress_bar_preference);
         progressBarPreference.setKey("progress_bar");
+        progressBarPreference.setOrder(0);
         getPreferenceScreen().addPreference(progressBarPreference);
 
-        List<Uri> uris = manager.getImageUris(manager.getCurrentOrdering(getResources()));
-        AsyncTaskLoadImages task = new AsyncTaskLoadImages(progressBarPreference);
+        AsyncTaskLoadImages task = new AsyncTaskLoadImages(getContext(), 100, 100);
+        task.addProgressListener(new ProgressListener<Uri, BigDecimal, List<ImageInfo>>() {
+            @Override
+            public void onProgressChanged(AsyncTask<Uri, BigDecimal, List<ImageInfo>> task, BigDecimal current, BigDecimal max) {
+
+            }
+
+            @Override
+            public void onTaskFinished(AsyncTask<Uri, BigDecimal, List<ImageInfo>> task, List<ImageInfo> imageInfos) {
+                getPreferenceScreen().removePreference(progressBarPreference);
+                if (getContext() != null) {
+                    createUI(imageInfos);
+                }
+            }
+        });
         task.execute(uris.toArray(new Uri[uris.size()]));
     }
 
-    private void addPreferenceFromUri(Uri uri) {
-        ImagePreference preference = new ImagePreference(getContext());
+    private void createUI(List<ImageInfo> imagesToAdd) {
+        getPreferenceScreen().removeAll();
 
-        preference.setOnDeleteClickListener(new ImagePreferenceDeleteClickListener(uri));
+        getPreferenceScreen().addPreference(getAddPreference());
 
-        try {
-            ImageInfo imageInfo = ImageLoader.loadImage(uri, getContext(), 100, 100);
-            preference.setTitle(imageInfo.getName());
-            preference.setImageBitmap(imageInfo.getImage());
-        } catch (IOException e) {
-            Log.e(ImagesPreferenceFragment.class.getSimpleName(), "Error opening file", e);
-            preference.setTitle(R.string.error_reading_file);
-            preference.setSummary(e.getClass().getName() + ": " + e.getLocalizedMessage());
+        for (ImageInfo info : imagesToAdd) {
+            addPreferenceFromImageInfo(info);
         }
-        imagePreferences.add(preference);
+        for (ImagePreference imagePreference : imagePreferences) {
+            getPreferenceScreen().addPreference(imagePreference);
+        }
     }
 
-    private void updateDisplay() {
-        getPreferenceScreen().removeAll();
+    private void addPreferenceFromImageInfo(ImageInfo info) {
+        ImagePreference preference = new ImagePreference(getContext());
+        preference.setOnDeleteClickListener(new ImagePreferenceDeleteClickListener(info.getUri()));
+        preference.setTitle(info.getName());
+        if (info.getImage() != null) {
+            preference.setImageBitmap(info.getImage());
+        }
+        imagePreferences.add(preference);
+        getPreferenceScreen().addPreference(preference);
+    }
+
+    private Preference getAddPreference() {
         if (addPreference == null) {
             addPreference = new Preference(getContext());
-            addPreference.setTitle(getResources().getString(R.string.preference_pick_folder));
+            addPreference.setTitle(getResources().getString(R.string.preference_add_images));
             addPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
@@ -128,11 +144,7 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
                 }
             });
         }
-        getPreferenceScreen().addPreference(addPreference);
-
-        for (ImagePreference imagePreference : imagePreferences) {
-            getPreferenceScreen().addPreference(imagePreference);
-        }
+        return addPreference;
     }
 
     private class ImagePreferenceDeleteClickListener implements OnDeleteClickListener {
@@ -144,64 +156,15 @@ public class ImagesPreferenceFragment extends PreferenceFragmentCompat {
         }
 
         @Override
-        public void onDeleteButtonClicked(ImagePreference view) {
+        public void onDeleteButtonClicked(ImagePreference preference) {
             manager.removeUri(uri);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 getContext().getContentResolver().releasePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
             }
-            imagePreferences.remove(view);
-            updateDisplay();
+            imagePreferences.remove(preference);
+            getPreferenceScreen().removePreference(preference);
         }
     }
 
-    private class AsyncTaskLoadImages extends AsyncTask<Uri, BigDecimal, List<ImagePreference>> {
-
-        private Preference progressBarPreference;
-
-        public AsyncTaskLoadImages(Preference progressBarPreference) {
-            this.progressBarPreference = progressBarPreference;
-        }
-
-        @Override
-        protected List<ImagePreference> doInBackground(Uri... uris) {
-            List<ImagePreference> bitmaps = new ArrayList<>(uris.length);
-            BigDecimal listSize = BigDecimal.valueOf(uris.length);
-            for (Uri uri : uris) {
-                bitmaps.add(loadBitmap(uri));
-                publishProgress(BigDecimal.valueOf(bitmaps.size()).divide(listSize, 2, RoundingMode.HALF_UP));
-            }
-            return bitmaps;
-        }
-
-        private ImagePreference loadBitmap(Uri uri) {
-            ImagePreference preference = new ImagePreference(getContext());
-            preference.setOnDeleteClickListener(new ImagePreferenceDeleteClickListener(uri));
-
-            try {
-                ImageInfo info = ImageLoader.loadImage(uri, getContext(), 100, 100);
-                preference.setTitle(info.getName());
-                preference.setImageBitmap(info.getImage());
-            } catch (IOException e) {
-                Log.e(ImagesPreferenceFragment.class.getSimpleName(), "Error opening file", e);
-                preference.setTitle(R.string.error_reading_file);
-                preference.setSummary(e.getClass().getName() + ": " + e.getLocalizedMessage());
-            }
-
-
-            return preference;
-        }
-
-        @Override
-        protected void onProgressUpdate(BigDecimal... values) {
-
-        }
-
-        @Override
-        protected void onPostExecute(List<ImagePreference> imagePreferences) {
-            ImagesPreferenceFragment.this.imagePreferences = new HashSet<>(imagePreferences);
-            updateDisplay();
-            getPreferenceScreen().removePreference(progressBarPreference);
-        }
-    }
 }
