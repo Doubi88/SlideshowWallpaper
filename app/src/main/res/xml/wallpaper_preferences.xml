@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <Preference android:title="@string/preference_pick_folder"
-        android:key="@string/preference_pick_folder_key"
-        />
+    <Preference android:title="@string/preference_edit_image_list"
+        android:key="@string/preference_add_images_key">
+        <intent android:targetPackage="de.tobi.slideshowwallpaper"
+            android:targetClass="de.tobi.slideshowwallpaper.preferences.ImagePreferencesActivity" />
+    </Preference>
     <ListPreference android:key="@string/preference_ordering_key"
         android:title="@string/preference_ordering"
         android:entries="@array/orderings"
