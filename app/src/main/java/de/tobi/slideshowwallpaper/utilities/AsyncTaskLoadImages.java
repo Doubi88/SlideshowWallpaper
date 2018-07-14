@@ -1,25 +1,18 @@
 package de.tobi.slideshowwallpaper.utilities;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.RecoverySystem;
-import android.support.v7.preference.Preference;
 import android.util.Log;
-import android.widget.ProgressBar;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.tobi.slideshowwallpaper.R;
-import de.tobi.slideshowwallpaper.preferences.ImagePreference;
-import de.tobi.slideshowwallpaper.preferences.ImagesPreferenceFragment;
 
 public class AsyncTaskLoadImages extends AsyncTask<Uri, BigDecimal, List<ImageInfo>> {
 
@@ -75,7 +68,7 @@ public class AsyncTaskLoadImages extends AsyncTask<Uri, BigDecimal, List<ImageIn
         try {
             info = ImageLoader.loadImage(uri, context, desiredWidth, desiredHeight, true);
         } catch (IOException e) {
-            Log.e(ImagesPreferenceFragment.class.getSimpleName(), "Error opening file", e);
+            Log.e(AsyncTaskLoadImages.class.getSimpleName(), "Error opening file", e);
             info = new ImageInfo(uri, context.getResources().getString(R.string.error_reading_file) + ": " + e.getClass().getSimpleName() + " " + e.getMessage(), 0, null);
         }
 

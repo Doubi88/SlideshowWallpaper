@@ -11,6 +11,7 @@
     <string name="preference_seconds_key">seconds</string>
     <string name="preference_seconds">Seconds between images</string>
     <string name="images_selected">images selected</string>
+    <string name="image_view_description">Image</string>
     <string-array name="orderings">
         <item>Selection order</item>
         <item>Order by name</item>

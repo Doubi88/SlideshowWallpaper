@@ -32,4 +32,22 @@ public class ImageInfo {
     public Bitmap getImage() {
         return image;
     }
+
+    public void setImage(Bitmap image) {
+        this.image = image;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        boolean result = false;
+        if ((obj != null) && (obj instanceof ImageInfo)) {
+            result = ((obj == this) || (((ImageInfo) obj).getUri().equals(getUri())));
+        }
+        return result;
+    }
+
+    @Override
+    public int hashCode() {
+        return getUri().hashCode();
+    }
 }
