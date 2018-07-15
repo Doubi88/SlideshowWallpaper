@@ -12,7 +12,6 @@ public class WallpaperPreferencesActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Debug.waitForDebugger();
         setContentView(R.layout.activity_wallpaper_preferences);
         getSupportFragmentManager().beginTransaction().replace(R.id.content, new WallpaperPreferencesFragment()).commit();
     }

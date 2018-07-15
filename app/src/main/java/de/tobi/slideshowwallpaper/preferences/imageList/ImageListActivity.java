@@ -29,7 +29,6 @@ public class ImageListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Debug.waitForDebugger();
         setContentView(R.layout.image_list);
 
         RecyclerView recyclerView = findViewById(R.id.image_list);
@@ -96,7 +95,7 @@ public class ImageListActivity extends AppCompatActivity {
                 }
             }
 
-            imageListAdapter.addImageInfos(uris);
+            imageListAdapter.addUris(uris);
         }
     }
 }

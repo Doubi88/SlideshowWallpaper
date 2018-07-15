@@ -50,14 +50,25 @@ public class AsyncTaskLoadImages extends AsyncTask<Uri, BigDecimal, List<ImageIn
         }
     }
 
+    private void notifyCancelledListeners(List<ImageInfo> result) {
+        for (ProgressListener<Uri, BigDecimal, List<ImageInfo>> listener :  listeners) {
+            listener.onTaskCancelled(this, result);
+        }
+    }
+
     @Override
     protected List<ImageInfo> doInBackground(Uri... uris) {
         List<ImageInfo> bitmaps = new ArrayList<>(uris.length);
-        BigDecimal listSize = BigDecimal.valueOf(uris.length);
-        for (Uri uri : uris) {
-            ImageInfo info = loadBitmap(uri);
-            bitmaps.add(info);
-            publishProgress(BigDecimal.valueOf(bitmaps.size()).divide(listSize, 2, RoundingMode.HALF_UP), BigDecimal.valueOf(bitmaps.size()));
+        if (!isCancelled()) {
+            BigDecimal listSize = BigDecimal.valueOf(uris.length);
+            for (Uri uri : uris) {
+                if (isCancelled()) {
+                    break;
+                }
+                ImageInfo info = loadBitmap(uri);
+                bitmaps.add(info);
+                publishProgress(BigDecimal.valueOf(bitmaps.size()).divide(listSize, 2, RoundingMode.HALF_UP), BigDecimal.valueOf(bitmaps.size()));
+            }
         }
         return bitmaps;
     }
@@ -74,6 +85,11 @@ public class AsyncTaskLoadImages extends AsyncTask<Uri, BigDecimal, List<ImageIn
 
 
         return info;
+    }
+
+    @Override
+    protected void onCancelled(List<ImageInfo> imageInfos) {
+        notifyCancelledListeners(imageInfos);
     }
 
     @Override

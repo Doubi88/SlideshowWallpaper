@@ -16,11 +16,11 @@ import de.tobi.slideshowwallpaper.listeners.OnDeleteClickListener;
 
 public class ImageListAdapter extends RecyclerView.Adapter<ImageInfoViewHolder> {
 
-    private List<Uri> imageInfos;
+    private List<Uri> uris;
     private List<OnDeleteClickListener> listeners;
 
-    public ImageListAdapter(List<Uri> imageInfos) {
-        this.imageInfos = new ArrayList<>(imageInfos);
+    public ImageListAdapter(List<Uri> uris) {
+        this.uris = new ArrayList<>(uris);
         listeners = new LinkedList<>();
     }
 
@@ -52,26 +52,26 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageInfoViewHolder> 
     @Override
     public void onBindViewHolder(ImageInfoViewHolder holder, int position) {
         Log.d(ImageListAdapter.class.getSimpleName(), "Loading image " + position);
-        holder.setImageInfo(imageInfos.get(position));
+        holder.setUri(uris.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return imageInfos.size();
+        return uris.size();
     }
 
     public void delete(Uri uri) {
-        int index = imageInfos.indexOf(uri);
-        imageInfos.remove(index);
+        int index = uris.indexOf(uri);
+        uris.remove(index);
         notifyItemRemoved(index);
 
         notifyListeners(uri);
     }
 
-    public void addImageInfos(List<Uri> infos) {
-        int oldSize = imageInfos.size();
-        imageInfos.addAll(infos);
+    public void addUris(List<Uri> uris) {
+        int oldSize = this.uris.size();
+        this.uris.addAll(uris);
 
-        notifyItemRangeInserted(oldSize, infos.size());
+        notifyItemRangeInserted(oldSize, uris.size());
     }
 }

@@ -34,6 +34,7 @@ public class ImageInfoViewHolder extends RecyclerView.ViewHolder {
     private TextView textView;
     private ImageView deleteButton;
     private ProgressBar progressBar;
+    private AsyncTaskLoadImages asyncTask;
 
     private LinkedList<OnDeleteClickListener> listeners;
 
@@ -56,22 +57,32 @@ public class ImageInfoViewHolder extends RecyclerView.ViewHolder {
         width = 1;
     }
 
-    public void setImageInfo(Uri uri) {
+    public void setUri(Uri uri) {
         if (imageInfo == null || !uri.equals(imageInfo.getUri())) {
             if (imageInfo != null) {
-                imageView.setImageBitmap(null);
-                imageInfo.getImage().recycle();
-                imageInfo = null;
+                if (asyncTask != null && asyncTask.getStatus() != AsyncTask.Status.FINISHED) {
+                    asyncTask.cancel(false);
+                }
 
-                textView.setText("");
+                imageView.setImageBitmap(null);
+                if (imageInfo.getImage() != null) {
+                    imageInfo.getImage().recycle();
+                }
+
+                imageInfo = ImageLoader.loadFileNameAndSize(uri, imageView.getContext());
+                textView.setText(imageInfo.getName());
+
                 progressBar.setVisibility(View.VISIBLE);
             }
 
-            AsyncTaskLoadImages asyncTask = new AsyncTaskLoadImages(imageView.getContext(), width, height);
+
+
+            asyncTask = new AsyncTaskLoadImages(imageView.getContext(), width, height);
             asyncTask.addProgressListener(new ProgressListener<Uri, BigDecimal, List<ImageInfo>>() {
                 @Override
                 public void onProgressChanged(AsyncTask<Uri, BigDecimal, List<ImageInfo>> task, BigDecimal current, BigDecimal max) {
-
+                    progressBar.setMax(max.intValue());
+                    progressBar.setProgress(current.intValue());
                 }
 
                 @Override
@@ -85,6 +96,15 @@ public class ImageInfoViewHolder extends RecyclerView.ViewHolder {
                         textView.setText(imageInfo.getName());
                         progressBar.setVisibility(View.INVISIBLE);
 
+                    }
+                }
+
+                @Override
+                public void onTaskCancelled(AsyncTask<Uri, BigDecimal, List<ImageInfo>> task, List<ImageInfo> imageInfos) {
+                    if (imageInfos != null) {
+                        for (ImageInfo info : imageInfos) {
+                            info.getImage().recycle();
+                        }
                     }
                 }
             });

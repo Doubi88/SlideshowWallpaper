@@ -103,7 +103,6 @@ public class SlideshowWallpaperService extends WallpaperService {
         private class DrawRunner implements Runnable {
             @Override
             public void run() {
-                //Debug.waitForDebugger();
                 SurfaceHolder holder = getSurfaceHolder();
                 Canvas canvas = null;
                 try {
