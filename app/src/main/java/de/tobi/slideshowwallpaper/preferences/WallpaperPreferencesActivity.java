@@ -1,7 +1,6 @@
 package de.tobi.slideshowwallpaper.preferences;
 
 import android.os.Bundle;
-import android.os.Debug;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
