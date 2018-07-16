@@ -22,4 +22,5 @@
         <item>name</item>
         <item>random</item>
     </string-array>
+    <dimen name="image_preview_height">200dp</dimen>
 </resources>

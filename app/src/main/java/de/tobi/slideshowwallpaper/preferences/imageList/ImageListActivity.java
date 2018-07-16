@@ -32,7 +32,9 @@ public class ImageListActivity extends AppCompatActivity {
         setContentView(R.layout.image_list);
 
         RecyclerView recyclerView = findViewById(R.id.image_list);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(layoutManager);
         manager = new SharedPreferencesManager(getSharedPreferences(getPackageName() + "_preferences", MODE_PRIVATE));
 
         List<Uri> uris = manager.getImageUris(SharedPreferencesManager.Ordering.SELECTION);
@@ -68,8 +70,6 @@ public class ImageListActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
         super.onActivityResult(requestCode, resultCode, data);
 
         List<Uri> uris = new LinkedList<>();

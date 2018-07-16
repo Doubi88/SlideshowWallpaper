@@ -53,8 +53,8 @@ public class ImageInfoViewHolder extends RecyclerView.ViewHolder {
         });
 
         float scale = imageView.getResources().getDisplayMetrics().density;
-        height = (int) (200f * scale + 0.5f);
-        width = 1;
+        height = (int) imageView.getResources().getDimension(R.dimen.image_preview_height);
+        width = itemView.getWidth();
     }
 
     public void setUri(Uri uri) {
@@ -65,9 +65,6 @@ public class ImageInfoViewHolder extends RecyclerView.ViewHolder {
                 }
 
                 imageView.setImageBitmap(null);
-                if (imageInfo.getImage() != null) {
-                    imageInfo.getImage().recycle();
-                }
 
                 imageInfo = ImageLoader.loadFileNameAndSize(uri, imageView.getContext());
                 textView.setText(imageInfo.getName());
@@ -94,7 +91,7 @@ public class ImageInfoViewHolder extends RecyclerView.ViewHolder {
                             imageView.setImageBitmap(Bitmap.createBitmap(imageInfo.getImage(), 0, 0, imageInfo.getImage().getWidth(), imageInfo.getImage().getHeight(), matrix, false));
                         }
                         textView.setText(imageInfo.getName());
-                        progressBar.setVisibility(View.INVISIBLE);
+                        progressBar.setVisibility(View.GONE);
 
                     }
                 }
