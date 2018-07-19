@@ -60,7 +60,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageInfoViewHolder> 
         return uris.size();
     }
 
-    public void delete(Uri uri) {
+    private void delete(Uri uri) {
         int index = uris.indexOf(uri);
         uris.remove(index);
         notifyItemRemoved(index);
