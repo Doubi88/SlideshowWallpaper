@@ -72,6 +72,7 @@ public class ImageLoader {
             if (in != null) {
                 byte[] bytes = readStream(in, info.getSize());
                 bitmap = readBitmap(bytes, desiredWidth, desiredHeight, considerMemory);
+                info.setImage(bitmap);
             }
 
         } finally {
@@ -84,7 +85,7 @@ public class ImageLoader {
             }
         }
 
-        return new ImageInfo(uri, info.getName(), info.getSize(), bitmap);
+        return info;
     }
 
     @NonNull
