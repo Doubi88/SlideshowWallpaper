@@ -14,9 +14,7 @@ import android.view.SurfaceHolder;
 import android.widget.Toast;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import de.tobi.slideshowwallpaper.preferences.SharedPreferencesManager;
 import de.tobi.slideshowwallpaper.utilities.ImageInfo;
@@ -103,7 +101,6 @@ public class SlideshowWallpaperService extends WallpaperService {
         private class DrawRunner implements Runnable {
             @Override
             public void run() {
-                //Debug.waitForDebugger();
                 SurfaceHolder holder = getSurfaceHolder();
                 Canvas canvas = null;
                 try {

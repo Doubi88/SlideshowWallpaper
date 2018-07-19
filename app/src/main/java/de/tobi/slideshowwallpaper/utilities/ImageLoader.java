@@ -13,7 +13,42 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 
+import de.tobi.slideshowwallpaper.R;
+
 public class ImageLoader {
+
+    /**
+     * Loads the image file and name, without loading the image itself. {@link ImageInfo#getImage()} will return {@code null}
+     * @param uri The {@link Uri} to load the image from
+     * @param context The {@link Context} to use
+     * @return An {@link ImageInfo} object, only containing uri, name and size. {@link ImageInfo#getImage()} will be {@code null}
+     */
+    public static ImageInfo loadFileNameAndSize(@NonNull Uri uri, @NonNull Context context) {
+        String name = null;
+        int size = 0;
+        Cursor fileCursor = null;
+        try {
+            fileCursor = context.getContentResolver().query(uri, null, null, null, null);
+            if (fileCursor != null) {
+                int nameIndex = fileCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                fileCursor.moveToFirst();
+                name = fileCursor.getString(nameIndex);
+
+                int sizeIndex = fileCursor.getColumnIndex(OpenableColumns.SIZE);
+                fileCursor.moveToFirst();
+                size = Integer.parseInt(fileCursor.getString(sizeIndex));
+            } else {
+                Log.e(ImageLoader.class.getSimpleName(), "Could not load file " + uri.toString());
+                name = context.getResources().getString(R.string.error_reading_file);
+                size = 0;
+            }
+            return new ImageInfo(uri, name, size, null);
+        } finally {
+            if (fileCursor != null) {
+                fileCursor.close();
+            }
+        }
+    }
 
     /**
      * Loads the {@link Bitmap} from the given file Uri. Turns it by 90 degrees, if it is wider than high (horizontal)
@@ -29,33 +64,17 @@ public class ImageLoader {
     @NonNull
     public static ImageInfo loadImage(@NonNull Uri uri, @NonNull Context context, int desiredWidth, int desiredHeight, boolean considerMemory) throws IOException {
         Bitmap bitmap = null;
-        String name = null;
-        int size = 0;
-
-        Cursor fileCursor = null;
+        ImageInfo info = null;
         InputStream in = null;
         try  {
-            fileCursor = context.getContentResolver().query(uri, null, null, null, null);
-            if (fileCursor != null) {
-                int nameIndex = fileCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                fileCursor.moveToFirst();
-                name = fileCursor.getString(nameIndex);
-
-                int sizeIndex = fileCursor.getColumnIndex(OpenableColumns.SIZE);
-                fileCursor.moveToFirst();
-                size = Integer.parseInt(fileCursor.getString(sizeIndex));
-
-                in = context.getContentResolver().openInputStream(uri);
-                if (in != null) {
-                    byte[] bytes = readStream(in, size);
-                    bitmap = readBitmap(bytes, desiredWidth, desiredHeight, considerMemory);
-                }
-            } else {
-                Log.e(ImageLoader.class.getSimpleName(), "Could not load file " + uri.toString());
-                name = "Error loading image";
-                size = 0;
-                bitmap = null;
+            info = loadFileNameAndSize(uri, context);
+            in = context.getContentResolver().openInputStream(uri);
+            if (in != null) {
+                byte[] bytes = readStream(in, info.getSize());
+                bitmap = readBitmap(bytes, desiredWidth, desiredHeight, considerMemory);
+                info.setImage(bitmap);
             }
+
         } finally {
             if (in != null) {
                 try {
@@ -64,12 +83,9 @@ public class ImageLoader {
                     e.printStackTrace();
                 }
             }
-            if (fileCursor != null) {
-                fileCursor.close();
-            }
         }
 
-        return new ImageInfo(uri, name, size, bitmap);
+        return info;
     }
 
     @NonNull
@@ -98,7 +114,7 @@ public class ImageLoader {
         options.inJustDecodeBounds = false;
         options.inMutable = true;
         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, size, options);
-        if (considerMemory && Runtime.getRuntime().freeMemory() <= (bitmap.getByteCount() * 2)) {
+        if (considerMemory && Runtime.getRuntime().maxMemory() <= (bitmap.getByteCount() * 2)) {
             bitmap = null;
         } else {
             if ((bitmap.getWidth() > bitmap.getHeight() && maxHeight > maxWidth) || (bitmap.getHeight() > bitmap.getWidth() && maxWidth > maxHeight)) {

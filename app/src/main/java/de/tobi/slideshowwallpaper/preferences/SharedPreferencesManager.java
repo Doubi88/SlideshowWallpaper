@@ -4,17 +4,14 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.util.Log;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 import de.tobi.slideshowwallpaper.R;
-import de.tobi.slideshowwallpaper.SlideshowWallpaperService;
 
 public class SharedPreferencesManager {
 
@@ -40,7 +37,7 @@ public class SharedPreferencesManager {
         RANDOM(2) {
             @Override
             public List<Uri> sort(List<Uri> list) {
-                List<Uri> result = new ArrayList<Uri>(list);
+                List<Uri> result = new ArrayList<>(list);
                 Collections.shuffle(result);
                 return result;
             }
@@ -90,7 +87,7 @@ public class SharedPreferencesManager {
         for (String uri : uris) {
             result.add(Uri.parse(uri));
         }
-        return result;
+        return ordering.sort(result);
     }
 
     private Set<String> getUriSet() {
@@ -99,7 +96,7 @@ public class SharedPreferencesManager {
 
     public void addUri(Uri uri) {
         Set<String> uris = getUriSet();
-        HashSet<String> newSet = new HashSet<>(uris);
+        LinkedHashSet<String> newSet = new LinkedHashSet<>(uris);
         newSet.add(uri.toString());
 
         SharedPreferences.Editor editor = preferences.edit();
@@ -109,7 +106,7 @@ public class SharedPreferencesManager {
 
     public void removeUri(Uri uri) {
         Set<String> uris = getUriSet();
-        HashSet<String> newSet = new HashSet<>(uris);
+        LinkedHashSet<String> newSet = new LinkedHashSet<>(uris);
         newSet.remove(uri.toString());
 
         SharedPreferences.Editor editor = preferences.edit();
@@ -143,10 +140,8 @@ public class SharedPreferencesManager {
     }
 
     public int getSecondsBetweenImages() throws NumberFormatException {
-        int seconds = 5;
         String secondsString = preferences.getString(PREFERENCE_KEY_SECONDS_BETWEEN, "5");
-        seconds = Integer.parseInt(secondsString);
-        return seconds;
+        return Integer.parseInt(secondsString);
 
     }
 
