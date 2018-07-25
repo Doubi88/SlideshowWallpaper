@@ -43,7 +43,7 @@
                 android:layout_weight="1"
                 android:id="@+id/delete_button"
                 android:layout_margin="3dp"
-                app:backgroundTint="@color/secondaryColor"
+                app:backgroundTint="@color/primaryLightColor"
                 />
         </LinearLayout>
     </FrameLayout>

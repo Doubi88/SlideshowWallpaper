@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
+import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
 import android.service.wallpaper.WallpaperService;
@@ -36,6 +37,9 @@ public class SlideshowWallpaperService extends WallpaperService {
         private int width;
         private int height;
 
+        private int currentImageWidth;
+        private int currentImageHeight;
+
         private Runnable drawRunner;
         private Paint clearPaint;
         private Paint textPaint;
@@ -45,9 +49,16 @@ public class SlideshowWallpaperService extends WallpaperService {
         private int currentIndex;
         private int listLength;
 
+        private ImageInfo lastRenderedImage;
+
+        private float deltaX;
+        private float lastXOffset;
+        private float lastXOffsetStep;
+
         private SharedPreferencesManager manager;
 
         public SlideshowWallpaperEngine() {
+            deltaX = 0;
             handler = new Handler(Looper.getMainLooper());
             drawRunner = new DrawRunner();
 
@@ -70,10 +81,43 @@ public class SlideshowWallpaperService extends WallpaperService {
         }
 
         @Override
+        public void onOffsetsChanged(float xOffset, float yOffset, float xOffsetStep, float yOffsetStep, int xPixelOffset, int yPixelOffset) {
+            super.onOffsetsChanged(xOffset, yOffset, xOffsetStep, yOffsetStep, xPixelOffset, yPixelOffset);
+            try {
+                lastXOffset = xOffset;
+                lastXOffsetStep = xOffsetStep;
+                Bitmap image = getNextImage();
+                if (image != null) {
+                    deltaX = calculateDeltaX(image, lastXOffset, lastXOffsetStep);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                deltaX = 0;
+            }
+            handler.removeCallbacks(drawRunner);
+            handler.post(drawRunner);
+        }
+
+        private float calculateDeltaX(Bitmap image, float xOffset, float xOffsetStep) {
+            int width = image.getWidth();
+            int height = image.getHeight();
+            float result = 0;
+            if ((width > height && this.height > this.width) || (height > width && this.width > this.height)) {
+                if (manager.getWrongOrientationRule(getResources()) == SharedPreferencesManager.WrongOrientationRule.SCROLL) {
+                    result = -(width * xOffset / (xOffsetStep + 1f));
+                } else {
+                    result = -(width * 0.5f / 1.5f);
+                }
+            }
+            return result;
+        }
+
+        @Override
         public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
             super.onSurfaceChanged(holder, format, width, height);
             this.width = width;
             this.height = height;
+            handler.post(drawRunner);
         }
 
         @Override
@@ -98,6 +142,76 @@ public class SlideshowWallpaperService extends WallpaperService {
             return SlideshowWallpaperService.this.getSharedPreferences(getPackageName() + "_preferences", MODE_PRIVATE);
         }
 
+
+        private Bitmap getNextImage() throws IOException {
+            Uri uri = getNextUri();
+            if (uri != null) {
+                if (lastRenderedImage == null || !uri.equals(lastRenderedImage.getUri())) {
+                    lastRenderedImage = ImageLoader.loadImage(uri, SlideshowWallpaperService.this, width, height, false);
+                    Bitmap image = lastRenderedImage.getImage();
+                    deltaX = calculateDeltaX(image, lastXOffset, lastXOffsetStep);
+                    return image;
+                } else {
+                    return lastRenderedImage.getImage();
+                }
+            } else {
+                return null;
+            }
+        }
+
+        private Uri getNextUri() {
+            Uri result = null;
+            SharedPreferencesManager.Ordering ordering = manager.getCurrentOrdering(getResources());
+            List<Uri> uris = manager.getImageUris(ordering);
+
+            if (uris.size() > 0) {
+                int currentImageIndex = manager.getCurrentIndex();
+                int nextUpdate = calculateNextUpdateInSeconds();
+                if (nextUpdate <= 0) {
+                    int delay = getDelaySeconds();
+                    while (nextUpdate <= 0) {
+                        currentImageIndex++;
+
+                        if (currentImageIndex >= uris.size()) {
+                            currentImageIndex = 0;
+                        }
+
+                        nextUpdate += delay;
+                    }
+                    manager.setCurrentIndex(currentImageIndex);
+                    manager.setLastUpdate(System.currentTimeMillis());
+                }
+                result = uris.get(currentImageIndex);
+                currentIndex = currentImageIndex;
+                listLength = uris.size();
+            }
+
+            return result;
+        }
+
+        private int getDelaySeconds() {
+            int seconds = 5;
+            try {
+                seconds = manager.getSecondsBetweenImages();
+            } catch (NumberFormatException e) {
+                Log.e(SlideshowWallpaperEngine.class.getSimpleName(), "Invalid number", e);
+                Toast toast = Toast.makeText(getApplicationContext(), e.getClass().getSimpleName() + " " + e.getMessage(), Toast.LENGTH_LONG);
+                toast.show();
+            }
+            return seconds;
+        }
+
+        private int calculateNextUpdateInSeconds() {
+            long lastUpdate = manager.getLastUpdate();
+            int result = 0;
+            if (lastUpdate > 0) {
+                int delaySeconds = getDelaySeconds();
+                long current = System.currentTimeMillis();
+                result = delaySeconds - (int)((current - lastUpdate) / 1000); // Difference between delay and elapsed time since last update in seconds
+            }
+            return result;
+        }
+
         private class DrawRunner implements Runnable {
             @Override
             public void run() {
@@ -110,7 +224,18 @@ public class SlideshowWallpaperService extends WallpaperService {
 
                         Bitmap bitmap = getNextImage();
                         if (bitmap != null) {
-                            canvas.drawBitmap(bitmap, ImageLoader.calculateMatrixScaleToFit(bitmap, width, height), null);
+                            currentImageHeight = bitmap.getHeight();
+                            currentImageWidth = bitmap.getWidth();
+
+                            SharedPreferencesManager.WrongOrientationRule rule = manager.getWrongOrientationRule(getResources());
+                            if (rule == SharedPreferencesManager.WrongOrientationRule.SCALE_DOWN) {
+                                canvas.drawBitmap(bitmap, ImageLoader.calculateMatrixScaleToFit(bitmap, width, height, false), null);
+                            } else if (rule == SharedPreferencesManager.WrongOrientationRule.SCALE_UP || rule == SharedPreferencesManager.WrongOrientationRule.SCROLL) {
+                                canvas.save();
+                                canvas.translate(deltaX, 0);
+                                canvas.drawBitmap(bitmap, ImageLoader.calculateMatrixScaleToFit(bitmap, width, height, true), null);
+                                canvas.restore();
+                            }
                             String drawText = (currentIndex + 1) + "/" + listLength;
                             canvas.drawText(drawText, 0, drawText.length(), textSize + 10, textSize + 10, textPaint);
                         }
@@ -132,70 +257,7 @@ public class SlideshowWallpaperService extends WallpaperService {
                     handler.postDelayed(drawRunner, calculateNextUpdateInSeconds() * 1000);
                 }
             }
-
-            private Bitmap getNextImage() throws IOException {
-                Uri uri = getNextUri();
-                if (uri != null) {
-                    ImageInfo info = ImageLoader.loadImage(uri, SlideshowWallpaperService.this, width, height, false);
-                    return info.getImage();
-                } else {
-                    return null;
-                }
-            }
-
-            private Uri getNextUri() {
-                Uri result = null;
-                SharedPreferencesManager.Ordering ordering = manager.getCurrentOrdering(getResources());
-                List<Uri> uris = manager.getImageUris(ordering);
-
-                if (uris.size() > 0) {
-                    int currentImageIndex = manager.getCurrentIndex();
-                    int nextUpdate = calculateNextUpdateInSeconds();
-                    if (nextUpdate <= 0) {
-                        int delay = getDelaySeconds();
-                        while (nextUpdate <= 0) {
-                            currentImageIndex++;
-
-                            if (currentImageIndex >= uris.size()) {
-                                currentImageIndex = 0;
-                            }
-
-                            nextUpdate += delay;
-                        }
-                        manager.setCurrentIndex(currentImageIndex);
-                        manager.setLastUpdate(System.currentTimeMillis());
-                    }
-                    result = uris.get(currentImageIndex);
-                    currentIndex = currentImageIndex;
-                    listLength = uris.size();
-                }
-
-                return result;
-            }
-
-            private int getDelaySeconds() {
-                int seconds = 5;
-                try {
-                    seconds = manager.getSecondsBetweenImages();
-                } catch (NumberFormatException e) {
-                    Log.e(SlideshowWallpaperEngine.class.getSimpleName(), "Invalid number", e);
-                    Toast toast = Toast.makeText(getApplicationContext(), e.getClass().getSimpleName() + " " + e.getMessage(), Toast.LENGTH_LONG);
-                    toast.show();
-                }
-                return seconds;
-            }
-
-            private int calculateNextUpdateInSeconds() {
-                long lastUpdate = manager.getLastUpdate();
-                int result = 0;
-                if (lastUpdate > 0) {
-                    int delaySeconds = getDelaySeconds();
-                    long current = System.currentTimeMillis();
-                    result = delaySeconds - (int)((current - lastUpdate) / 1000); // Difference between delay and elapsed time since last update in seconds
-                }
-                return result;
-            }
-
         }
+
     }
 }

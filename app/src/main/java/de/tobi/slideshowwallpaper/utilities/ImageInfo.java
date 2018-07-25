@@ -2,6 +2,7 @@ package de.tobi.slideshowwallpaper.utilities;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.support.media.ExifInterface;
 
 public class ImageInfo {
 

@@ -12,6 +12,9 @@
     <string name="image_view_description">Image</string>
     <string name="settings_name">Slideshow Wallpaper Settings</string>
     <string name="image_list_name">Slideshow Wallpaper Image List</string>
+    <string name="preference_wrong_orientation_rule_key">wrong_orientation_rule</string>
+    <string name="preference_wrong_orientation_rule">Wrong Orientation Rule</string>
+    <string name="preference_wrong_orientation_rule_summary">What to do with images, that have the opposite orientation of the screen.</string>
     <string-array name="orderings">
         <item>Selection order</item>
         <item>Order by name</item>
@@ -22,5 +25,14 @@
         <item>name</item>
         <item>random</item>
     </string-array>
-    <dimen name="image_preview_height">200dp</dimen>
+    <string-array name="wrong_orientation_rules">
+        <item>Scroll over home screens</item>
+        <item>Scale down to fit</item>
+        <item>Scale up to fit</item>
+    </string-array>
+    <string-array name="wrong_orientation_rule_values">
+        <item>scroll</item>
+        <item>scale_down</item>
+        <item>scale_up</item>
+    </string-array>
 </resources>

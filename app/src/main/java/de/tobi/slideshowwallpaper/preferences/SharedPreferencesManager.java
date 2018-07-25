@@ -20,6 +20,7 @@ public class SharedPreferencesManager {
     private static final String PREFERENCE_KEY_LAST_INDEX = "last_index";
     private static final String PREFERENCE_KEY_URI_LIST = "pick_images";
     private static final String PREFERENCE_KEY_SECONDS_BETWEEN = "seconds";
+    private static final String PREFERENCE_KEY_WRONG_ORIENTATION_RULE = "wrong_orientation_rule";
 
     public enum Ordering {
         SELECTION(0) {
@@ -69,6 +70,37 @@ public class SharedPreferencesManager {
         }
 
         public abstract List<Uri> sort(List<Uri> list);
+    }
+
+    public enum WrongOrientationRule {
+        SCROLL(0),
+        SCALE_DOWN(1),
+        SCALE_UP(2);
+
+        private int valueListIndex;
+
+        private WrongOrientationRule(int valueListIndex) {
+            this.valueListIndex = valueListIndex;
+        }
+
+        public String getDescription(Resources r) {
+            return r.getStringArray(R.array.wrong_orientation_rules)[valueListIndex];
+        }
+
+        public String getValue(Resources r) {
+            return r.getStringArray(R.array.wrong_orientation_rule_values)[valueListIndex];
+        }
+
+        public static WrongOrientationRule forValue(String value, Resources r) {
+            WrongOrientationRule[] values = values();
+            WrongOrientationRule result = null;
+            for (int i = 0; i < values.length && result == null; i++) {
+                if (values[i].getValue(r).equals(value)) {
+                    result = values[i];
+                }
+            }
+            return result;
+        }
     }
     private SharedPreferences preferences;
 
@@ -140,14 +172,19 @@ public class SharedPreferencesManager {
     }
 
     public int getSecondsBetweenImages() throws NumberFormatException {
-        String secondsString = preferences.getString(PREFERENCE_KEY_SECONDS_BETWEEN, "5");
+        String secondsString = preferences.getString(PREFERENCE_KEY_SECONDS_BETWEEN, "15");
         return Integer.parseInt(secondsString);
 
     }
 
     public void setSecondsBetweenImages(int value) {
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt(PREFERENCE_KEY_SECONDS_BETWEEN, value);
+        editor.putString(PREFERENCE_KEY_SECONDS_BETWEEN, String.valueOf(value));
         editor.apply();
+    }
+
+    public WrongOrientationRule getWrongOrientationRule(Resources r) {
+        String value = preferences.getString(PREFERENCE_KEY_WRONG_ORIENTATION_RULE, "scale_down");
+        return WrongOrientationRule.forValue(value, r);
     }
 }
