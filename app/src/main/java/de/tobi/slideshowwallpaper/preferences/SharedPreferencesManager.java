@@ -4,17 +4,14 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.util.Log;
-import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import de.tobi.slideshowwallpaper.R;
-import de.tobi.slideshowwallpaper.SlideshowWallpaperService;
 
 public class SharedPreferencesManager {
 
@@ -23,6 +20,7 @@ public class SharedPreferencesManager {
     private static final String PREFERENCE_KEY_LAST_INDEX = "last_index";
     private static final String PREFERENCE_KEY_URI_LIST = "pick_images";
     private static final String PREFERENCE_KEY_SECONDS_BETWEEN = "seconds";
+    private static final String PREFERENCE_KEY_WRONG_ORIENTATION_RULE = "wrong_orientation_rule";
 
     public enum Ordering {
         SELECTION(0) {
@@ -40,7 +38,7 @@ public class SharedPreferencesManager {
         RANDOM(2) {
             @Override
             public List<Uri> sort(List<Uri> list) {
-                List<Uri> result = new ArrayList<Uri>(list);
+                List<Uri> result = new ArrayList<>(list);
                 Collections.shuffle(result);
                 return result;
             }
@@ -73,6 +71,38 @@ public class SharedPreferencesManager {
 
         public abstract List<Uri> sort(List<Uri> list);
     }
+
+    public enum WrongOrientationRule {
+        SCROLL_FORWARD(0),
+        SCROLL_BACKWARD(1),
+        SCALE_DOWN(2),
+        SCALE_UP(3);
+
+        private int valueListIndex;
+
+        private WrongOrientationRule(int valueListIndex) {
+            this.valueListIndex = valueListIndex;
+        }
+
+        public String getDescription(Resources r) {
+            return r.getStringArray(R.array.wrong_orientation_rules)[valueListIndex];
+        }
+
+        public String getValue(Resources r) {
+            return r.getStringArray(R.array.wrong_orientation_rule_values)[valueListIndex];
+        }
+
+        public static WrongOrientationRule forValue(String value, Resources r) {
+            WrongOrientationRule[] values = values();
+            WrongOrientationRule result = null;
+            for (int i = 0; i < values.length && result == null; i++) {
+                if (values[i].getValue(r).equals(value)) {
+                    result = values[i];
+                }
+            }
+            return result;
+        }
+    }
     private SharedPreferences preferences;
 
     public SharedPreferencesManager(@NonNull SharedPreferences preferences) {
@@ -85,43 +115,58 @@ public class SharedPreferencesManager {
     }
 
     public List<Uri> getImageUris(@NonNull Ordering ordering) {
-        Set<String> uris = getUriSet();
-        ArrayList<Uri> result = new ArrayList<>(uris.size());
+        String[] uris = getUriList();
+        ArrayList<Uri> result = new ArrayList<>(uris.length);
         for (String uri : uris) {
             result.add(Uri.parse(uri));
         }
-        return result;
+        return ordering.sort(result);
     }
 
-    private Set<String> getUriSet() {
-        return preferences.getStringSet(PREFERENCE_KEY_URI_LIST, Collections.<String>emptySet());
+    private String[] getUriList() {
+        String list = preferences.getString(PREFERENCE_KEY_URI_LIST, null);
+        if (list == null) {
+            return new String[0];
+        } else
+            return list.split(";");
     }
 
     public void addUri(Uri uri) {
-        Set<String> uris = getUriSet();
-        HashSet<String> newSet = new HashSet<>(uris);
-        newSet.add(uri.toString());
+        StringBuilder listBuilder = new StringBuilder(preferences.getString(PREFERENCE_KEY_URI_LIST, ""));
+
+        if (listBuilder.length() > 0) {
+            listBuilder.append(";");
+        }
+        listBuilder.append(uri.toString());
 
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putStringSet(PREFERENCE_KEY_URI_LIST, newSet);
+        editor.putString(PREFERENCE_KEY_URI_LIST, listBuilder.toString());
         editor.apply();
     }
 
     public void removeUri(Uri uri) {
-        Set<String> uris = getUriSet();
-        HashSet<String> newSet = new HashSet<>(uris);
-        newSet.remove(uri.toString());
+        String[] uris = getUriList();
+        List<String> newList = new LinkedList<>(Arrays.asList(uris));
+        newList.remove(uri.toString());
+
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < newList.size(); i++) {
+            result.append(newList.get(i));
+            if (i + 1 < newList.size()) {
+                result.append(";");
+            }
+        }
 
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putStringSet(PREFERENCE_KEY_URI_LIST, newSet);
+        editor.putString(PREFERENCE_KEY_URI_LIST, result.toString());
         editor.apply();
     }
 
     public int getCurrentIndex() {
         int result = preferences.getInt(PREFERENCE_KEY_LAST_INDEX, 0);
-        Set<String> set = getUriSet();
-        while (result >= set.size()) {
-            result -= set.size();
+        String[] uris = getUriList();
+        while (result >= uris.length) {
+            result -= uris.length;
         }
         return result;
     }
@@ -143,16 +188,19 @@ public class SharedPreferencesManager {
     }
 
     public int getSecondsBetweenImages() throws NumberFormatException {
-        int seconds = 5;
-        String secondsString = preferences.getString(PREFERENCE_KEY_SECONDS_BETWEEN, "5");
-        seconds = Integer.parseInt(secondsString);
-        return seconds;
+        String secondsString = preferences.getString(PREFERENCE_KEY_SECONDS_BETWEEN, "15");
+        return Integer.parseInt(secondsString);
 
     }
 
     public void setSecondsBetweenImages(int value) {
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt(PREFERENCE_KEY_SECONDS_BETWEEN, value);
+        editor.putString(PREFERENCE_KEY_SECONDS_BETWEEN, String.valueOf(value));
         editor.apply();
+    }
+
+    public WrongOrientationRule getWrongOrientationRule(Resources r) {
+        String value = preferences.getString(PREFERENCE_KEY_WRONG_ORIENTATION_RULE, "scale_down");
+        return WrongOrientationRule.forValue(value, r);
     }
 }

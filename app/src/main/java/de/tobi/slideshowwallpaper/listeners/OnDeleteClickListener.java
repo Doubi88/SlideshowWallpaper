@@ -1,8 +1,8 @@
 package de.tobi.slideshowwallpaper.listeners;
 
-import de.tobi.slideshowwallpaper.preferences.ImagePreference;
+import android.net.Uri;
 
 public interface OnDeleteClickListener {
 
-    public void onDeleteButtonClicked(ImagePreference view);
+    public void onDeleteButtonClicked(Uri uri);
 }

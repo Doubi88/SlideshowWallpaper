@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="preference_add_images_key">pick_images</string>
+    <string name="preference_seconds_key">seconds</string>
+    <string name="preference_ordering_key">ordering</string>
+    <string name="preference_wrong_orientation_rule_key">wrong_orientation_rule</string>
+    <string-array name="ordering_values">
+        <item>selection</item>
+        <item>name</item>
+        <item>random</item>
+    </string-array>
+    <string-array name="wrong_orientation_rule_values">
+        <item>scroll_forward</item>
+        <item>scroll_backward</item>
+        <item>scale_down</item>
+        <item>scale_up</item>
+    </string-array>
+
+</resources>
