@@ -2,10 +2,8 @@ package de.tobi.slideshowwallpaper.preferences;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Debug;
 import android.support.v7.preference.PreferenceFragmentCompat;
 
-import java.util.Arrays;
 import java.util.HashSet;
 
 import de.tobi.slideshowwallpaper.R;
