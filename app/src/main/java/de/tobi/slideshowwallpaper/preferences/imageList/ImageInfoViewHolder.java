@@ -96,7 +96,7 @@ public class ImageInfoViewHolder extends RecyclerView.ViewHolder {
                     if (imageInfos.size() == 1) {
                         imageInfo = imageInfos.get(0);
                         if (imageInfo.getImage() != null) {
-                            Matrix matrix = ImageLoader.calculateMatrixScaleToFit(imageInfo.getImage(), width, height, true);
+                            Matrix matrix = ImageLoader.calculateMatrixScaleToFit(imageInfo.getImage(), width, height, false);
                             imageView.setImageBitmap(Bitmap.createBitmap(imageInfo.getImage(), 0, 0, imageInfo.getImage().getWidth(), imageInfo.getImage().getHeight(), matrix, false));
                         }
                         textView.setText(imageInfo.getName());

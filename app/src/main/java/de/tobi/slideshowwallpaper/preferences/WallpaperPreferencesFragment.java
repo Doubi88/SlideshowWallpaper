@@ -58,8 +58,8 @@ public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
     }
 
     @Override
-    public void onDestroy() {
+    public void onPause() {
         getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(listener);
-        super.onDestroy();
+        super.onPause();
     }
 }

@@ -6,7 +6,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
-import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
 import android.service.wallpaper.WallpaperService;
@@ -103,8 +102,11 @@ public class SlideshowWallpaperService extends WallpaperService {
             int height = image.getHeight();
             float result = 0;
             if ((width > height && this.height > this.width) || (height > width && this.width > this.height)) {
-                if (manager.getWrongOrientationRule(getResources()) == SharedPreferencesManager.WrongOrientationRule.SCROLL) {
+                SharedPreferencesManager.WrongOrientationRule rule = manager.getWrongOrientationRule(getResources());
+                if (rule == SharedPreferencesManager.WrongOrientationRule.SCROLL_FORWARD) {
                     result = -(width * xOffset / (xOffsetStep + 1f));
+                } else if (rule == SharedPreferencesManager.WrongOrientationRule.SCROLL_BACKWARD) {
+                    result = (width * xOffset / (xOffsetStep + 1f)) - (width/ (xOffsetStep + 1f));
                 } else {
                     result = -(width * 0.5f / 1.5f);
                 }
@@ -229,11 +231,11 @@ public class SlideshowWallpaperService extends WallpaperService {
 
                             SharedPreferencesManager.WrongOrientationRule rule = manager.getWrongOrientationRule(getResources());
                             if (rule == SharedPreferencesManager.WrongOrientationRule.SCALE_DOWN) {
-                                canvas.drawBitmap(bitmap, ImageLoader.calculateMatrixScaleToFit(bitmap, width, height, false), null);
-                            } else if (rule == SharedPreferencesManager.WrongOrientationRule.SCALE_UP || rule == SharedPreferencesManager.WrongOrientationRule.SCROLL) {
+                                canvas.drawBitmap(bitmap, ImageLoader.calculateMatrixScaleToFit(bitmap, width, height, true), null);
+                            } else if (rule == SharedPreferencesManager.WrongOrientationRule.SCALE_UP || rule == SharedPreferencesManager.WrongOrientationRule.SCROLL_FORWARD || rule == SharedPreferencesManager.WrongOrientationRule.SCROLL_BACKWARD) {
                                 canvas.save();
                                 canvas.translate(deltaX, 0);
-                                canvas.drawBitmap(bitmap, ImageLoader.calculateMatrixScaleToFit(bitmap, width, height, true), null);
+                                canvas.drawBitmap(bitmap, ImageLoader.calculateMatrixScaleToFit(bitmap, width, height, false), null);
                                 canvas.restore();
                             }
                             String drawText = (currentIndex + 1) + "/" + listLength;

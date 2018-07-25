@@ -156,14 +156,11 @@ public class ImageLoader {
     public static Matrix calculateMatrixScaleToFit(Bitmap bitmap, int screenWidth, int screenHeight, boolean both) {
         Matrix result = new Matrix();
 
-        int imageWidth = bitmap.getWidth();
-        int imageHeight = bitmap.getHeight();
-
         float scale = 0;
         if (both) {
-            scale = Math.max((float) screenWidth / (float) bitmap.getWidth(), (float) screenHeight / (float) bitmap.getHeight());
-        } else {
             scale = Math.min((float) screenWidth / (float) bitmap.getWidth(), (float) screenHeight / (float) bitmap.getHeight());
+        } else {
+            scale = Math.max((float) screenWidth / (float) bitmap.getWidth(), (float) screenHeight / (float) bitmap.getHeight());
         }
         float yTranslate = (screenHeight - bitmap.getHeight() * scale) / 2f;
 

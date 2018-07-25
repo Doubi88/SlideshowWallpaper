@@ -26,12 +26,14 @@
         <item>random</item>
     </string-array>
     <string-array name="wrong_orientation_rules">
-        <item>Scroll over home screens</item>
+        <item>Scroll with home screens</item>
+        <item>Scroll with home screens in opposite direction</item>
         <item>Scale down to fit</item>
         <item>Scale up to fit</item>
     </string-array>
     <string-array name="wrong_orientation_rule_values">
-        <item>scroll</item>
+        <item>scroll_forward</item>
+        <item>scroll_backward</item>
         <item>scale_down</item>
         <item>scale_up</item>
     </string-array>

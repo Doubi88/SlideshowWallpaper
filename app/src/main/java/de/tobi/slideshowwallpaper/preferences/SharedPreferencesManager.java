@@ -73,9 +73,10 @@ public class SharedPreferencesManager {
     }
 
     public enum WrongOrientationRule {
-        SCROLL(0),
-        SCALE_DOWN(1),
-        SCALE_UP(2);
+        SCROLL_FORWARD(0),
+        SCROLL_BACKWARD(1),
+        SCALE_DOWN(2),
+        SCALE_UP(3);
 
         private int valueListIndex;
 
