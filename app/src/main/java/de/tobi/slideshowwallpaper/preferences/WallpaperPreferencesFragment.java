@@ -4,8 +4,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.preference.PreferenceFragmentCompat;
 
-import java.util.HashSet;
-
 import de.tobi.slideshowwallpaper.R;
 
 public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
@@ -37,7 +35,7 @@ public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
     }
     private void updateSummary(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getResources().getString(R.string.preference_add_images_key))) {
-            findPreference(key).setSummary(sharedPreferences.getStringSet(key, new HashSet<String>()).size() + " " + getResources().getString(R.string.images_selected));
+            findPreference(key).setSummary(new SharedPreferencesManager(getPreferenceManager().getSharedPreferences()).getImageUris(SharedPreferencesManager.Ordering.SELECTION).size() + " " + getResources().getString(R.string.images_selected));
         } else if (key.equals(getResources().getString(R.string.preference_seconds_key))) {
             findPreference(key).setSummary(sharedPreferences.getString(key, "15"));
         } else if (key.equals(getResources().getString(R.string.preference_ordering_key))) {

@@ -6,10 +6,10 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import de.tobi.slideshowwallpaper.R;
 
@@ -115,43 +115,58 @@ public class SharedPreferencesManager {
     }
 
     public List<Uri> getImageUris(@NonNull Ordering ordering) {
-        Set<String> uris = getUriSet();
-        ArrayList<Uri> result = new ArrayList<>(uris.size());
+        String[] uris = getUriList();
+        ArrayList<Uri> result = new ArrayList<>(uris.length);
         for (String uri : uris) {
             result.add(Uri.parse(uri));
         }
         return ordering.sort(result);
     }
 
-    private Set<String> getUriSet() {
-        return preferences.getStringSet(PREFERENCE_KEY_URI_LIST, Collections.<String>emptySet());
+    private String[] getUriList() {
+        String list = preferences.getString(PREFERENCE_KEY_URI_LIST, null);
+        if (list == null) {
+            return new String[0];
+        } else
+            return list.split(";");
     }
 
     public void addUri(Uri uri) {
-        Set<String> uris = getUriSet();
-        LinkedHashSet<String> newSet = new LinkedHashSet<>(uris);
-        newSet.add(uri.toString());
+        StringBuilder listBuilder = new StringBuilder(preferences.getString(PREFERENCE_KEY_URI_LIST, ""));
+
+        if (listBuilder.length() > 0) {
+            listBuilder.append(";");
+        }
+        listBuilder.append(uri.toString());
 
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putStringSet(PREFERENCE_KEY_URI_LIST, newSet);
+        editor.putString(PREFERENCE_KEY_URI_LIST, listBuilder.toString());
         editor.apply();
     }
 
     public void removeUri(Uri uri) {
-        Set<String> uris = getUriSet();
-        LinkedHashSet<String> newSet = new LinkedHashSet<>(uris);
-        newSet.remove(uri.toString());
+        String[] uris = getUriList();
+        List<String> newList = new LinkedList<>(Arrays.asList(uris));
+        newList.remove(uri.toString());
+
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < newList.size(); i++) {
+            result.append(newList.get(i));
+            if (i + 1 < newList.size()) {
+                result.append(";");
+            }
+        }
 
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putStringSet(PREFERENCE_KEY_URI_LIST, newSet);
+        editor.putString(PREFERENCE_KEY_URI_LIST, result.toString());
         editor.apply();
     }
 
     public int getCurrentIndex() {
         int result = preferences.getInt(PREFERENCE_KEY_LAST_INDEX, 0);
-        Set<String> set = getUriSet();
-        while (result >= set.size()) {
-            result -= set.size();
+        String[] uris = getUriList();
+        while (result >= uris.length) {
+            result -= uris.length;
         }
         return result;
     }
