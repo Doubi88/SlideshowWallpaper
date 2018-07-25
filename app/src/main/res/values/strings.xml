@@ -1,18 +1,14 @@
 <resources>
     <string name="app_name">Slideshow Wallpaper</string>
     <string name="preference_edit_image_list">Edit image list</string>
-    <string name="preference_add_images_key">pick_images</string>
     <string name="preference_ordering">Ordering</string>
-    <string name="preference_ordering_key">ordering</string>
     <string name="error_reading_file">Error reading file</string>
     <string name="delete_button_description">Remove</string>
-    <string name="preference_seconds_key">seconds</string>
     <string name="preference_seconds">Seconds between images</string>
     <string name="images_selected">images selected</string>
     <string name="image_view_description">Image</string>
     <string name="settings_name">Slideshow Wallpaper Settings</string>
     <string name="image_list_name">Slideshow Wallpaper Image List</string>
-    <string name="preference_wrong_orientation_rule_key">wrong_orientation_rule</string>
     <string name="preference_wrong_orientation_rule">Wrong Orientation Rule</string>
     <string name="preference_wrong_orientation_rule_summary">What to do with images, that have the opposite orientation of the screen.</string>
     <string-array name="orderings">
@@ -20,21 +16,10 @@
         <item>Order by name</item>
         <item>Random</item>
     </string-array>
-    <string-array name="ordering_values">
-        <item>selection</item>
-        <item>name</item>
-        <item>random</item>
-    </string-array>
     <string-array name="wrong_orientation_rules">
         <item>Scroll with home screens</item>
         <item>Scroll with home screens in opposite direction</item>
         <item>Scale down to fit</item>
         <item>Scale up to fit</item>
-    </string-array>
-    <string-array name="wrong_orientation_rule_values">
-        <item>scroll_forward</item>
-        <item>scroll_backward</item>
-        <item>scale_down</item>
-        <item>scale_up</item>
     </string-array>
 </resources>
