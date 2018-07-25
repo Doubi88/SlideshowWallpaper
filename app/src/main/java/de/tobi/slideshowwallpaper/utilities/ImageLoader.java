@@ -6,8 +6,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 import android.provider.OpenableColumns;
 import android.support.annotation.NonNull;
+import android.support.media.ExifInterface;
 import android.util.Log;
 
 import java.io.IOException;
@@ -27,7 +29,9 @@ public class ImageLoader {
         String name = null;
         int size = 0;
         Cursor fileCursor = null;
+        ParcelFileDescriptor descriptor = null;
         try {
+
             fileCursor = context.getContentResolver().query(uri, null, null, null, null);
             if (fileCursor != null) {
                 int nameIndex = fileCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
@@ -37,6 +41,7 @@ public class ImageLoader {
                 int sizeIndex = fileCursor.getColumnIndex(OpenableColumns.SIZE);
                 fileCursor.moveToFirst();
                 size = Integer.parseInt(fileCursor.getString(sizeIndex));
+
             } else {
                 Log.e(ImageLoader.class.getSimpleName(), "Could not load file " + uri.toString());
                 name = context.getResources().getString(R.string.error_reading_file);
@@ -70,9 +75,15 @@ public class ImageLoader {
             info = loadFileNameAndSize(uri, context);
             in = context.getContentResolver().openInputStream(uri);
             if (in != null) {
-                byte[] bytes = readStream(in, info.getSize());
-                bitmap = readBitmap(bytes, desiredWidth, desiredHeight, considerMemory);
-                info.setImage(bitmap);
+
+                int degrees = getRotationDegrees(context, uri);
+                bitmap = readBitmap(readStream(in, info.getSize()), desiredWidth, desiredHeight, considerMemory);
+                Matrix matrix = new Matrix();
+                matrix.setRotate(degrees);
+
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
+                info = new ImageInfo(uri, info.getName(), info.getSize(), bitmap);
+
             }
 
         } finally {
@@ -86,6 +97,20 @@ public class ImageLoader {
         }
 
         return info;
+    }
+
+    private static int getRotationDegrees(Context context, Uri uri) throws IOException {
+        int result = 0;
+        InputStream inputStream = null;
+        try {
+            inputStream = context.getContentResolver().openInputStream(uri);
+            result = new ExifInterface(inputStream).getRotationDegrees();
+        } finally {
+            if (inputStream != null) {
+                inputStream.close();
+            }
+        }
+        return result;
     }
 
     @NonNull
@@ -103,25 +128,12 @@ public class ImageLoader {
         BitmapFactory.decodeByteArray(bytes,0, size, options);
         int imageWidth = options.outWidth;
         int imageHeight = options.outHeight;
-        if ((imageWidth > imageHeight && maxHeight > maxWidth) || (imageHeight > imageWidth) && (maxWidth > maxHeight)) {
-            // swapping width and height is intended here
-            //noinspection SuspiciousNameCombination
-            imageWidth = options.outHeight;
-            //noinspection SuspiciousNameCombination
-            imageHeight = options.outWidth;
-        }
+
         options.inSampleSize = calculateSampleSize(imageWidth, imageHeight, maxWidth, maxHeight);
         options.inJustDecodeBounds = false;
-        options.inMutable = true;
         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, size, options);
         if (considerMemory && Runtime.getRuntime().maxMemory() <= (bitmap.getByteCount() * 2)) {
             bitmap = null;
-        } else {
-            if ((bitmap.getWidth() > bitmap.getHeight() && maxHeight > maxWidth) || (bitmap.getHeight() > bitmap.getWidth() && maxWidth > maxHeight)) {
-                Matrix matrix = new Matrix();
-                matrix.setRotate(90);
-                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-            }
         }
         return bitmap;
     }
@@ -130,20 +142,23 @@ public class ImageLoader {
         int result = 1;
 
         if (width > desiredWidth || height > desiredHeight) {
-            int halfWidth = width / 2;
-            int halfHeight = height / 2;
 
-            while ((halfWidth / result) >= desiredWidth && (halfHeight / result >= desiredHeight)) {
+            while ((width / result) >= desiredWidth && (height / result >= desiredHeight)) {
                 result *= 2;
             }
         }
         return result;
     }
 
-    public static Matrix calculateMatrixScaleToFit(Bitmap bitmap, int screenWidth, int screenHeight) {
+    public static Matrix calculateMatrixScaleToFit(Bitmap bitmap, int screenWidth, int screenHeight, boolean both) {
         Matrix result = new Matrix();
 
-        float scale = Math.max((float)screenWidth / (float)bitmap.getWidth(), (float)screenHeight / (float)bitmap.getHeight());
+        float scale = 0;
+        if (both) {
+            scale = Math.min((float) screenWidth / (float) bitmap.getWidth(), (float) screenHeight / (float) bitmap.getHeight());
+        } else {
+            scale = Math.max((float) screenWidth / (float) bitmap.getWidth(), (float) screenHeight / (float) bitmap.getHeight());
+        }
         float yTranslate = (screenHeight - bitmap.getHeight() * scale) / 2f;
 
         result.setScale(scale, scale);
