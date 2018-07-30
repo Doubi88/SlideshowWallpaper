@@ -11,6 +11,8 @@
     <string name="image_list_name">Slideshow Wallpaper Image List</string>
     <string name="preference_wrong_orientation_rule">Wrong Orientation Rule</string>
     <string name="preference_wrong_orientation_rule_summary">What to do with images, that have the opposite orientation of the screen.</string>
+    <string name="preference_preview">Preview</string>
+    <string name="preference_preview_summary">Preview and set as current wallpaper.</string>
     <string-array name="orderings">
         <item>Selection order</item>
         <item>Order by name</item>

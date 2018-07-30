@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Slideshow Wallpaper</string>
     <string name="preference_edit_image_list">Bilderliste bearbeiten</string>
@@ -12,6 +11,8 @@
     <string name="image_list_name">Slideshow Wallpaper Bilderliste</string>
     <string name="preference_wrong_orientation_rule">Regel bei falscher Ausrichtung</string>
     <string name="preference_wrong_orientation_rule_summary">Was soll mit Bildern passieren, die die falsche Ausrichtung haben?</string>
+    <string name="preference_preview">Vorschau</string>
+    <string name="preference_preview_summary">Vorschau starten und als aktuellen Hintergrund setzen.</string>
     <string-array name="orderings">
         <item>Auswahlreihenfolge</item>
         <item>Nach Namen sortieren</item>
