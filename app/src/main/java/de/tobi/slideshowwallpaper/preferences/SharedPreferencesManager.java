@@ -6,9 +6,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import de.tobi.slideshowwallpaper.R;
@@ -19,23 +17,25 @@ public class SharedPreferencesManager {
     private static final String PREFERENCE_KEY_LAST_UPDATE = "last_update";
     private static final String PREFERENCE_KEY_LAST_INDEX = "last_index";
     private static final String PREFERENCE_KEY_URI_LIST = "pick_images";
+    private static final String PREFERENCE_KEY_URI_LIST_RANDOM = "uri_list_random";
+    private static final String PREFERENCE_KEY_URI_LIST_ALPHABETICAL = "uri_list_alphabetical";
     private static final String PREFERENCE_KEY_SECONDS_BETWEEN = "seconds";
     private static final String PREFERENCE_KEY_WRONG_ORIENTATION_RULE = "wrong_orientation_rule";
 
     public enum Ordering {
-        SELECTION(0) {
+        SELECTION(0, PREFERENCE_KEY_URI_LIST) {
             @Override
             public List<Uri> sort(List<Uri> list) {
                 return list;
             }
         },
-        ALPHABET(1) {
+        ALPHABETICAL(1, PREFERENCE_KEY_URI_LIST_ALPHABETICAL) {
             @Override
             public List<Uri> sort(List<Uri> list) {
                 return list; //TODO
             }
         },
-        RANDOM(2) {
+        RANDOM(2, PREFERENCE_KEY_URI_LIST_RANDOM) {
             @Override
             public List<Uri> sort(List<Uri> list) {
                 List<Uri> result = new ArrayList<>(list);
@@ -45,9 +45,11 @@ public class SharedPreferencesManager {
         };
 
         private int valueListIndex;
+        private String preferenceKey;
 
-        private Ordering(int valueListIndex) {
+        private Ordering(int valueListIndex, String preferenceKey) {
             this.valueListIndex = valueListIndex;
+            this.preferenceKey = preferenceKey;
         }
 
         public static Ordering forValue(String value, Resources r) {
@@ -67,6 +69,10 @@ public class SharedPreferencesManager {
 
         public String getValue(Resources r) {
             return r.getStringArray(R.array.ordering_values)[valueListIndex];
+        }
+
+        public String getPreferenceKey() {
+            return preferenceKey;
         }
 
         public abstract List<Uri> sort(List<Uri> list);
@@ -115,56 +121,57 @@ public class SharedPreferencesManager {
     }
 
     public List<Uri> getImageUris(@NonNull Ordering ordering) {
-        String[] uris = getUriList();
+        String[] uris = getUriList(ordering);
         ArrayList<Uri> result = new ArrayList<>(uris.length);
         for (String uri : uris) {
             result.add(Uri.parse(uri));
         }
-        return ordering.sort(result);
+        return result;
     }
 
-    private String[] getUriList() {
-        String list = preferences.getString(PREFERENCE_KEY_URI_LIST, null);
+    private String[] getUriList(Ordering ordering) {
+        String list = preferences.getString(ordering.getPreferenceKey(), null);
         if (list == null) {
             return new String[0];
-        } else
+        } else {
             return list.split(";");
+        }
     }
 
     public void addUri(Uri uri) {
-        StringBuilder listBuilder = new StringBuilder(preferences.getString(PREFERENCE_KEY_URI_LIST, ""));
-
-        if (listBuilder.length() > 0) {
-            listBuilder.append(";");
+        List<Uri> list = getImageUris(Ordering.SELECTION);
+        list.add(uri);
+        for (Ordering ordering : Ordering.values()) {
+            saveUriList(ordering.sort(list), ordering.getPreferenceKey());
         }
-        listBuilder.append(uri.toString());
+    }
 
+    private void saveUriList(List<Uri> uris, String preferenceKey) {
+        StringBuilder listBuilder = new StringBuilder();
+        for (int i = 0; i < uris.size(); i++) {
+            Uri uri = uris.get(i);
+            listBuilder.append(uri.toString());
+
+            if (i + 1 < uris.size()) {
+                listBuilder.append(";");
+            }
+        }
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(PREFERENCE_KEY_URI_LIST, listBuilder.toString());
+        editor.putString(preferenceKey, listBuilder.toString());
         editor.apply();
     }
 
     public void removeUri(Uri uri) {
-        String[] uris = getUriList();
-        List<String> newList = new LinkedList<>(Arrays.asList(uris));
-        newList.remove(uri.toString());
-
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < newList.size(); i++) {
-            result.append(newList.get(i));
-            if (i + 1 < newList.size()) {
-                result.append(";");
-            }
+        List<Uri> uris = getImageUris(Ordering.SELECTION);
+        uris.remove(uri);
+        for (Ordering ordering : Ordering.values()) {
+            saveUriList(ordering.sort(uris), ordering.getPreferenceKey());
         }
-
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(PREFERENCE_KEY_URI_LIST, result.toString());
-        editor.apply();
     }
 
     public int getCurrentIndex() {
         int result = preferences.getInt(PREFERENCE_KEY_LAST_INDEX, 0);
-        String[] uris = getUriList();
+        String[] uris = getUriList(Ordering.SELECTION);
         while (result >= uris.length) {
             result -= uris.length;
         }
