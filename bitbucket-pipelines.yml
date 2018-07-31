@@ -37,7 +37,7 @@ pipelines:
             - app/build/outputs/apk/debug/app-debug.apk
       - step:
                 name: upload
-                deployment: development
+                deployment: test
                 script:
                   - mv app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/app-development-debug.apk
                   - curl -v -X POST "https://${BB_AUTH_STRING}@api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"app/build/outputs/apk/debug/app-development-debug.apk"
