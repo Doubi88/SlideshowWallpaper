@@ -8,20 +8,25 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.tobi.slideshowwallpaper.R;
 import de.tobi.slideshowwallpaper.listeners.OnDeleteClickListener;
+import de.tobi.slideshowwallpaper.utilities.AsyncTaskLoadImages;
 
 public class ImageListAdapter extends RecyclerView.Adapter<ImageInfoViewHolder> {
 
     private List<Uri> uris;
     private List<OnDeleteClickListener> listeners;
+    private HashMap<Uri, AsyncTaskLoadImages> loading;
+
 
     public ImageListAdapter(List<Uri> uris) {
         this.uris = new ArrayList<>(uris);
         listeners = new LinkedList<>();
+        loading = new HashMap<>();
     }
 
     @Override
@@ -52,6 +57,17 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageInfoViewHolder> 
     @Override
     public void onBindViewHolder(ImageInfoViewHolder holder, int position) {
         Log.d(ImageListAdapter.class.getSimpleName(), "Loading image " + position);
+        AsyncTaskLoadImages asyncTask = loading.get(uris.get(position));
+        if (asyncTask == null) {
+            Log.d(ImageListAdapter.class.getSimpleName(), "Starting new AsyncTask for " + position);
+            asyncTask = new AsyncTaskLoadImages(holder.itemView.getContext(), holder.itemView.getWidth(), holder.itemView.getResources().getDimensionPixelSize(R.dimen.image_preview_height));
+            loading.put(uris.get(position), asyncTask);
+
+            asyncTask.execute(uris.get(position));
+        } else {
+            Log.d(ImageListAdapter.class.getSimpleName(), "AsyncTask for " + position + " is already there.");
+        }
+        asyncTask.addProgressListener(holder);
         holder.setUri(uris.get(position));
     }
 
