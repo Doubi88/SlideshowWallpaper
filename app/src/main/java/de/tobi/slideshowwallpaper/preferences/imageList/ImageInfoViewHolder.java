@@ -26,7 +26,7 @@ import de.tobi.slideshowwallpaper.utilities.ImageInfo;
 import de.tobi.slideshowwallpaper.utilities.ImageLoader;
 import de.tobi.slideshowwallpaper.utilities.ProgressListener;
 
-public class ImageInfoViewHolder extends RecyclerView.ViewHolder {
+public class ImageInfoViewHolder extends RecyclerView.ViewHolder implements ProgressListener<Uri, BigDecimal, List<ImageInfo>> {
 
     private final int height;
     private final int width;
@@ -70,54 +70,12 @@ public class ImageInfoViewHolder extends RecyclerView.ViewHolder {
 
     public void setUri(Uri uri) {
         if (imageInfo == null || !uri.equals(imageInfo.getUri())) {
-            if (imageInfo != null) {
-                if (asyncTask != null && asyncTask.getStatus() != AsyncTask.Status.FINISHED) {
-                    asyncTask.cancel(false);
-                }
-                imageView.setImageBitmap(null);
-                progressBar.setVisibility(View.VISIBLE);
-
-            }
             showBottomBar();
 
             imageInfo = ImageLoader.loadFileNameAndSize(uri, imageView.getContext());
             textView.setText(imageInfo.getName());
 
-            asyncTask = new AsyncTaskLoadImages(imageView.getContext(), width, height);
-            asyncTask.addProgressListener(new ProgressListener<Uri, BigDecimal, List<ImageInfo>>() {
-                @Override
-                public void onProgressChanged(AsyncTask<Uri, BigDecimal, List<ImageInfo>> task, BigDecimal current, BigDecimal max) {
-                    progressBar.setMax(max.intValue());
-                    progressBar.setProgress(current.intValue());
-                }
-
-                @Override
-                public void onTaskFinished(AsyncTask<Uri, BigDecimal, List<ImageInfo>> task, List<ImageInfo> imageInfos) {
-                    if (imageInfos.size() == 1) {
-                        imageInfo = imageInfos.get(0);
-                        if (imageInfo.getImage() != null) {
-                            Matrix matrix = ImageLoader.calculateMatrixScaleToFit(imageInfo.getImage(), width, height, false);
-                            imageView.setImageBitmap(Bitmap.createBitmap(imageInfo.getImage(), 0, 0, imageInfo.getImage().getWidth(), imageInfo.getImage().getHeight(), matrix, false));
-                        }
-                        textView.setText(imageInfo.getName());
-                        progressBar.setVisibility(View.GONE);
-
-                    }
-                }
-
-                @Override
-                public void onTaskCancelled(AsyncTask<Uri, BigDecimal, List<ImageInfo>> task, List<ImageInfo> imageInfos) {
-                    if (imageInfos != null) {
-                        for (ImageInfo info : imageInfos) {
-                            info.getImage().recycle();
-                        }
-                    }
-                }
-            });
-
-
-            asyncTask.execute(uri);
-        }
+      }
     }
 
     private void toggleBottomBar() {
@@ -186,7 +144,36 @@ public class ImageInfoViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
-    public Uri getImageInfo() {
+    public Uri getUri() {
         return imageInfo.getUri();
+    }
+
+    @Override
+    public void onProgressChanged(AsyncTask<Uri, BigDecimal, List<ImageInfo>> task, BigDecimal current, BigDecimal max) {
+        progressBar.setMax(max.intValue());
+        progressBar.setProgress(current.intValue());
+    }
+
+    @Override
+    public void onTaskFinished(AsyncTask<Uri, BigDecimal, List<ImageInfo>> task, List<ImageInfo> imageInfos) {
+        if (imageInfos.size() == 1) {
+            imageInfo = imageInfos.get(0);
+            if (imageInfo.getImage() != null) {
+                Matrix matrix = ImageLoader.calculateMatrixScaleToFit(imageInfo.getImage(), width, height, false);
+                imageView.setImageBitmap(Bitmap.createBitmap(imageInfo.getImage(), 0, 0, imageInfo.getImage().getWidth(), imageInfo.getImage().getHeight(), matrix, false));
+            }
+            textView.setText(imageInfo.getName());
+            progressBar.setVisibility(View.GONE);
+
+        }
+    }
+
+    @Override
+    public void onTaskCancelled(AsyncTask<Uri, BigDecimal, List<ImageInfo>> task, List<ImageInfo> imageInfos) {
+        if (imageInfos != null) {
+            for (ImageInfo info : imageInfos) {
+                info.getImage().recycle();
+            }
+        }
     }
 }
