@@ -1,12 +1,15 @@
 package de.tobi.slideshowwallpaper.preferences.imageList;
 
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -15,12 +18,15 @@ import java.util.List;
 import de.tobi.slideshowwallpaper.R;
 import de.tobi.slideshowwallpaper.listeners.OnDeleteClickListener;
 import de.tobi.slideshowwallpaper.utilities.AsyncTaskLoadImages;
+import de.tobi.slideshowwallpaper.utilities.ImageInfo;
+import de.tobi.slideshowwallpaper.utilities.ProgressListener;
 
 public class ImageListAdapter extends RecyclerView.Adapter<ImageInfoViewHolder> {
 
     private List<Uri> uris;
     private List<OnDeleteClickListener> listeners;
     private HashMap<Uri, AsyncTaskLoadImages> loading;
+    private HashMap<Uri, ImageInfoViewHolder> activeHolders;
 
 
     public ImageListAdapter(List<Uri> uris) {
@@ -56,19 +62,42 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageInfoViewHolder> 
 
     @Override
     public void onBindViewHolder(ImageInfoViewHolder holder, int position) {
-        Log.d(ImageListAdapter.class.getSimpleName(), "Loading image " + position);
-        AsyncTaskLoadImages asyncTask = loading.get(uris.get(position));
+        final Uri uri = uris.get(position);
+        AsyncTaskLoadImages asyncTask = loading.get(uri);
         if (asyncTask == null) {
-            Log.d(ImageListAdapter.class.getSimpleName(), "Starting new AsyncTask for " + position);
             asyncTask = new AsyncTaskLoadImages(holder.itemView.getContext(), holder.itemView.getWidth(), holder.itemView.getResources().getDimensionPixelSize(R.dimen.image_preview_height));
-            loading.put(uris.get(position), asyncTask);
+            loading.put(uri, asyncTask);
 
-            asyncTask.execute(uris.get(position));
-        } else {
-            Log.d(ImageListAdapter.class.getSimpleName(), "AsyncTask for " + position + " is already there.");
+            asyncTask.addProgressListener(new ProgressListener<Uri, BigDecimal, List<ImageInfo>>() {
+                @Override
+                public void onProgressChanged(AsyncTask<Uri, BigDecimal, List<ImageInfo>> task, BigDecimal current, BigDecimal max) {
+
+                }
+
+                @Override
+                public void onTaskFinished(AsyncTask<Uri, BigDecimal, List<ImageInfo>> task, List<ImageInfo> imageInfos) {
+                    loading.remove(uri);
+                }
+
+                @Override
+                public void onTaskCancelled(AsyncTask<Uri, BigDecimal, List<ImageInfo>> task, List<ImageInfo> imageInfos) {
+                    loading.remove(uri);
+                }
+            });
+            asyncTask.execute(uri);
         }
         asyncTask.addProgressListener(holder);
-        holder.setUri(uris.get(position));
+        holder.setUri(uri);
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(@NonNull ImageInfoViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        AsyncTaskLoadImages task = loading.get(holder.getUri());
+        if (task != null) {
+            task.cancel(false);
+            loading.remove(holder.getUri());
+        }
     }
 
     @Override

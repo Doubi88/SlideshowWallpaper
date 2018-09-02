@@ -144,7 +144,7 @@ public class ImageInfoViewHolder extends RecyclerView.ViewHolder implements Prog
         }
     }
 
-    public Uri getImageInfo() {
+    public Uri getUri() {
         return imageInfo.getUri();
     }
 
