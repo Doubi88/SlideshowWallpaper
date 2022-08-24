@@ -15,7 +15,7 @@ pipelines:
 
           script:
             # Download and unzip android sdk
-            - wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip
+            - wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip
             - unzip -o -qq android-sdk.zip -d android-sdk
 
             # Define Android Home and add PATHs
