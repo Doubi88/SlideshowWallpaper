@@ -5,8 +5,8 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceFragmentCompat;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
 
 import de.tobi.slideshowwallpaper.R;
 import de.tobi.slideshowwallpaper.SlideshowWallpaperService;

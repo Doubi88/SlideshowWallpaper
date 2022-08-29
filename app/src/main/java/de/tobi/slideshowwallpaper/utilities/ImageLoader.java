@@ -10,8 +10,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.provider.OpenableColumns;
-import android.support.annotation.NonNull;
-import android.support.media.ExifInterface;
+import androidx.annotation.NonNull;
+import androidx.exifinterface.media.ExifInterface;
 import android.util.Log;
 
 import java.io.IOException;
@@ -47,7 +47,6 @@ public class ImageLoader {
             } else {
                 Log.e(ImageLoader.class.getSimpleName(), "Could not load file " + uri.toString());
                 name = context.getResources().getString(R.string.error_reading_file);
-                size = 0;
             }
             return new ImageInfo(uri, name, size, null);
         } catch (SecurityException e) {
