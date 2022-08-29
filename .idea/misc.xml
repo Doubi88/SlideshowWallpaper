@@ -5,6 +5,7 @@
       <map>
         <entry key="app/src/main/res/layout/activity_wallpaper_preferences.xml" value="0.5380208333333333" />
         <entry key="app/src/main/res/layout/image_list.xml" value="0.5380208333333333" />
+        <entry key="app/src/main/res/layout/image_list_entry.xml" value="0.303125" />
         <entry key="app/src/main/res/xml/wallpaper_preferences.xml" value="0.5380208333333333" />
       </map>
     </option>
