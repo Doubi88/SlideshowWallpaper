@@ -15,8 +15,7 @@ pipelines:
           name: upload
           deployment: test
           script:
-            - mv app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/app-development-debug.apk
-            - curl -v -X POST "https://${BB_AUTH_STRING}@api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"app/build/outputs/apk/debug/app-development-debug.apk"
+            - curl -v -X POST "https://${BB_AUTH_STRING}@api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"app/build/outputs/apk/debug/app-debug.apk"
     master:
       - step:
           name: Build Prod Application
@@ -30,8 +29,7 @@ pipelines:
           name: upload
           deployment: production
           script:
-            - mv app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/app-master-release.apk
-            - curl -v -X POST "https://${BB_AUTH_STRING}@api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"app/build/outputs/apk/release/app-master-release.apk"
+            - curl -v -X POST "https://${BB_AUTH_STRING}@api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"app/build/outputs/apk/release/app-release.apk"
   default:
       - step:
           name: Build Debug Application
