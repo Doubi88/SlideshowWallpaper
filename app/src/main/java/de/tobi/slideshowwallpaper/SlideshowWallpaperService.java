@@ -100,9 +100,12 @@ public class SlideshowWallpaperService extends WallpaperService {
         private float calculateDeltaX(Bitmap image, float xOffset, float xOffsetStep) {
             int width = image.getWidth();
             int height = image.getHeight();
+
             float result = 0;
             if ((width > height && this.height > this.width) || (height > width && this.width > this.height)) {
                 SharedPreferencesManager.WrongOrientationRule rule = manager.getWrongOrientationRule(getResources());
+                float scale = ImageLoader.calculateScaleFactorToFit(image, this.width, this.height, rule == SharedPreferencesManager.WrongOrientationRule.SCALE_DOWN);
+                width = Math.round(width * scale);
                 if (rule == SharedPreferencesManager.WrongOrientationRule.SCROLL_FORWARD) {
                     result = -(width * xOffset / (xOffsetStep + 1f));
                 } else if (rule == SharedPreferencesManager.WrongOrientationRule.SCROLL_BACKWARD) {
