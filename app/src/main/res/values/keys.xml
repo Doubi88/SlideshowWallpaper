@@ -4,6 +4,7 @@
     <string name="preference_seconds_key">seconds</string>
     <string name="preference_ordering_key">ordering</string>
     <string name="preference_wrong_orientation_rule_key">wrong_orientation_rule</string>
+    <string name="preference_preview_key">preview</string>
     <string-array name="ordering_values">
         <item>selection</item>
         <item>name</item>

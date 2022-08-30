@@ -1,15 +1,17 @@
 package de.tobi.slideshowwallpaper.utilities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
+import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.provider.OpenableColumns;
-import android.support.annotation.NonNull;
-import android.support.media.ExifInterface;
+import androidx.annotation.NonNull;
+import androidx.exifinterface.media.ExifInterface;
 import android.util.Log;
 
 import java.io.IOException;
@@ -45,9 +47,10 @@ public class ImageLoader {
             } else {
                 Log.e(ImageLoader.class.getSimpleName(), "Could not load file " + uri.toString());
                 name = context.getResources().getString(R.string.error_reading_file);
-                size = 0;
             }
             return new ImageInfo(uri, name, size, null);
+        } catch (SecurityException e) {
+            return new ImageInfo(null, "Cannot access image", 0, null);
         } finally {
             if (fileCursor != null) {
                 fileCursor.close();
@@ -73,7 +76,22 @@ public class ImageLoader {
         InputStream in = null;
         try  {
             info = loadFileNameAndSize(uri, context);
-            in = context.getContentResolver().openInputStream(uri);
+            int retried = 0;
+            do {
+                try {
+                    in = context.getContentResolver().openInputStream(uri);
+                } catch (SecurityException e) {
+                    // Permission denied. Show image as error
+                    try {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                            context.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        }
+                        retried++;
+                    } catch (Exception e2) {
+                        retried = 2; // No longer retry
+                    }
+                }
+            } while (in == null && retried < 2);
             if (in != null) {
 
                 int degrees = getRotationDegrees(context, uri);
@@ -84,6 +102,9 @@ public class ImageLoader {
                 bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
                 info = new ImageInfo(uri, info.getName(), info.getSize(), bitmap);
 
+            }
+            else {
+                info = new ImageInfo(uri, context.getResources().getString(R.string.error_reading_file), 0, null);
             }
 
         } finally {

@@ -1,10 +1,15 @@
 package de.tobi.slideshowwallpaper.preferences;
 
+import android.app.WallpaperManager;
+import android.content.ComponentName;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.preference.PreferenceFragmentCompat;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
 
 import de.tobi.slideshowwallpaper.R;
+import de.tobi.slideshowwallpaper.SlideshowWallpaperService;
 
 public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
 
@@ -24,6 +29,17 @@ public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
                 updateSummary(sharedPreferences, key);
             }
         };
+        getPreferenceManager().findPreference(getResources().getString(R.string.preference_preview_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Intent intent = new Intent(
+                        WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
+                intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
+                        new ComponentName(getContext(), SlideshowWallpaperService.class));
+                startActivity(intent);
+                return true;
+            }
+        });
         getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(listener);
     }
 
