@@ -1,81 +1,42 @@
-# This is a sample build configuration for Java (Gradle).
-# Check our guides at https://confluence.atlassian.com/x/zd-5Mw for more examples.
-# Only use spaces to indent your .yml configuration.
-# -----
-# You can specify a custom docker image from Docker Hub as your build environment.
-image: java:8
+image: androidsdk/android-31
 
 pipelines:
   branches:
     development:
       - step:
+          name: Build Debug Application
           caches:
             - gradle
-            - android-sdk
-
           script:
-            # Download and unzip android sdk
-            - wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip
-            - unzip -o -qq android-sdk.zip -d android-sdk
-
-            # Define Android Home and add PATHs
-            - export ANDROID_HOME="/opt/atlassian/pipelines/agent/build/android-sdk"
-            - export PATH="$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH"
-
-            # Download packages.
-            - yes | sdkmanager "platform-tools"
-            - yes | sdkmanager "platforms;android-27"
-            - yes | sdkmanager "build-tools;27.0.3"
-            - yes | sdkmanager "extras;android;m2repository"
-            - yes | sdkmanager "extras;google;m2repository"
-            - yes | sdkmanager "extras;google;instantapps"
-            - yes | sdkmanager --licenses
-
-            # Build apk
             - ./gradlew assembleDebug
           artifacts:
-            - app/build/outputs/apk/debug/app-debug.apk
+            - app/build/outputs/**
       - step:
-                name: upload
-                deployment: test
-                script:
-                  - mv app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/app-development-debug.apk
-                  - curl -v -X POST "https://${BB_AUTH_STRING}@api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"app/build/outputs/apk/debug/app-development-debug.apk"
+          name: upload
+          deployment: test
+          script:
+            - curl -v -X POST "https://${BB_AUTH_STRING}@api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"app/build/outputs/apk/debug/app-debug.apk"
     master:
       - step:
+          name: Build Prod Application
           caches:
             - gradle
-            - android-sdk
-
           script:
-            # Download and unzip android sdk
-            - wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
-            - unzip -o -qq android-sdk.zip -d android-sdk
-
-            # Define Android Home and add PATHs
-            - export ANDROID_HOME="/opt/atlassian/pipelines/agent/build/android-sdk"
-            - export PATH="$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH"
-
-            # Download packages.
-            - yes | sdkmanager "platform-tools"
-            - yes | sdkmanager "platforms;android-27"
-            - yes | sdkmanager "build-tools;27.0.3"
-            - yes | sdkmanager "extras;android;m2repository"
-            - yes | sdkmanager "extras;google;m2repository"
-            - yes | sdkmanager "extras;google;instantapps"
-            - yes | sdkmanager --licenses
-
-            # Build apk
+            - ./gradlew assembleRelease
+          artifacts:
+            - app/build/outputs/**
+      - step:
+          name: upload
+          deployment: production
+          script:
+            - curl -v -X POST "https://${BB_AUTH_STRING}@api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"app/build/outputs/apk/release/app-release.apk"
+  default:
+      - step:
+          name: Build Debug Application
+          caches:
+            - gradle
+          script:
             - ./gradlew assembleDebug
           artifacts:
-            - app/build/outputs/apk/debug/app-debug.apk
-      - step:
-                name: upload
-                deployment: production
-                script:
-                  - mv app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/app-master-debug.apk
-                  - curl -v -X POST "https://${BB_AUTH_STRING}@api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"app/build/outputs/apk/debug/app-master-debug.apk"
-
-definitions:
-    caches:
-      android-sdk: android-sdk
+            - app/build/outputs/**
+  

@@ -13,6 +13,7 @@
     <string name="preference_wrong_orientation_rule_summary">Was soll mit Bildern passieren, die die falsche Ausrichtung haben?</string>
     <string name="preference_preview">Vorschau</string>
     <string name="preference_preview_summary">Vorschau starten und als aktuellen Hintergrund setzen.</string>
+    <string name="add_image">Bild(er) hinzufügen</string>
     <string-array name="orderings">
         <item>Auswahlreihenfolge</item>
         <item>Nach Namen sortieren</item>
