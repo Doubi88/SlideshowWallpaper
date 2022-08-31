@@ -99,24 +99,32 @@ public class SlideshowWallpaperService extends WallpaperService {
 
         private float calculateDeltaX(Bitmap image, float xOffset, float xOffsetStep) {
             int width = image.getWidth();
-            int height = image.getHeight();
 
             float result = 0;
-            if ((width > height && this.height > this.width) || (height > width && this.width > this.height)) {
-                SharedPreferencesManager.WrongOrientationRule rule = manager.getWrongOrientationRule(getResources());
-                float scale = ImageLoader.calculateScaleFactorToFit(image, this.width, this.height, rule == SharedPreferencesManager.WrongOrientationRule.SCALE_DOWN);
-                width = Math.round(width * scale);
-
-                if (rule == SharedPreferencesManager.WrongOrientationRule.SCROLL_BACKWARD) {
-                    xOffset = 1 - xOffset;
-                } else if (rule != SharedPreferencesManager.WrongOrientationRule.SCROLL_FORWARD) {
+            SharedPreferencesManager.WrongOrientationRule rule = manager.getWrongOrientationRule(getResources());
+            float scale = ImageLoader.calculateScaleFactorToFit(image, this.width, this.height, rule == SharedPreferencesManager.WrongOrientationRule.SCALE_DOWN);
+            width = Math.round(width * scale);
+            if (width > this.width) {
+                if (rule == SharedPreferencesManager.WrongOrientationRule.SCALE_UP || xOffsetStep == 0) {
+                    // Center image
                     xOffset = 0.5f;
                     xOffsetStep = 0.5f;
+                } else if (rule == SharedPreferencesManager.WrongOrientationRule.SCROLL_BACKWARD) {
+                    xOffset = 1 - xOffset;
                 }
+                float pages = (1 / xOffsetStep) + 1;
+                float page = xOffset / xOffsetStep;
+                float pageWidth = width / pages;
 
-                float pageWidth = width / ((1 / xOffsetStep) + 1);
-                float page = xOffset / xOffsetStep; // TODO Rightmost page must use rightmost pixel of image width page. It uses leftmost pixel currentliy.
-                result = -(pageWidth * page);
+                /*
+                 * Formula:
+                 * pageWidth * page = absolute leftmost pixel of current page
+                 * pageWidth * xOffset = relative offset pixel on current page
+                 * this.width * xOffset = relative offset pixel on screen
+                 *
+                 * Move the relative offset pixel in the current page to the relative offset pixel on the screen
+                 */
+                result = -(pageWidth * page + pageWidth * xOffset - this.width * xOffset);
 
             }
             return result;
