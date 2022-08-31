@@ -20,7 +20,7 @@ public class SharedPreferencesManager {
     private static final String PREFERENCE_KEY_URI_LIST_RANDOM = "uri_list_random";
     private static final String PREFERENCE_KEY_URI_LIST_ALPHABETICAL = "uri_list_alphabetical";
     private static final String PREFERENCE_KEY_SECONDS_BETWEEN = "seconds";
-    private static final String PREFERENCE_KEY_WRONG_ORIENTATION_RULE = "wrong_orientation_rule";
+    private static final String PREFERENCE_KEY_TOO_WIDE_IMAGES_RULE = "too_wide_images_rule";
 
     public enum Ordering {
         SELECTION(0, PREFERENCE_KEY_URI_LIST) {
@@ -78,7 +78,7 @@ public class SharedPreferencesManager {
         public abstract List<Uri> sort(List<Uri> list);
     }
 
-    public enum WrongOrientationRule {
+    public enum TooWideImagesRule {
         SCROLL_FORWARD(0),
         SCROLL_BACKWARD(1),
         SCALE_DOWN(2),
@@ -86,21 +86,21 @@ public class SharedPreferencesManager {
 
         private int valueListIndex;
 
-        private WrongOrientationRule(int valueListIndex) {
+        private TooWideImagesRule(int valueListIndex) {
             this.valueListIndex = valueListIndex;
         }
 
         public String getDescription(Resources r) {
-            return r.getStringArray(R.array.wrong_orientation_rules)[valueListIndex];
+            return r.getStringArray(R.array.too_wide_images_rules)[valueListIndex];
         }
 
         public String getValue(Resources r) {
-            return r.getStringArray(R.array.wrong_orientation_rule_values)[valueListIndex];
+            return r.getStringArray(R.array.too_wide_images_rule_values)[valueListIndex];
         }
 
-        public static WrongOrientationRule forValue(String value, Resources r) {
-            WrongOrientationRule[] values = values();
-            WrongOrientationRule result = null;
+        public static TooWideImagesRule forValue(String value, Resources r) {
+            TooWideImagesRule[] values = values();
+            TooWideImagesRule result = null;
             for (int i = 0; i < values.length && result == null; i++) {
                 if (values[i].getValue(r).equals(value)) {
                     result = values[i];
@@ -206,8 +206,8 @@ public class SharedPreferencesManager {
         editor.apply();
     }
 
-    public WrongOrientationRule getWrongOrientationRule(Resources r) {
-        String value = preferences.getString(PREFERENCE_KEY_WRONG_ORIENTATION_RULE, "scale_down");
-        return WrongOrientationRule.forValue(value, r);
+    public TooWideImagesRule getTooWideImagesRule(Resources r) {
+        String value = preferences.getString(PREFERENCE_KEY_TOO_WIDE_IMAGES_RULE, TooWideImagesRule.SCALE_DOWN.getValue(r));
+        return TooWideImagesRule.forValue(value, r);
     }
 }

@@ -171,15 +171,19 @@ public class ImageLoader {
         return result;
     }
 
-    public static Matrix calculateMatrixScaleToFit(Bitmap bitmap, int screenWidth, int screenHeight, boolean both) {
-        Matrix result = new Matrix();
-
+    public static float calculateScaleFactorToFit(Bitmap bitmap, int screenWidth, int screenHeight, boolean both) {
         float scale = 0;
         if (both) {
             scale = Math.min((float) screenWidth / (float) bitmap.getWidth(), (float) screenHeight / (float) bitmap.getHeight());
         } else {
             scale = Math.max((float) screenWidth / (float) bitmap.getWidth(), (float) screenHeight / (float) bitmap.getHeight());
         }
+        return scale;
+    }
+    public static Matrix calculateMatrixScaleToFit(Bitmap bitmap, int screenWidth, int screenHeight, boolean both) {
+        Matrix result = new Matrix();
+
+        float scale = calculateScaleFactorToFit(bitmap, screenWidth, screenHeight, both);
         float yTranslate = (screenHeight - bitmap.getHeight() * scale) / 2f;
 
         result.setScale(scale, scale);

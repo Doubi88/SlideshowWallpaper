@@ -99,17 +99,18 @@ public class SlideshowWallpaperService extends WallpaperService {
 
         private float calculateDeltaX(Bitmap image, float xOffset, float xOffsetStep) {
             int width = image.getWidth();
-            int height = image.getHeight();
+
             float result = 0;
-            if ((width > height && this.height > this.width) || (height > width && this.width > this.height)) {
-                SharedPreferencesManager.WrongOrientationRule rule = manager.getWrongOrientationRule(getResources());
-                if (rule == SharedPreferencesManager.WrongOrientationRule.SCROLL_FORWARD) {
-                    result = -(width * xOffset / (xOffsetStep + 1f));
-                } else if (rule == SharedPreferencesManager.WrongOrientationRule.SCROLL_BACKWARD) {
-                    result = (width * xOffset / (xOffsetStep + 1f)) - (width/ (xOffsetStep + 1f));
-                } else {
-                    result = -(width * 0.5f / 1.5f);
+            SharedPreferencesManager.TooWideImagesRule rule = manager.getTooWideImagesRule(getResources());
+            float scale = ImageLoader.calculateScaleFactorToFit(image, this.width, this.height, rule == SharedPreferencesManager.TooWideImagesRule.SCALE_DOWN);
+            width = Math.round(width * scale);
+            if (width > this.width) {
+                if (rule == SharedPreferencesManager.TooWideImagesRule.SCALE_UP) {
+                    xOffset = 0.5f;
+                } else if (rule == SharedPreferencesManager.TooWideImagesRule.SCROLL_BACKWARD) {
+                    xOffset = 1 - xOffset;
                 }
+                result = -xOffset * (width - this.width);
             }
             return result;
         }
@@ -229,10 +230,10 @@ public class SlideshowWallpaperService extends WallpaperService {
                             currentImageHeight = bitmap.getHeight();
                             currentImageWidth = bitmap.getWidth();
 
-                            SharedPreferencesManager.WrongOrientationRule rule = manager.getWrongOrientationRule(getResources());
-                            if (rule == SharedPreferencesManager.WrongOrientationRule.SCALE_DOWN) {
+                            SharedPreferencesManager.TooWideImagesRule rule = manager.getTooWideImagesRule(getResources());
+                            if (rule == SharedPreferencesManager.TooWideImagesRule.SCALE_DOWN) {
                                 canvas.drawBitmap(bitmap, ImageLoader.calculateMatrixScaleToFit(bitmap, width, height, true), null);
-                            } else if (rule == SharedPreferencesManager.WrongOrientationRule.SCALE_UP || rule == SharedPreferencesManager.WrongOrientationRule.SCROLL_FORWARD || rule == SharedPreferencesManager.WrongOrientationRule.SCROLL_BACKWARD) {
+                            } else if (rule == SharedPreferencesManager.TooWideImagesRule.SCALE_UP || rule == SharedPreferencesManager.TooWideImagesRule.SCROLL_FORWARD || rule == SharedPreferencesManager.TooWideImagesRule.SCROLL_BACKWARD) {
                                 canvas.save();
                                 canvas.translate(deltaX, 0);
                                 canvas.drawBitmap(bitmap, ImageLoader.calculateMatrixScaleToFit(bitmap, width, height, false), null);
