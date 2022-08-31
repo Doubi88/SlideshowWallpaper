@@ -29,7 +29,7 @@ pipelines:
           name: upload
           deployment: production
           script:
-            - curl -v -X POST "https://${BB_AUTH_STRING}@api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"app/build/outputs/apk/release/app-release.apk"
+            - curl -v -X POST "https://${BB_AUTH_STRING}@api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"app/build/outputs/apk/release/app-release-unsigned.apk"
   default:
       - step:
           name: Build Debug Application
