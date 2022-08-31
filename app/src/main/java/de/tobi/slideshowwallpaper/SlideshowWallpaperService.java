@@ -105,27 +105,12 @@ public class SlideshowWallpaperService extends WallpaperService {
             float scale = ImageLoader.calculateScaleFactorToFit(image, this.width, this.height, rule == SharedPreferencesManager.WrongOrientationRule.SCALE_DOWN);
             width = Math.round(width * scale);
             if (width > this.width) {
-                if (rule == SharedPreferencesManager.WrongOrientationRule.SCALE_UP || xOffsetStep == 0) {
-                    // Center image
+                if (rule == SharedPreferencesManager.WrongOrientationRule.SCALE_UP) {
                     xOffset = 0.5f;
-                    xOffsetStep = 0.5f;
                 } else if (rule == SharedPreferencesManager.WrongOrientationRule.SCROLL_BACKWARD) {
                     xOffset = 1 - xOffset;
                 }
-                float pages = (1 / xOffsetStep) + 1;
-                float page = xOffset / xOffsetStep;
-                float pageWidth = width / pages;
-
-                /*
-                 * Formula:
-                 * pageWidth * page = absolute leftmost pixel of current page
-                 * pageWidth * xOffset = relative offset pixel on current page
-                 * this.width * xOffset = relative offset pixel on screen
-                 *
-                 * Move the relative offset pixel in the current page to the relative offset pixel on the screen
-                 */
-                result = -(pageWidth * page + pageWidth * xOffset - this.width * xOffset);
-
+                result = -xOffset * (width - this.width);
             }
             return result;
         }
