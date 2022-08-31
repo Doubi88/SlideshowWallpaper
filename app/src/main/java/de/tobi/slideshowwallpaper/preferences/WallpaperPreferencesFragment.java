@@ -49,21 +49,30 @@ public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
         updateSummary(sharedPreferences, getResources().getString(R.string.preference_seconds_key));
         updateSummary(sharedPreferences, getResources().getString(R.string.preference_ordering_key));
     }
+
+    private <T> int getIndex(T[] values, T value) {
+        int index = -1;
+        for (int i = 0; (i < values.length) && (index < 0); i++) {
+            if (values[i].equals(value)) {
+                index = i;
+            }
+        }
+        return index;
+    }
     private void updateSummary(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getResources().getString(R.string.preference_add_images_key))) {
             findPreference(key).setSummary(new SharedPreferencesManager(getPreferenceManager().getSharedPreferences()).getImageUris(SharedPreferencesManager.Ordering.SELECTION).size() + " " + getResources().getString(R.string.images_selected));
         } else if (key.equals(getResources().getString(R.string.preference_seconds_key))) {
-            findPreference(key).setSummary(sharedPreferences.getString(key, "15"));
+            String[] seconds = getResources().getStringArray(R.array.seconds);
+            String[] secondsValues = getResources().getStringArray(R.array.seconds_values);
+            String currentValue = sharedPreferences.getString(key, "15");
+            int index = getIndex(secondsValues, currentValue);
+            findPreference(key).setSummary(seconds[index]);
         } else if (key.equals(getResources().getString(R.string.preference_ordering_key))) {
             String[] orderings = getResources().getStringArray(R.array.orderings);
             String[] orderingValues = getResources().getStringArray(R.array.ordering_values);
             String currentValue = sharedPreferences.getString(key, "selection");
-            int index = -1;
-            for (int i = 0; (i < orderingValues.length) && (index < 0); i++) {
-                if (orderingValues[i].equals(currentValue)) {
-                    index = i;
-                }
-            }
+            int index = getIndex(orderingValues, currentValue);
             findPreference(key).setSummary(orderings[index]);
         }
 

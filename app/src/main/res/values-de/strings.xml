@@ -25,4 +25,18 @@
         <item>Passend</item>
         <item>Zoomen</item>
     </string-array>
+    <string-array name="seconds">
+        <item>5 Sek.</item>
+        <item>10 Sek.</item>
+        <item>15 Sek.</item>
+        <item>30 Sek.</item>
+        <item>45 Sek.</item>
+        <item>1 Min.</item>
+        <item>2 Min.</item>
+        <item>3 Min.</item>
+        <item>4 Min.</item>
+        <item>5 Min.</item>
+        <item>10 Min.</item>
+        <item>15 Min.</item>
+    </string-array>
 </resources>

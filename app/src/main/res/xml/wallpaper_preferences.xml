@@ -10,11 +10,11 @@
         android:entries="@array/orderings"
         android:entryValues="@array/ordering_values"
         />
-    <EditTextPreference
-        android:inputType="number"
+    <ListPreference
         android:key="@string/preference_seconds_key"
         android:title="@string/preference_seconds"
-        android:numeric="integer"/>
+        android:entries="@array/seconds"
+        android:entryValues="@array/seconds_values"/>
     <ListPreference
         android:key="@string/preference_too_wide_images_rule_key"
         android:title="@string/preference_too_wide_images_rule"
