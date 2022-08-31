@@ -107,18 +107,17 @@ public class SlideshowWallpaperService extends WallpaperService {
                 float scale = ImageLoader.calculateScaleFactorToFit(image, this.width, this.height, rule == SharedPreferencesManager.WrongOrientationRule.SCALE_DOWN);
                 width = Math.round(width * scale);
 
-                float pages = (1 / xOffsetStep) + 1;
-                float currentPage = xOffset / xOffsetStep; // Starts at 0
-                float lastPageLeftPixel = width - this.width;
-                if (rule == SharedPreferencesManager.WrongOrientationRule.SCROLL_FORWARD) {
-                    float leftmostPixel = (lastPageLeftPixel / pages) * currentPage;
-                    result = -leftmostPixel;
-                } else if (rule == SharedPreferencesManager.WrongOrientationRule.SCROLL_BACKWARD) {
-                    float leftmostPixel = (lastPageLeftPixel / pages) * (pages - currentPage);
-                    result = -leftmostPixel;
-                } else {
-                    result = -(width * 0.5f / 1.5f);
+                if (rule == SharedPreferencesManager.WrongOrientationRule.SCROLL_BACKWARD) {
+                    xOffset = 1 - xOffset;
+                } else if (rule != SharedPreferencesManager.WrongOrientationRule.SCROLL_FORWARD) {
+                    xOffset = 0.5f;
+                    xOffsetStep = 0.5f;
                 }
+
+                float pageWidth = width / ((1 / xOffsetStep) + 1);
+                float page = xOffset / xOffsetStep; // TODO Rightmost page must use rightmost pixel of image width page. It uses leftmost pixel currentliy.
+                result = -(pageWidth * page);
+
             }
             return result;
         }
