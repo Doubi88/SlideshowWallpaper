@@ -106,10 +106,16 @@ public class SlideshowWallpaperService extends WallpaperService {
                 SharedPreferencesManager.WrongOrientationRule rule = manager.getWrongOrientationRule(getResources());
                 float scale = ImageLoader.calculateScaleFactorToFit(image, this.width, this.height, rule == SharedPreferencesManager.WrongOrientationRule.SCALE_DOWN);
                 width = Math.round(width * scale);
+
+                float pages = (1 / xOffsetStep) + 1;
+                float currentPage = xOffset / xOffsetStep; // Starts at 0
+                float lastPageLeftPixel = width - this.width;
                 if (rule == SharedPreferencesManager.WrongOrientationRule.SCROLL_FORWARD) {
-                    result = -(width * xOffset / (xOffsetStep + 1f));
+                    float leftmostPixel = (lastPageLeftPixel / pages) * currentPage;
+                    result = -leftmostPixel;
                 } else if (rule == SharedPreferencesManager.WrongOrientationRule.SCROLL_BACKWARD) {
-                    result = (width * xOffset / (xOffsetStep + 1f)) - (width/ (xOffsetStep + 1f));
+                    float leftmostPixel = (lastPageLeftPixel / pages) * (pages - currentPage);
+                    result = -leftmostPixel;
                 } else {
                     result = -(width * 0.5f / 1.5f);
                 }
