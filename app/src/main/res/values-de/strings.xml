@@ -7,10 +7,10 @@
     <string name="preference_seconds">Sekunden bis zum Bilderwechsel</string>
     <string name="images_selected">Bilder ausgewählt</string>
     <string name="image_view_description">Bild</string>
-    <string name="settings_name">Slideshow-Wallpaper-Einstellungen</string>
-    <string name="image_list_name">Slideshow Wallpaper Bilderliste</string>
-    <string name="preference_wrong_orientation_rule">Regel bei falscher Ausrichtung</string>
-    <string name="preference_wrong_orientation_rule_summary">Was soll mit Bildern passieren, die die falsche Ausrichtung haben?</string>
+    <string name="settings_name">Einstellungen</string>
+    <string name="image_list_name">Bilderliste</string>
+    <string name="preference_too_wide_images_rule">Zu breite Bilder</string>
+    <string name="preference_too_wide_images_rule_summary">Was soll mit Bildern, die zu breit sind, um sie auf einem Bildschirm anzuzeigen, geschehen?</string>
     <string name="preference_preview">Vorschau</string>
     <string name="preference_preview_summary">Vorschau starten und als aktuellen Hintergrund setzen.</string>
     <string name="add_image">Bild(er) hinzufügen</string>
@@ -19,7 +19,7 @@
         <item>Nach Namen sortieren</item>
         <item>Zufällig</item>
     </string-array>
-    <string-array name="wrong_orientation_rules">
+    <string-array name="too_wide_images_rules">
         <item>Mit den Homescreens scrollen</item>
         <item>Mit den Homescreens in entgegengesetzter Richtung scrollen</item>
         <item>Passend</item>

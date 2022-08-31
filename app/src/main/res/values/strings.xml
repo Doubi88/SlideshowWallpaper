@@ -7,10 +7,10 @@
     <string name="preference_seconds">Seconds between images</string>
     <string name="images_selected">images selected</string>
     <string name="image_view_description">Image</string>
-    <string name="settings_name">Slideshow Wallpaper Settings</string>
-    <string name="image_list_name">Slideshow Wallpaper Image List</string>
-    <string name="preference_wrong_orientation_rule">Wrong Orientation Rule</string>
-    <string name="preference_wrong_orientation_rule_summary">What to do with images, that have the opposite orientation of the screen.</string>
+    <string name="settings_name">Settings</string>
+    <string name="image_list_name">Image List</string>
+    <string name="preference_too_wide_images_rule">Too Wide Images</string>
+    <string name="preference_too_wide_images_rule_summary">What to do with images, that are too wide for displaying them on one screen.</string>
     <string name="preference_preview">Preview</string>
     <string name="preference_preview_summary">Preview and set as current wallpaper.</string>
     <string name="add_image">Add Image(s)</string>
@@ -19,7 +19,7 @@
         <item>Order by name</item>
         <item>Random</item>
     </string-array>
-    <string-array name="wrong_orientation_rules">
+    <string-array name="too_wide_images_rules">
         <item>Scroll with home screens</item>
         <item>Scroll with home screens in opposite direction</item>
         <item>Scale down to fit</item>
