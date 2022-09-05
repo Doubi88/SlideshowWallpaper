@@ -60,31 +60,28 @@ public class ImageListActivity extends AppCompatActivity {
         List<Uri> uris = manager.getImageUris(SharedPreferencesManager.Ordering.SELECTION);
 
         imageListAdapter = new ImageListAdapter(uris);
-        imageListAdapter.addOnDeleteClickListener(new OnDeleteClickListener() {
-            @Override
-            public void onDeleteButtonClicked(Uri uri) {
-                manager.removeUri(uri);
+        imageListAdapter.addOnDeleteClickListener(uri -> {
+            manager.removeUri(uri);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                getContentResolver().releasePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
             }
         });
         recyclerView.setAdapter(imageListAdapter);
 
-        findViewById(R.id.add_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-                }
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-                } else {
-                    intent.setAction(Intent.ACTION_GET_CONTENT);
-                }
-                startActivityForResult(intent, REQUEST_CODE_FILE);
+        findViewById(R.id.add_button).setOnClickListener(view -> {
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
             }
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+            } else {
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+            }
+            startActivityForResult(intent, REQUEST_CODE_FILE);
         });
     }
 

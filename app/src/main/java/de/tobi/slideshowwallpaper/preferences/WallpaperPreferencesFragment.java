@@ -20,6 +20,7 @@ package de.tobi.slideshowwallpaper.preferences;
 
 import android.app.WallpaperManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -41,21 +42,18 @@ public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
     public void onResume() {
         super.onResume();
         updateSummaries();
-        listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                updateSummary(sharedPreferences, key);
-            }
-        };
-        getPreferenceManager().findPreference(getResources().getString(R.string.preference_preview_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
+        listener = this::updateSummary;
+        getPreferenceManager().findPreference(getResources().getString(R.string.preference_preview_key)).setOnPreferenceClickListener(preference -> {
+            Context ctx = getContext();
+            if (ctx != null) {
                 Intent intent = new Intent(
                         WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
                 intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
-                        new ComponentName(getContext(), SlideshowWallpaperService.class));
+                        new ComponentName(ctx, SlideshowWallpaperService.class));
                 startActivity(intent);
                 return true;
+            } else {
+                return false;
             }
         });
         getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(listener);
