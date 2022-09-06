@@ -25,7 +25,7 @@
     <string name="preference_ordering">Ordering</string>
     <string name="error_reading_file">Error reading file</string>
     <string name="delete_button_description">Remove</string>
-    <string name="preference_seconds">Seconds between images</string>
+    <string name="preference_seconds">Time between images</string>
     <string name="images_selected">images selected</string>
     <string name="image_view_description">Image</string>
     <string name="settings_name">Settings</string>

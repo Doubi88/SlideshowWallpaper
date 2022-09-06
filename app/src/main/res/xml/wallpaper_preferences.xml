@@ -19,29 +19,37 @@
  *
  */
 -->
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <Preference android:title="@string/preference_edit_image_list"
-        android:key="@string/preference_add_images_key">
-        <intent android:targetPackage="de.tobi.slideshowwallpaper"
-            android:targetClass="de.tobi.slideshowwallpaper.preferences.imageList.ImageListActivity" />
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <Preference
+        android:key="@string/preference_add_images_key"
+        android:title="@string/preference_edit_image_list"
+        app:icon="@drawable/ic_image_list">
+        <intent
+            android:targetClass="de.tobi.slideshowwallpaper.preferences.imageList.ImageListActivity"
+            android:targetPackage="de.tobi.slideshowwallpaper" />
     </Preference>
     <ListPreference android:key="@string/preference_ordering_key"
         android:title="@string/preference_ordering"
         android:entries="@array/orderings"
         android:entryValues="@array/ordering_values"
+        app:icon="@drawable/ic_ordering"
         />
     <ListPreference
         android:key="@string/preference_seconds_key"
         android:title="@string/preference_seconds"
         android:entries="@array/seconds"
-        android:entryValues="@array/seconds_values"/>
+        android:entryValues="@array/seconds_values"
+        app:icon="@drawable/ic_delay"/>
     <ListPreference
         android:key="@string/preference_too_wide_images_rule_key"
         android:title="@string/preference_too_wide_images_rule"
         android:summary="@string/preference_too_wide_images_rule_summary"
         android:entries="@array/too_wide_images_rules"
-        android:entryValues="@array/too_wide_images_rule_values" />
+        android:entryValues="@array/too_wide_images_rule_values"
+        app:icon="@drawable/ic_wide_handling" />
     <Preference android:title="@string/preference_preview"
         android:key="@string/preference_preview_key"
-        android:summary="@string/preference_preview_summary"/>
+        android:summary="@string/preference_preview_summary"
+        app:icon="@drawable/ic_preview" />
 </PreferenceScreen>
