@@ -38,6 +38,11 @@ pipelines:
           caches:
             - gradle
           script:
+            - mkdir app/Keystore
+            - echo $KEYSTORE_ENCRYPTED | tr '|' '\n' > app/Keystore/SlideshowWallpaper.jks.asc
+            - echo $CREDENTIALS_ENCRYPTED | tr '|' '\n' > app/Keystore/keystore.properties.asc
+            - gpg -d --passphrase $GPG_PASSPHRASE --batch app/Keystore/keystore.properties.asc > app/Keystore/keystore.properties
+            - gpg -d --passphrase $GPG_PASSPHRASE --batch app/Keystore/SlideshowWallpaper.jks.asc > app/Keystore/SlideshowWallpaper.jks
             - ./gradlew assembleRelease
           artifacts:
             - app/build/outputs/**
@@ -45,7 +50,7 @@ pipelines:
           name: upload
           deployment: production
           script:
-            - curl -v -X POST "https://${BB_AUTH_STRING}@api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"app/build/outputs/apk/release/app-release-unsigned.apk"
+            - curl -v -X POST "https://${BB_AUTH_STRING}@api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"app/build/outputs/apk/release/app-release.apk"
   default:
       - step:
           name: Build Debug Application
