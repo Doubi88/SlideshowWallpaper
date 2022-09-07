@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
-image: doubi88/android-31-gpg
+image: doubi88/android-31-gpg:1
 
 pipelines:
   branches:
