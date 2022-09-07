@@ -1,16 +1,16 @@
 apply plugin: 'com.android.application'
 
 def keystorePropertiesFile = file("Keystore/keystore.properties")
-def keystoreProperties = new Properties()
-keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+def keystoreProperties = null
+if (keystorePropertiesFile.canRead()) {
+    keystoreProperties = new Properties()
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
 
 android {
     signingConfigs {
         release {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
+
         }
     }
     compileSdk 32
@@ -31,6 +31,13 @@ android {
     }
     productFlavors {
     }
+}
+
+if (keystoreProperties != null) {
+    android.signingConfigs.release.keyAlias keystoreProperties['keyAlias']
+    android.signingConfigs.release.keyPassword keystoreProperties['keyPassword']
+    android.signingConfigs.release.storeFile file(keystoreProperties['storeFile'])
+    android.signingConfigs.release.storePassword keystoreProperties['storePassword']
 }
 
 dependencies {
