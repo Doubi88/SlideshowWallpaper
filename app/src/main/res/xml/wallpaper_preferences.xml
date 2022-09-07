@@ -1,27 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <Preference android:title="@string/preference_edit_image_list"
-        android:key="@string/preference_add_images_key">
-        <intent android:targetPackage="de.tobi.slideshowwallpaper"
-            android:targetClass="de.tobi.slideshowwallpaper.preferences.imageList.ImageListActivity" />
+<!--
+/*
+ * Slideshow Wallpaper: An Android live wallpaper displaying custom images.
+ * Copyright (C) 2022  Doubi88 <tobis_mail@yahoo.de>
+ *
+ * Slideshow Wallpaper is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Slideshow Wallpaper is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+-->
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <Preference
+        android:key="@string/preference_add_images_key"
+        android:title="@string/preference_edit_image_list"
+        app:icon="@drawable/ic_image_list">
+        <intent
+            android:targetClass="de.tobi.slideshowwallpaper.preferences.imageList.ImageListActivity"
+            android:targetPackage="de.tobi.slideshowwallpaper" />
     </Preference>
     <ListPreference android:key="@string/preference_ordering_key"
         android:title="@string/preference_ordering"
         android:entries="@array/orderings"
         android:entryValues="@array/ordering_values"
+        app:icon="@drawable/ic_ordering"
         />
-    <EditTextPreference
-        android:inputType="number"
+    <ListPreference
         android:key="@string/preference_seconds_key"
         android:title="@string/preference_seconds"
-        android:numeric="integer"/>
+        android:entries="@array/seconds"
+        android:entryValues="@array/seconds_values"
+        app:icon="@drawable/ic_delay"/>
     <ListPreference
-        android:key="@string/preference_wrong_orientation_rule_key"
-        android:title="@string/preference_wrong_orientation_rule"
-        android:summary="@string/preference_wrong_orientation_rule_summary"
-        android:entries="@array/wrong_orientation_rules"
-        android:entryValues="@array/wrong_orientation_rule_values" />
+        android:key="@string/preference_too_wide_images_rule_key"
+        android:title="@string/preference_too_wide_images_rule"
+        android:summary="@string/preference_too_wide_images_rule_summary"
+        android:entries="@array/too_wide_images_rules"
+        android:entryValues="@array/too_wide_images_rule_values"
+        app:icon="@drawable/ic_wide_handling" />
     <Preference android:title="@string/preference_preview"
         android:key="@string/preference_preview_key"
-        android:summary="@string/preference_preview_summary"/>
+        android:summary="@string/preference_preview_summary"
+        app:icon="@drawable/ic_preview" />
 </PreferenceScreen>

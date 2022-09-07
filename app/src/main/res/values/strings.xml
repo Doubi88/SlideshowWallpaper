@@ -1,16 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Slideshow Wallpaper: An Android live wallpaper displaying custom images.
+ * Copyright (C) 2022  Doubi88 <tobis_mail@yahoo.de>
+ *
+ * Slideshow Wallpaper is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Slideshow Wallpaper is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+-->
 <resources>
     <string name="app_name">Slideshow Wallpaper</string>
     <string name="preference_edit_image_list">Edit image list</string>
     <string name="preference_ordering">Ordering</string>
     <string name="error_reading_file">Error reading file</string>
     <string name="delete_button_description">Remove</string>
-    <string name="preference_seconds">Seconds between images</string>
+    <string name="preference_seconds">Time between images</string>
     <string name="images_selected">images selected</string>
     <string name="image_view_description">Image</string>
-    <string name="settings_name">Slideshow Wallpaper Settings</string>
-    <string name="image_list_name">Slideshow Wallpaper Image List</string>
-    <string name="preference_wrong_orientation_rule">Wrong Orientation Rule</string>
-    <string name="preference_wrong_orientation_rule_summary">What to do with images, that have the opposite orientation of the screen.</string>
+    <string name="settings_name">Settings</string>
+    <string name="image_list_name">Image List</string>
+    <string name="preference_too_wide_images_rule">Too Wide Images</string>
+    <string name="preference_too_wide_images_rule_summary">What to do with images, that are too wide for displaying them on one screen.</string>
     <string name="preference_preview">Preview</string>
     <string name="preference_preview_summary">Preview and set as current wallpaper.</string>
     <string name="add_image">Add Image(s)</string>
@@ -19,10 +40,24 @@
         <item>Order by name</item>
         <item>Random</item>
     </string-array>
-    <string-array name="wrong_orientation_rules">
+    <string-array name="too_wide_images_rules">
         <item>Scroll with home screens</item>
         <item>Scroll with home screens in opposite direction</item>
         <item>Scale down to fit</item>
         <item>Scale up to fit</item>
+    </string-array>
+    <string-array name="seconds">
+        <item>5 sec</item>
+        <item>10 sec</item>
+        <item>15 sec</item>
+        <item>30 sec</item>
+        <item>45 sec</item>
+        <item>1 min</item>
+        <item>2 min</item>
+        <item>3 min</item>
+        <item>4 min</item>
+        <item>5 min</item>
+        <item>10 min</item>
+        <item>15 min</item>
     </string-array>
 </resources>
