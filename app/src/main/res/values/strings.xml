@@ -21,23 +21,24 @@
 -->
 <resources>
     <string name="app_name">Slideshow Wallpaper</string>
-    <string name="preference_edit_image_list">Edit image list</string>
+    <string name="preference_edit_image_list">Images</string>
     <string name="preference_ordering">Ordering</string>
     <string name="error_reading_file">Error reading file</string>
     <string name="delete_button_description">Remove</string>
     <string name="preference_seconds">Time between images</string>
-    <string name="images_selected">images selected</string>
+    <plurals name="images_selected">
+        <item quantity="one">%d image selected</item>
+        <item quantity="other">%d images selected</item>
+    </plurals>
     <string name="image_view_description">Image</string>
     <string name="settings_name">Settings</string>
-    <string name="image_list_name">Image List</string>
-    <string name="preference_too_wide_images_rule">Too Wide Images</string>
-    <string name="preference_too_wide_images_rule_summary">What to do with images, that are too wide for displaying them on one screen.</string>
+    <string name="image_list_name">Images</string>
+    <string name="preference_too_wide_images_rule">Display</string>
     <string name="preference_preview">Preview</string>
     <string name="preference_preview_summary">Preview and set as current wallpaper.</string>
     <string name="add_image">Add Image(s)</string>
     <string-array name="orderings">
         <item>Selection order</item>
-        <item>Order by name</item>
         <item>Random</item>
     </string-array>
     <string-array name="too_wide_images_rules">

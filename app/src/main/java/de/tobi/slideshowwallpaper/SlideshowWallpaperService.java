@@ -187,6 +187,10 @@ public class SlideshowWallpaperService extends WallpaperService {
 
             if (uris.size() > 0) {
                 int currentImageIndex = manager.getCurrentIndex();
+                if (currentImageIndex >= uris.size()) {
+                    // If an image was deleted and therefore we are over the end of the list
+                    currentImageIndex -= uris.size();
+                }
                 int nextUpdate = calculateNextUpdateInSeconds();
                 if (nextUpdate <= 0) {
                     int delay = getDelaySeconds();
