@@ -27,7 +27,6 @@
     <string name="preference_preview_key" translatable="false">preview</string>
     <string-array name="ordering_values">
         <item>selection</item>
-        <item>name</item>
         <item>random</item>
     </string-array>
     <string-array name="too_wide_images_rule_values">

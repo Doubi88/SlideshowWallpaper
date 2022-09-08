@@ -44,7 +44,6 @@
     <ListPreference
         android:key="@string/preference_too_wide_images_rule_key"
         android:title="@string/preference_too_wide_images_rule"
-        android:summary="@string/preference_too_wide_images_rule_summary"
         android:entries="@array/too_wide_images_rules"
         android:entryValues="@array/too_wide_images_rule_values"
         app:icon="@drawable/ic_wide_handling" />

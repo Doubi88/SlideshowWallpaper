@@ -36,7 +36,6 @@ public class SharedPreferencesManager {
     private static final String PREFERENCE_KEY_LAST_INDEX = "last_index";
     private static final String PREFERENCE_KEY_URI_LIST = "pick_images";
     private static final String PREFERENCE_KEY_URI_LIST_RANDOM = "uri_list_random";
-    private static final String PREFERENCE_KEY_URI_LIST_ALPHABETICAL = "uri_list_alphabetical";
     private static final String PREFERENCE_KEY_SECONDS_BETWEEN = "seconds";
     private static final String PREFERENCE_KEY_TOO_WIDE_IMAGES_RULE = "too_wide_images_rule";
 
@@ -47,13 +46,7 @@ public class SharedPreferencesManager {
                 return list;
             }
         },
-        ALPHABETICAL(1, PREFERENCE_KEY_URI_LIST_ALPHABETICAL) {
-            @Override
-            public List<Uri> sort(List<Uri> list) {
-                return list; //TODO
-            }
-        },
-        RANDOM(2, PREFERENCE_KEY_URI_LIST_RANDOM) {
+        RANDOM(1, PREFERENCE_KEY_URI_LIST_RANDOM) {
             @Override
             public List<Uri> sort(List<Uri> list) {
                 List<Uri> result = new ArrayList<>(list);
@@ -149,7 +142,7 @@ public class SharedPreferencesManager {
 
     private String[] getUriList(Ordering ordering) {
         String list = preferences.getString(ordering.getPreferenceKey(), null);
-        if (list == null) {
+        if (list == null || list.equals("")) {
             return new String[0];
         } else {
             return list.split(";");

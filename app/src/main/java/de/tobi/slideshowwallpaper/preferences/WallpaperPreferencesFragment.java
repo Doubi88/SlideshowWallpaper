@@ -42,7 +42,6 @@ public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
     public void onResume() {
         super.onResume();
         updateSummaries();
-        listener = this::updateSummary;
         getPreferenceManager().findPreference(getResources().getString(R.string.preference_preview_key)).setOnPreferenceClickListener(preference -> {
             Context ctx = getContext();
             if (ctx != null) {
@@ -56,7 +55,7 @@ public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
                 return false;
             }
         });
-        getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(listener);
+        getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this::updateSummary);
     }
 
     private void updateSummaries() {
@@ -64,6 +63,7 @@ public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
         updateSummary(sharedPreferences, getResources().getString(R.string.preference_add_images_key));
         updateSummary(sharedPreferences, getResources().getString(R.string.preference_seconds_key));
         updateSummary(sharedPreferences, getResources().getString(R.string.preference_ordering_key));
+        updateSummary(sharedPreferences, getResources().getString(R.string.preference_too_wide_images_rule_key));
     }
 
     private <T> int getIndex(T[] values, T value) {
@@ -77,7 +77,9 @@ public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
     }
     private void updateSummary(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getResources().getString(R.string.preference_add_images_key))) {
-            findPreference(key).setSummary(new SharedPreferencesManager(getPreferenceManager().getSharedPreferences()).getImageUris(SharedPreferencesManager.Ordering.SELECTION).size() + " " + getResources().getString(R.string.images_selected));
+            SharedPreferencesManager prefManager = new SharedPreferencesManager(sharedPreferences);
+            int imagesCount = prefManager.getImageUris(SharedPreferencesManager.Ordering.SELECTION).size();
+            findPreference(key).setSummary(getResources().getQuantityString(R.plurals.images_selected, imagesCount, imagesCount));
         } else if (key.equals(getResources().getString(R.string.preference_seconds_key))) {
             String[] seconds = getResources().getStringArray(R.array.seconds);
             String[] secondsValues = getResources().getStringArray(R.array.seconds_values);
@@ -87,9 +89,15 @@ public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
         } else if (key.equals(getResources().getString(R.string.preference_ordering_key))) {
             String[] orderings = getResources().getStringArray(R.array.orderings);
             String[] orderingValues = getResources().getStringArray(R.array.ordering_values);
-            String currentValue = sharedPreferences.getString(key, "selection");
+            String currentValue = sharedPreferences.getString(key, SharedPreferencesManager.Ordering.SELECTION.getValue(getResources()));
             int index = getIndex(orderingValues, currentValue);
             findPreference(key).setSummary(orderings[index]);
+        } else if (key.equals(getResources().getString(R.string.preference_too_wide_images_rule_key))) {
+            String[] displayRules = getResources().getStringArray(R.array.too_wide_images_rules);
+            String[] displayRuleValues = getResources().getStringArray(R.array.too_wide_images_rule_values);
+            String currentValue = sharedPreferences.getString(key, SharedPreferencesManager.TooWideImagesRule.SCALE_DOWN.getValue(getResources()));
+            int index = getIndex(displayRuleValues, currentValue);
+            findPreference(key).setSummary(displayRules[index]);
         }
 
     }
