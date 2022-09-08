@@ -51,13 +51,4 @@ pipelines:
           deployment: production
           script:
             - curl -v -X POST "https://${BB_AUTH_STRING}@api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"app/build/outputs/apk/release/app-release.apk"
-  default:
-      - step:
-          name: Build Debug Application
-          caches:
-            - gradle
-          script:
-            - ./gradlew assembleDebug
-          artifacts:
-            - app/build/outputs/**
   
