@@ -26,7 +26,6 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
         }
     }
     productFlavors {
@@ -38,6 +37,7 @@ if (keystoreProperties != null) {
     android.signingConfigs.release.keyPassword keystoreProperties['keyPassword']
     android.signingConfigs.release.storeFile file(keystoreProperties['storeFile'])
     android.signingConfigs.release.storePassword keystoreProperties['storePassword']
+    android.buildTypes.release.signingConfig signingConfigs.release
 }
 
 dependencies {

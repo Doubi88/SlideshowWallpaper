@@ -261,8 +261,11 @@ public class SlideshowWallpaperService extends WallpaperService {
                                 canvas.drawBitmap(bitmap, ImageLoader.calculateMatrixScaleToFit(bitmap, width, height, false), null);
                                 canvas.restore();
                             }
-                            String drawText = (currentIndex + 1) + "/" + listLength;
-                            canvas.drawText(drawText, 0, drawText.length(), textSize + 10, textSize + 10, textPaint);
+
+                            if (BuildConfig.DEBUG) {
+                                String drawText = (currentIndex + 1) + "/" + listLength;
+                                canvas.drawText(drawText, 0, drawText.length(), textSize + 10, textSize + 10, textPaint);
+                            }
                         }
                     }
                 } catch (IOException e) {
