@@ -31,6 +31,7 @@ android {
     }
     productFlavors {
     }
+    namespace 'de.tobi.slideshowwallpaper'
 }
 
 if (keystoreProperties != null) {
@@ -42,7 +43,7 @@ if (keystoreProperties != null) {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.appcompat:appcompat:1.5.0'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'androidx.legacy:legacy-preference-v14:1.0.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
