@@ -31,6 +31,8 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.widget.Toast;
 
+import com.rohitss.uceh.UCEHandler;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -75,6 +77,10 @@ public class SlideshowWallpaperService extends WallpaperService {
         private SharedPreferencesManager manager;
 
         public SlideshowWallpaperEngine() {
+
+            new UCEHandler.Builder(getApplicationContext()).addCommaSeparatedEmailAddresses("tobis_mail@yahoo.de")
+                    .setBackgroundModeEnabled(true)
+                    .build();
             deltaX = 0;
             handler = new Handler(Looper.getMainLooper());
             drawRunner = new DrawRunner();
