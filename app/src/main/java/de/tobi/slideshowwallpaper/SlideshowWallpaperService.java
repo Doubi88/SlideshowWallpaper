@@ -78,9 +78,6 @@ public class SlideshowWallpaperService extends WallpaperService {
 
         public SlideshowWallpaperEngine() {
 
-            new UCEHandler.Builder(getApplicationContext()).addCommaSeparatedEmailAddresses("tobis_mail@yahoo.de")
-                    .setBackgroundModeEnabled(true)
-                    .build();
             deltaX = 0;
             handler = new Handler(Looper.getMainLooper());
             drawRunner = new DrawRunner();
@@ -176,7 +173,9 @@ public class SlideshowWallpaperService extends WallpaperService {
                 if (lastRenderedImage == null || !uri.equals(lastRenderedImage.getUri())) {
                     lastRenderedImage = ImageLoader.loadImage(uri, SlideshowWallpaperService.this, width, height, false);
                     Bitmap image = lastRenderedImage.getImage();
-                    deltaX = calculateDeltaX(image, lastXOffset, lastXOffsetStep);
+                    if (image != null) {
+                        deltaX = calculateDeltaX(image, lastXOffset, lastXOffsetStep);
+                    }
                     return image;
                 } else {
                     return lastRenderedImage.getImage();
