@@ -69,6 +69,8 @@ public class ImageLoader {
             return new ImageInfo(uri, name, size, null);
         } catch (SecurityException e) {
             return new ImageInfo(null, "Cannot access image", 0, null);
+        } catch (IllegalArgumentException e) {
+            return new ImageInfo(null, "Cannot access image", 0, null);
         } finally {
             if (fileCursor != null) {
                 fileCursor.close();
@@ -95,21 +97,23 @@ public class ImageLoader {
         try  {
             info = loadFileNameAndSize(uri, context);
             int retried = 0;
-            do {
-                try {
-                    in = context.getContentResolver().openInputStream(uri);
-                } catch (SecurityException e) {
-                    // Permission denied. Show image as error
+            if (info.getUri() != null) {
+                do {
                     try {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                            context.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        in = context.getContentResolver().openInputStream(uri);
+                    } catch (SecurityException e) {
+                        // Permission denied. Show image as error
+                        try {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                                context.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            }
+                            retried++;
+                        } catch (Exception e2) {
+                            retried = 2; // No longer retry
                         }
-                        retried++;
-                    } catch (Exception e2) {
-                        retried = 2; // No longer retry
                     }
-                }
-            } while (in == null && retried < 2);
+                } while (in == null && retried < 2);
+            }
             if (in != null) {
 
                 int degrees = getRotationDegrees(context, uri);
