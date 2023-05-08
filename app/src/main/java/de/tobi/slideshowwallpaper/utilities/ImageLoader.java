@@ -55,12 +55,22 @@ public class ImageLoader {
             fileCursor = context.getContentResolver().query(uri, null, null, null, null);
             if (fileCursor != null) {
                 int nameIndex = fileCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                fileCursor.moveToFirst();
-                name = fileCursor.getString(nameIndex);
-
+                if (nameIndex >= 0 && nameIndex < fileCursor.getColumnCount()) {
+                    fileCursor.moveToFirst();
+                    name = fileCursor.getString(nameIndex);
+                }
+                else {
+                    Log.e("FileCursor error", "FileCursor: " + fileCursor.toString() + " nameIndex: " + String.valueOf(nameIndex));
+                    name = "Error loading filename";
+                }
                 int sizeIndex = fileCursor.getColumnIndex(OpenableColumns.SIZE);
-                fileCursor.moveToFirst();
-                size = Integer.parseInt(fileCursor.getString(sizeIndex));
+                if (sizeIndex >= 0 && sizeIndex < fileCursor.getColumnCount()) {
+                    fileCursor.moveToFirst();
+                    size = Integer.parseInt(fileCursor.getString(sizeIndex));
+                }
+                else {
+                    size = 0;
+                }
 
             } else {
                 Log.e(ImageLoader.class.getSimpleName(), "Could not load file " + uri.toString());
