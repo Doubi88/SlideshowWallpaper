@@ -32,7 +32,7 @@ pipelines:
           deployment: test
           script:
             - curl -v -X POST "https://${BB_AUTH_STRING}@api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"app/build/outputs/apk/debug/app-debug.apk"
-    {master,bugfix-index}:
+    '{master,bugfix-index}':
       - step:
           name: Build Prod Application
           caches:
