@@ -87,15 +87,13 @@ Contributions are what make the open source community such an amazing place to l
 If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
 Don't forget to give the project a star! Thanks again!
 
-1. Download [Android Studio][android-studio-url]
-2. Fork the Project
-3. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-4. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-5. Push to the Branch (`git push origin feature/AmazingFeature`)
-6. Open a Pull Request
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 
 <!-- LICENSE -->
@@ -117,7 +115,7 @@ Project Link: [https://github.com/doubi88/slideshowwallpaper](https://github.com
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## About this README
-This README file was created from the [Best README Template][https://github.com/othneildrew/Best-README-Template].
+This README file was created from the [Best README Template][readme-tamplate-url].
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
@@ -133,3 +131,5 @@ This README file was created from the [Best README Template][https://github.com/
 [license-shield]: https://img.shields.io/github/license/doubi88/slideshowwallpaper.svg?style=for-the-badge
 [license-url]: https://github.com/doubi88/slideshowwallpaper/blob/master/LICENSE
 [product-screenshot]: images/screenshot.png
+[readme-template-url]: https://github.com/othneildrew/Best-README-Template
+[play-store-logo]: 
