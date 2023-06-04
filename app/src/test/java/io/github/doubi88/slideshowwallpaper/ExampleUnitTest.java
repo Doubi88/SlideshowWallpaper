@@ -1,4 +1,4 @@
-package de.tobi.slideshowwallpaper;
+package io.github.doubi88.slideshowwallpaper;
 
 import org.junit.Test;
 

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-package de.tobi.slideshowwallpaper.preferences;
+package io.github.doubi88.slideshowwallpaper.preferences;
 
 import android.app.WallpaperManager;
 import android.content.ComponentName;
@@ -24,11 +24,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import androidx.preference.Preference;
+
 import androidx.preference.PreferenceFragmentCompat;
 
-import de.tobi.slideshowwallpaper.R;
-import de.tobi.slideshowwallpaper.SlideshowWallpaperService;
+import io.github.doubi88.slideshowwallpaper.R;
+import io.github.doubi88.slideshowwallpaper.SlideshowWallpaperService;
 
 public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
 

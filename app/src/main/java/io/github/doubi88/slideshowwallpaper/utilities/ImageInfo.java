@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-package de.tobi.slideshowwallpaper.utilities;
+package io.github.doubi88.slideshowwallpaper.utilities;
 
 import android.graphics.Bitmap;
 import android.net.Uri;

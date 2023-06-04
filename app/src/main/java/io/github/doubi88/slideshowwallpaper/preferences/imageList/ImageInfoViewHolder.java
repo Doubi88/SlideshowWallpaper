@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-package de.tobi.slideshowwallpaper.preferences.imageList;
+package io.github.doubi88.slideshowwallpaper.preferences.imageList;
 
 import android.animation.Animator;
 import android.graphics.Bitmap;
@@ -37,12 +37,12 @@ import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.tobi.slideshowwallpaper.R;
-import de.tobi.slideshowwallpaper.listeners.OnDeleteClickListener;
-import de.tobi.slideshowwallpaper.utilities.AsyncTaskLoadImages;
-import de.tobi.slideshowwallpaper.utilities.ImageInfo;
-import de.tobi.slideshowwallpaper.utilities.ImageLoader;
-import de.tobi.slideshowwallpaper.utilities.ProgressListener;
+import io.github.doubi88.slideshowwallpaper.R;
+import io.github.doubi88.slideshowwallpaper.listeners.OnDeleteClickListener;
+import io.github.doubi88.slideshowwallpaper.utilities.AsyncTaskLoadImages;
+import io.github.doubi88.slideshowwallpaper.utilities.ImageInfo;
+import io.github.doubi88.slideshowwallpaper.utilities.ImageLoader;
+import io.github.doubi88.slideshowwallpaper.utilities.ProgressListener;
 
 public class ImageInfoViewHolder extends RecyclerView.ViewHolder implements ProgressListener<Uri, BigDecimal, List<ImageInfo>> {
 

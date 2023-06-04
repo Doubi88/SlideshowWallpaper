@@ -15,7 +15,7 @@ android {
     }
     compileSdk 32
     defaultConfig {
-        applicationId "de.tobi.slideshowwallpaper"
+        applicationId "io.github.doubi88.slideshowwallpaper"
         minSdkVersion 18
         targetSdk 32
         versionCode 1
@@ -31,7 +31,7 @@ android {
     }
     productFlavors {
     }
-    namespace 'de.tobi.slideshowwallpaper'
+    namespace 'io.github.doubi88.slideshowwallpaper'
 }
 
 if (keystoreProperties != null) {

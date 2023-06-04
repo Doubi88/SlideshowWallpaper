@@ -16,20 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-package de.tobi.slideshowwallpaper.preferences;
+package io.github.doubi88.slideshowwallpaper.listeners;
 
-import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
+import android.net.Uri;
 
-import de.tobi.slideshowwallpaper.R;
+public interface OnDeleteClickListener {
 
-public class WallpaperPreferencesActivity extends AppCompatActivity {
-
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_wallpaper_preferences);
-        getSupportFragmentManager().beginTransaction().replace(R.id.content, new WallpaperPreferencesFragment()).commit();
-    }
+    public void onDeleteButtonClicked(Uri uri);
 }

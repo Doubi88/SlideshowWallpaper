@@ -16,11 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-package de.tobi.slideshowwallpaper.listeners;
+package io.github.doubi88.slideshowwallpaper.utilities;
 
-import android.net.Uri;
+import android.os.AsyncTask;
 
-public interface OnDeleteClickListener {
+public interface ProgressListener<Params, Progress, Result> {
 
-    public void onDeleteButtonClicked(Uri uri);
+    public void onProgressChanged(AsyncTask<Params, Progress, Result> task, Progress current, Progress max);
+    public void onTaskFinished(AsyncTask<Params, Progress, Result> task, Result result);
+    public void onTaskCancelled(AsyncTask<Params, Progress, Result> task, Result result);
 }

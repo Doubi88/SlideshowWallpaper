@@ -1,4 +1,4 @@
-package de.tobi.slideshowwallpaper;
+package io.github.doubi88.slideshowwallpaper;
 
 import android.content.Context;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
-        assertEquals("de.tobi.slideshowwallpaper", appContext.getPackageName());
+        assertEquals("io.github.doubi88.slideshowwallpaper", appContext.getPackageName());
     }
 }

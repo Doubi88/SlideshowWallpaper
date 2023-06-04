@@ -16,13 +16,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-package de.tobi.slideshowwallpaper.utilities;
+package io.github.doubi88.slideshowwallpaper.preferences;
 
-import android.os.AsyncTask;
+import android.os.Bundle;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
-public interface ProgressListener<Params, Progress, Result> {
+import io.github.doubi88.slideshowwallpaper.R;
 
-    public void onProgressChanged(AsyncTask<Params, Progress, Result> task, Progress current, Progress max);
-    public void onTaskFinished(AsyncTask<Params, Progress, Result> task, Result result);
-    public void onTaskCancelled(AsyncTask<Params, Progress, Result> task, Result result);
+public class WallpaperPreferencesActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_wallpaper_preferences);
+        getSupportFragmentManager().beginTransaction().replace(R.id.content, new WallpaperPreferencesFragment()).commit();
+    }
 }

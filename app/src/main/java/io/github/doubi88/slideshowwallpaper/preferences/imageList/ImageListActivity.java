@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-package de.tobi.slideshowwallpaper.preferences.imageList;
+package io.github.doubi88.slideshowwallpaper.preferences.imageList;
 
 import android.app.Activity;
 import android.content.ClipData;
@@ -29,14 +29,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.MenuItem;
-import android.view.View;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import de.tobi.slideshowwallpaper.R;
-import de.tobi.slideshowwallpaper.listeners.OnDeleteClickListener;
-import de.tobi.slideshowwallpaper.preferences.SharedPreferencesManager;
+import io.github.doubi88.slideshowwallpaper.R;
+import io.github.doubi88.slideshowwallpaper.preferences.SharedPreferencesManager;
 
 public class ImageListActivity extends AppCompatActivity {
 

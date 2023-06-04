@@ -26,8 +26,8 @@
         android:title="@string/preference_edit_image_list"
         app:icon="@drawable/ic_image_list">
         <intent
-            android:targetClass="de.tobi.slideshowwallpaper.preferences.imageList.ImageListActivity"
-            android:targetPackage="de.tobi.slideshowwallpaper" />
+            android:targetClass="io.github.doubi88.slideshowwallpaper.preferences.imageList.ImageListActivity"
+            android:targetPackage="io.github.doubi88.slideshowwallpaper" />
     </Preference>
     <ListPreference android:key="@string/preference_ordering_key"
         android:title="@string/preference_ordering"

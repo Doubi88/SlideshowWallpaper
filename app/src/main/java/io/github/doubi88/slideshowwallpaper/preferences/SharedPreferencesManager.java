@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-package de.tobi.slideshowwallpaper.preferences;
+package io.github.doubi88.slideshowwallpaper.preferences;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import de.tobi.slideshowwallpaper.R;
+import io.github.doubi88.slideshowwallpaper.R;
 
 public class SharedPreferencesManager {
 
