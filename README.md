@@ -113,7 +113,7 @@ Project Link: [https://github.com/doubi88/slideshowwallpaper](https://github.com
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## About this README
-This README file was created from the [Best README Template][readme-tamplate-url].
+This README file was created from the [Best README Template](https://github.com/othneildrew/Best-README-Template).
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
@@ -129,5 +129,4 @@ This README file was created from the [Best README Template][readme-tamplate-url
 [license-shield]: https://img.shields.io/github/license/doubi88/slideshowwallpaper.svg?style=for-the-badge
 [license-url]: https://github.com/doubi88/slideshowwallpaper/blob/master/LICENSE
 [product-screenshot]: images/screenshot.png
-[readme-template-url]: https://github.com/othneildrew/Best-README-Template
 [play-store-logo]: 
