@@ -57,7 +57,7 @@
       </ul>
     </li>
     <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
+    <li><a href="#project-license">Project License</a></li>
     <li><a href="#contact">Contact</a></li>
     <li><a href="#about-this-readme">About this README</a></li>
   </ol>
@@ -106,7 +106,7 @@ Distributed under GPL v3. See [`LICENSE`][license-url] for more information.
 <!-- CONTACT -->
 ## Contact
 
-Your Name - tobis_mail@yahoo.de
+Doubi88 - tobis_mail@yahoo.de
 
 Project Link: [https://github.com/doubi88/slideshowwallpaper](https://github.com/doubi88/slideshowwallpaper)
 
