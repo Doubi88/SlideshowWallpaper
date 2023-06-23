@@ -68,7 +68,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Main Screen][product-screenshot]](https://example.com)
+![Main Screen][product-screenshot]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -128,5 +128,5 @@ This README file was created from the [Best README Template](https://github.com/
 [issues-url]: https://github.com/doubi88/slideshowwallpaper/issues
 [license-shield]: https://img.shields.io/github/license/doubi88/slideshowwallpaper.svg?style=for-the-badge
 [license-url]: https://github.com/doubi88/slideshowwallpaper/blob/master/LICENSE
-[product-screenshot]: images/screenshot.png
+[product-screenshot]: docs/images/screenshot.png
 [play-store-logo]: 
