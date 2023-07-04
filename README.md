@@ -24,7 +24,7 @@
 [![Issues][issues-shield]][issues-url]
 [![GPL v3][license-shield]][license-url]
 
-
+<a href='https://play.google.com/store/apps/details?id=io.github.doubi88.slideshowwallpaper'><img height="125" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
 
 <!-- PROJECT LOGO -->
 <br />
@@ -52,9 +52,6 @@
   <ol>
     <li>
       <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#download-the-app-here">Download the app here</a></li>
-      </ul>
     </li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#project-license">Project License</a></li>
@@ -70,11 +67,6 @@
 
 ![Main Screen][product-screenshot]
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- GETTING STARTED -->
-## Download the app here
-[![Play Store][play-store-logo]][play-store-url]
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- CONTRIBUTING -->
@@ -129,4 +121,3 @@ This README file was created from the [Best README Template](https://github.com/
 [license-shield]: https://img.shields.io/github/license/doubi88/slideshowwallpaper.svg?style=for-the-badge
 [license-url]: https://github.com/doubi88/slideshowwallpaper/blob/master/LICENSE
 [product-screenshot]: docs/images/screenshot.png
-[play-store-logo]: 
