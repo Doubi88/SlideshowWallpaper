@@ -24,13 +24,13 @@
 [![Issues][issues-shield]][issues-url]
 [![GPL v3][license-shield]][license-url]
 
-
-
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
 
 <h3 align="center">Slideshow Wallpaper</h3>
+  
+  <p align="center"><a href='https://play.google.com/store/apps/details?id=io.github.doubi88.slideshowwallpaper'><img height="125" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a></p>
 
   <p align="center">
     A Live Wallpaper for Android, displaying user selected images.
@@ -52,9 +52,6 @@
   <ol>
     <li>
       <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#download-the-app-here">Download the app here</a></li>
-      </ul>
     </li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#project-license">Project License</a></li>
@@ -68,13 +65,10 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-![Main Screen][product-screenshot]
+Slideshow Wallpaper is a Live Wallpaper for Android, that displays a slideshow of user selected images. You can customize the duration, how long the images are displayed, the order and the display mode.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<img src="docs/images/screenshot.png" height="605">
 
-<!-- GETTING STARTED -->
-## Download the app here
-[![Play Store][play-store-logo]][play-store-url]
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- CONTRIBUTING -->
@@ -83,7 +77,6 @@
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
 If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
@@ -128,5 +121,3 @@ This README file was created from the [Best README Template](https://github.com/
 [issues-url]: https://github.com/doubi88/slideshowwallpaper/issues
 [license-shield]: https://img.shields.io/github/license/doubi88/slideshowwallpaper.svg?style=for-the-badge
 [license-url]: https://github.com/doubi88/slideshowwallpaper/blob/master/LICENSE
-[product-screenshot]: docs/images/screenshot.png
-[play-store-logo]: 
