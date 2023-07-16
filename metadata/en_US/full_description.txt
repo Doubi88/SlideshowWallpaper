@@ -1,0 +1,15 @@
+Icon image
+Slideshow Wallpaper
+About this app
+With Slideshow Wallpaper You can easily create a slideshow for your home screen and your lock screen. Just follow these easy steps:
+1️⃣ Select the images you want to see.
+2️⃣ Select Order, interval and display mode.
+3️⃣ Set as background.
+
+You can add and remove images at any time.
+
+Advantages of Slideshow Wallpaper:
+⭐ No permissions: This app does not need any android permissions. Not even internet. It only receives the rights to read the images you select, and revokes it when you remove them.
+⭐ No ads
+⭐ Free open source software: Slideshow Wallpaper is licensed under the GNU General Public License, Version 3. The source code is available at: https://www.github.com/Doubi88/SlideshowWallpaper (Feel free to suggest new features, report bugs or open pull requests there)
+
