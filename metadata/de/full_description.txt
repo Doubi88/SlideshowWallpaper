@@ -1,0 +1,11 @@
+Mit Slideshow Wallpaper kannst Du ganz einfach eine Diashow als Hintergrund für deinen Home- oder Lockscreen erstellen. Das funktioniert über folgende einfache Schritte:
+1️⃣ Unter "Bilder" die anzuzeigenden Bilder auswählen.
+2️⃣ Sortierung, Intervall und Anzeigemodus auswählen.
+3️⃣ Als Hintergrund setzen.
+
+Es können jederzeit Bilder hinzugefügt und entfernt werden.
+
+Vorteile von Slideshow Wallpaper:
+⭐ Keine Berechtigungen: Diese App fordert keinerlei Berechtigungen von Android an. Auch keine Internetverbindung. Sie erhält lediglich das Recht, die von Dir ausgewählten Bilder zu lesen. Wenn du ein Bild aus der Auswahl entfernst, wird auch die Berechtigung wieder entfernt.
+⭐ Keine Werbung
+⭐ Freie, quelloffene Software (Open Source): Slideshow Wallpaper steht unter der GNU General Public License, Version 3. Der Source-Code ist auf GitHub verfügbar: https://www.github.com/Doubi88/SlideshowWallpaper (Gerne können hier neue Features vorgeschlagen, Fehler gemeldet oder Pull-Requests erstellt werden)
