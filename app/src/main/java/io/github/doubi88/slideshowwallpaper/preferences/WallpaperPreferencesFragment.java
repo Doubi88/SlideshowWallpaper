@@ -23,6 +23,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 
 import androidx.preference.PreferenceFragmentCompat;
@@ -31,8 +32,6 @@ import io.github.doubi88.slideshowwallpaper.R;
 import io.github.doubi88.slideshowwallpaper.SlideshowWallpaperService;
 
 public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
-
-    private SharedPreferences.OnSharedPreferenceChangeListener listener;
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.wallpaper_preferences);
@@ -41,8 +40,11 @@ public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
     @Override
     public void onResume() {
         super.onResume();
-        updateSummaries();
+        // Here getResources should never throw an IllegalStateException,
+        // because onResume is only called, if an Activity is present.
+        updateSummaries(getResources());
         getPreferenceManager().findPreference(getResources().getString(R.string.preference_preview_key)).setOnPreferenceClickListener(preference -> {
+            // A click on a preference can only occur in a valid context
             Context ctx = getContext();
             if (ctx != null) {
                 Intent intent = new Intent(
@@ -58,12 +60,12 @@ public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
         getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this::updateSummary);
     }
 
-    private void updateSummaries() {
+    private void updateSummaries(Resources resources) {
         SharedPreferences sharedPreferences = getPreferenceManager().getSharedPreferences();
         updateSummary(sharedPreferences, getResources().getString(R.string.preference_add_images_key));
-        updateSummary(sharedPreferences, getResources().getString(R.string.preference_seconds_key));
-        updateSummary(sharedPreferences, getResources().getString(R.string.preference_ordering_key));
-        updateSummary(sharedPreferences, getResources().getString(R.string.preference_too_wide_images_rule_key));
+        updateSummary(sharedPreferences, resources.getString(R.string.preference_seconds_key));
+        updateSummary(sharedPreferences, resources.getString(R.string.preference_ordering_key));
+        updateSummary(sharedPreferences, resources.getString(R.string.preference_too_wide_images_rule_key));
     }
 
     private <T> int getIndex(T[] values, T value) {
@@ -76,35 +78,43 @@ public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
         return index;
     }
     private void updateSummary(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(getResources().getString(R.string.preference_add_images_key))) {
-            SharedPreferencesManager prefManager = new SharedPreferencesManager(sharedPreferences);
-            int imagesCount = prefManager.getImageUris(SharedPreferencesManager.Ordering.SELECTION).size();
-            findPreference(key).setSummary(getResources().getQuantityString(R.plurals.images_selected, imagesCount, imagesCount));
-        } else if (key.equals(getResources().getString(R.string.preference_seconds_key))) {
-            String[] seconds = getResources().getStringArray(R.array.seconds);
-            String[] secondsValues = getResources().getStringArray(R.array.seconds_values);
-            String currentValue = sharedPreferences.getString(key, "15");
-            int index = getIndex(secondsValues, currentValue);
-            findPreference(key).setSummary(seconds[index]);
-        } else if (key.equals(getResources().getString(R.string.preference_ordering_key))) {
-            String[] orderings = getResources().getStringArray(R.array.orderings);
-            String[] orderingValues = getResources().getStringArray(R.array.ordering_values);
-            String currentValue = sharedPreferences.getString(key, SharedPreferencesManager.Ordering.SELECTION.getValue(getResources()));
-            int index = getIndex(orderingValues, currentValue);
-            findPreference(key).setSummary(orderings[index]);
-        } else if (key.equals(getResources().getString(R.string.preference_too_wide_images_rule_key))) {
-            String[] displayRules = getResources().getStringArray(R.array.too_wide_images_rules);
-            String[] displayRuleValues = getResources().getStringArray(R.array.too_wide_images_rule_values);
-            String currentValue = sharedPreferences.getString(key, SharedPreferencesManager.TooWideImagesRule.SCALE_DOWN.getValue(getResources()));
-            int index = getIndex(displayRuleValues, currentValue);
-            findPreference(key).setSummary(displayRules[index]);
+        Resources res = null;
+        try {
+            res = getResources();
+        } catch (IllegalStateException e) {
+            // There is no context currently -> We do not need to update the view
+        }
+        if (res != null) {
+            if (key.equals(res.getString(R.string.preference_add_images_key))) {
+                SharedPreferencesManager prefManager = new SharedPreferencesManager(sharedPreferences);
+                int imagesCount = prefManager.getImageUris(SharedPreferencesManager.Ordering.SELECTION).size();
+                findPreference(key).setSummary(res.getQuantityString(R.plurals.images_selected, imagesCount, imagesCount));
+            } else if (key.equals(res.getString(R.string.preference_seconds_key))) {
+                String[] seconds = res.getStringArray(R.array.seconds);
+                String[] secondsValues = res.getStringArray(R.array.seconds_values);
+                String currentValue = sharedPreferences.getString(key, "15");
+                int index = getIndex(secondsValues, currentValue);
+                findPreference(key).setSummary(seconds[index]);
+            } else if (key.equals(res.getString(R.string.preference_ordering_key))) {
+                String[] orderings = res.getStringArray(R.array.orderings);
+                String[] orderingValues = res.getStringArray(R.array.ordering_values);
+                String currentValue = sharedPreferences.getString(key, SharedPreferencesManager.Ordering.SELECTION.getValue(res));
+                int index = getIndex(orderingValues, currentValue);
+                findPreference(key).setSummary(orderings[index]);
+            } else if (key.equals(res.getString(R.string.preference_too_wide_images_rule_key))) {
+                String[] displayRules = res.getStringArray(R.array.too_wide_images_rules);
+                String[] displayRuleValues = res.getStringArray(R.array.too_wide_images_rule_values);
+                String currentValue = sharedPreferences.getString(key, SharedPreferencesManager.TooWideImagesRule.SCALE_DOWN.getValue(res));
+                int index = getIndex(displayRuleValues, currentValue);
+                findPreference(key).setSummary(displayRules[index]);
+            }
         }
 
     }
 
     @Override
     public void onPause() {
-        getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(listener);
+        getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this::updateSummary);
         super.onPause();
     }
 }
