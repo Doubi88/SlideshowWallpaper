@@ -25,6 +25,7 @@ pipelines:
             - gradle
           script:
             - ./gradlew assembleDebug
+            - ./gradlew bundleDebug
           artifacts:
             - app/build/outputs/**
       - step:
@@ -32,6 +33,7 @@ pipelines:
           deployment: test
           script:
             - curl -v -X POST "https://${BB_AUTH_STRING}@api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"app/build/outputs/apk/debug/app-debug.apk"
+            - curl -v -X POST "https://${BB_AUTH_STRING}@api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"app/build/outputs/bundle/debug/app-debug.aab"
     master:
       - step:
           name: Build Prod Application
@@ -44,6 +46,7 @@ pipelines:
             - gpg -d --passphrase $GPG_PASSPHRASE --batch app/Keystore/keystore.properties.asc > app/Keystore/keystore.properties
             - gpg -d --passphrase $GPG_PASSPHRASE --batch app/Keystore/SlideshowWallpaper.jks.asc > app/Keystore/SlideshowWallpaper.jks
             - ./gradlew assembleRelease
+            - ./gradlew bundleRelease
           artifacts:
             - app/build/outputs/**
       - step:
@@ -51,4 +54,5 @@ pipelines:
           deployment: production
           script:
             - curl -v -X POST "https://${BB_AUTH_STRING}@api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"app/build/outputs/apk/release/app-release.apk"
+            - curl -v -X POST "https://${BB_AUTH_STRING}@api.bitbucket.org/2.0/repositories/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}/downloads" --form files=@"app/build/outputs/bundle/release/app-release.aab"
   
