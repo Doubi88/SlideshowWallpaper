@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Slideshow Wallpaper: An Android live wallpaper displaying custom images.
  * Copyright (C) 2022  Doubi88 <tobis_mail@yahoo.de>
@@ -37,6 +36,8 @@
     <string name="preference_preview">Preview</string>
     <string name="preference_preview_summary">Preview and set as current wallpaper.</string>
     <string name="add_image">Add Image(s)</string>
+    <string name="preference_info">Info</string>
+    <string name="preference_info_summary">Show information about this app</string>
     <string-array name="orderings">
         <item>Selection order</item>
         <item>Random</item>

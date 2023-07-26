@@ -51,4 +51,12 @@
         android:key="@string/preference_preview_key"
         android:summary="@string/preference_preview_summary"
         app:icon="@drawable/ic_preview" />
+    <Preference android:title="@string/preference_info"
+        android:key="@string/preference_info_key"
+        android:summary="@string/preference_info_summary"
+        android:icon="@drawable/ic_info">
+        <intent
+            android:targetClass="io.github.doubi88.slideshowwallpaper.preferences.InfoActivity"
+            android:targetPackage="io.github.doubi88.slideshowwallpaper" />
+    </Preference>
 </PreferenceScreen>
