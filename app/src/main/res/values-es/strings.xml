@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Slideshow Wallpaper: An Android live wallpaper displaying custom images.
+ * Copyright (C) 2022  Doubi88 <tobis_mail@yahoo.de>
+ *
+ * Slideshow Wallpaper is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Slideshow Wallpaper is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+-->
+<resources>
+    <string name="app_name">Slideshow Wallpaper</string>
+    <string name="preference_edit_image_list">Imágenes</string>
+    <string name="preference_ordering">Orden</string>
+    <string name="error_reading_file">Error al leer el archivo</string>
+    <string name="delete_button_description">Eliminar</string>
+    <string name="preference_seconds">Tiempo entre imágenes</string>
+    <plurals name="images_selected">
+        <item quantity="one">%d imagen seleccionada</item>
+        <item quantity="other">%d imágenes seleccionadas</item>
+    </plurals>
+    <string name="image_view_description">Imagen</string>
+    <string name="settings_name">Ajustes</string>
+    <string name="image_list_name">Imágenes</string>
+    <string name="preference_too_wide_images_rule">Mostrar</string>
+    <string name="preference_preview">Previsualizar</string>
+    <string name="preference_preview_summary">Previsualizar y establecer como fondo de pantalla actual.</string>
+    <string name="add_image">Add Image(s)</string>
+    <string-array name="orderings">
+        <item>Orden de selección</item>
+        <item>Aleatorio</item>
+    </string-array>
+    <string-array name="too_wide_images_rules">
+        <item>Desplazar en la misma dirección que la pantalla de inicio</item>
+        <item>Desplazar en la dirección contraria a la pantalla de inicio</item>
+        <item>Reducir para que encaje</item>
+        <item>Aumentar para que encaje</item>
+    </string-array>
+    <string-array name="seconds">
+        <item>5 segundos</item>
+        <item>10 segundos</item>
+        <item>15 segundos</item>
+        <item>30 segundos</item>
+        <item>45 segundos</item>
+        <item>1 minuto</item>
+        <item>2 minutos</item>
+        <item>3 minutos</item>
+        <item>4 minutos</item>
+        <item>5 minutos</item>
+        <item>10 minutos</item>
+        <item>15 minutos</item>
+    </string-array>
+</resources>
