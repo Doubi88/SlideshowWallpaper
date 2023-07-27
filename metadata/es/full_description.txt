@@ -1,0 +1,14 @@
+Imagen del icono
+Fondo de pantalla de presentación de diapositivas
+Acerca de esta aplicación
+Con Slideshow Wallpaper puedes crear fácilmente una presentación de diapositivas para tu pantalla principal y tu pantalla de bloqueo. Simplemente sigue estos pasos:
+1️⃣ Selecciona las imágenes que quieres ver.
+2️⃣ Selecciona el orden, el intervalo y el modo en el que debe mostrarse.
+3️⃣ Defínelo como fondo de pantalla.
+
+Puedes añadir y quitar imágenes en cualquier momento.
+
+Ventajas de Slideshow Wallpaper:
+⭐ Sin permisos: Esta aplicación no necesita ningun permiso de Android. Ni siquiera el internet. Sólo recibe el derecho para leer las imágenes que seleccionas, y los revoca cuando las quitas.
+⭐ Sin anuncios
+⭐ Software gratuito y de código libre: Sludeshow Wallpaper esta licenciado bajo la GNU General Public Lucense, Versión 3. El código fuente esta disponible en: https://www.github.com/Doubi88/SlideshowWallpaper (puedes sugerir nuevas funciones, reportar fallos o abrir pull requests ahí)

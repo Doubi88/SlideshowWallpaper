@@ -1,0 +1,1 @@
+Solucionado crash al cambiar imagen mostrada
