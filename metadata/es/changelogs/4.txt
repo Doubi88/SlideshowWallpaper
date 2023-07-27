@@ -1,0 +1,2 @@
+- Añadida traducción al español
+- Ya no es posible seleccionar imágenes más de una vez

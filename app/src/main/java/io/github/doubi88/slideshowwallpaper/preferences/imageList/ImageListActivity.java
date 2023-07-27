@@ -60,7 +60,7 @@ public class ImageListActivity extends AppCompatActivity {
         imageListAdapter = new ImageListAdapter(uris);
         imageListAdapter.addOnDeleteClickListener(uri -> {
             manager.removeUri(uri);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && !manager.hasImageUri(uri)) {
                 getContentResolver().releasePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
             }
         });
@@ -104,8 +104,9 @@ public class ImageListActivity extends AppCompatActivity {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                         getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     }
-                    manager.addUri(uri);
-                    uris.add(uri);
+                    if (manager.addUri(uri)) {
+                        uris.add(uri);
+                    }
                 }
             } else {
                 for (int index = 0; index < clipData.getItemCount(); index++) {
@@ -113,8 +114,9 @@ public class ImageListActivity extends AppCompatActivity {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                         getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     }
-                    manager.addUri(uri);
-                    uris.add(uri);
+                    if (manager.addUri(uri)) {
+                        uris.add(uri);
+                    }
                 }
             }
 
