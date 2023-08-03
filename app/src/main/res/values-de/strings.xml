@@ -27,8 +27,8 @@
     <string name="delete_button_description">Entfernen</string>
     <string name="preference_seconds">Zeit bis zum Bilderwechsel</string>
     <plurals name="images_selected">
-        <item quantity="one">%d Bild ausgewählt</item>
-        <item quantity="other">%d Bilder ausgewählt</item>
+        <item quantity="one">%d Bild ausgewählt (max %d)</item>
+        <item quantity="other">%d Bilder ausgewählt (max %d)</item>
     </plurals>
     <string name="image_view_description">Bild</string>
     <string name="settings_name">Einstellungen</string>
