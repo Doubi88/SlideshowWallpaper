@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.preference.PreferenceFragmentCompat;
@@ -88,7 +89,12 @@ public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
             if (key.equals(res.getString(R.string.preference_add_images_key))) {
                 SharedPreferencesManager prefManager = new SharedPreferencesManager(sharedPreferences);
                 int imagesCount = prefManager.getImageUris(SharedPreferencesManager.Ordering.SELECTION).size();
-                findPreference(key).setSummary(res.getQuantityString(R.plurals.images_selected, imagesCount, imagesCount));
+
+                int maxCount = 128;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    maxCount = 512;
+                }
+                findPreference(key).setSummary(res.getQuantityString(R.plurals.images_selected, imagesCount, imagesCount, maxCount));
             } else if (key.equals(res.getString(R.string.preference_seconds_key))) {
                 String[] seconds = res.getStringArray(R.array.seconds);
                 String[] secondsValues = res.getStringArray(R.array.seconds_values);
