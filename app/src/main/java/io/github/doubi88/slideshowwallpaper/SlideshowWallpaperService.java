@@ -223,12 +223,29 @@ public class SlideshowWallpaperService extends WallpaperService {
             int seconds = 5;
             try {
                 seconds = manager.getSecondsBetweenImages();
+                seconds = getNextAvailableSecondsEntry(seconds); // Because of the update of the seconds entries (Issue #14), we have to find the nearest entry here.
             } catch (NumberFormatException e) {
                 Log.e(SlideshowWallpaperEngine.class.getSimpleName(), "Invalid number", e);
                 Toast toast = Toast.makeText(getApplicationContext(), e.getClass().getSimpleName() + " " + e.getMessage(), Toast.LENGTH_LONG);
                 toast.show();
             }
             return seconds;
+        }
+
+        private int getNextAvailableSecondsEntry(int seconds) {
+            int[] entries = getResources().getIntArray(R.array.seconds_values);
+            int result = entries[0];
+            int distance = Math.abs(result - seconds);
+            for (int i = 1; i < entries.length; i++) {
+                if (Math.abs(entries[i] - seconds) < distance) {
+                    result = entries[i];
+                    distance = Math.abs(result - seconds);
+                }
+                else {
+                    break; // If the distance gets larger, it won't get smaller again, so break here.
+                }
+            }
+            return result;
         }
 
         private int calculateNextUpdateInSeconds() {

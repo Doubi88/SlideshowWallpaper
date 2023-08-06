@@ -216,8 +216,9 @@ public class SharedPreferencesManager {
 
     public int getSecondsBetweenImages() throws NumberFormatException {
         String secondsString = preferences.getString(PREFERENCE_KEY_SECONDS_BETWEEN, "15");
-        return Integer.parseInt(secondsString);
+        int result = Integer.parseInt(secondsString);
 
+        return result;
     }
 
     public void setSecondsBetweenImages(int value) {
