@@ -59,10 +59,10 @@ public class ImageListActivity extends AppCompatActivity {
         List<Uri> uris = manager.getImageUris(SharedPreferencesManager.Ordering.SELECTION);
 
         imageListAdapter = new ImageListAdapter(uris);
-        imageListAdapter.addOnDeleteClickListener(uri -> {
-            manager.removeUri(uri);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && !manager.hasImageUri(uri)) {
-                getContentResolver().releasePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        imageListAdapter.addOnDeleteClickListener(info -> {
+            manager.removeUri(info.getUri());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && info.getSize() > 0 && !manager.hasImageUri(info.getUri())) {
+                getContentResolver().releasePersistableUriPermission(info.getUri(), Intent.FLAG_GRANT_READ_URI_PERMISSION);
             }
         });
         recyclerView.setAdapter(imageListAdapter);
