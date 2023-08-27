@@ -43,7 +43,6 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageInfoViewHolder> 
     private List<Uri> uris;
     private List<OnDeleteClickListener> listeners;
     private HashMap<Uri, AsyncTaskLoadImages> loading;
-    private HashMap<Uri, ImageInfoViewHolder> activeHolders;
 
 
     public ImageListAdapter(List<Uri> uris) {
@@ -52,14 +51,15 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageInfoViewHolder> 
         loading = new HashMap<>();
     }
 
+    @NonNull
     @Override
     public ImageInfoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.image_list_entry, parent, false);
         ImageInfoViewHolder holder = new ImageInfoViewHolder(view);
         holder.setOnDeleteButtonClickListener(new OnDeleteClickListener() {
             @Override
-            public void onDeleteButtonClicked(Uri uri) {
-                delete(uri);
+            public void onDeleteButtonClicked(ImageInfo info) {
+                delete(info);
             }
         });
         return holder;
@@ -71,14 +71,14 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageInfoViewHolder> 
         }
     }
 
-    private void notifyListeners(Uri uri) {
+    private void notifyListeners(ImageInfo info) {
         for (OnDeleteClickListener listener : listeners) {
-            listener.onDeleteButtonClicked(uri);
+            listener.onDeleteButtonClicked(info);
         }
     }
 
     @Override
-    public void onBindViewHolder(ImageInfoViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ImageInfoViewHolder holder, int position) {
         final Uri uri = uris.get(position);
         AsyncTaskLoadImages asyncTask = loading.get(uri);
         if (asyncTask == null) {
@@ -122,12 +122,12 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageInfoViewHolder> 
         return uris.size();
     }
 
-    private void delete(Uri uri) {
-        int index = uris.indexOf(uri);
+    private void delete(ImageInfo info) {
+        int index = uris.indexOf(info.getUri());
         uris.remove(index);
         notifyItemRemoved(index);
 
-        notifyListeners(uri);
+        notifyListeners(info);
     }
 
     public void addUris(List<Uri> uris) {

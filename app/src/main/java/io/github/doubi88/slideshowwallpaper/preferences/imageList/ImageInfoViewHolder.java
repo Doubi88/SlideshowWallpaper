@@ -158,7 +158,7 @@ public class ImageInfoViewHolder extends RecyclerView.ViewHolder implements Prog
 
     private void notifyListeners() {
         for (OnDeleteClickListener listener : listeners) {
-            listener.onDeleteButtonClicked(imageInfo.getUri());
+            listener.onDeleteButtonClicked(imageInfo);
         }
     }
 
