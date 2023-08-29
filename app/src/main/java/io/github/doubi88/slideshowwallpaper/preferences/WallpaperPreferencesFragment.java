@@ -31,8 +31,11 @@ import androidx.preference.PreferenceFragmentCompat;
 
 import io.github.doubi88.slideshowwallpaper.R;
 import io.github.doubi88.slideshowwallpaper.SlideshowWallpaperService;
+import io.github.doubi88.slideshowwallpaper.utilities.CompatibilityHelpers;
 
 public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
+    public static int DEFAULT_SECONDS = 60;
+
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.wallpaper_preferences);
@@ -98,8 +101,15 @@ public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
             } else if (key.equals(res.getString(R.string.preference_seconds_key))) {
                 String[] seconds = res.getStringArray(R.array.seconds);
                 String[] secondsValues = res.getStringArray(R.array.seconds_values);
-                String currentValue = sharedPreferences.getString(key, "15");
-                int index = getIndex(secondsValues, currentValue);
+                String currentValue = sharedPreferences.getString(key, String.valueOf(DEFAULT_SECONDS));
+                int intValue = DEFAULT_SECONDS;
+                try {
+                    intValue = Integer.parseInt(currentValue);
+                } catch (NumberFormatException e) {
+                    intValue = DEFAULT_SECONDS;
+                }
+                int currentIntValue = CompatibilityHelpers.getNextAvailableSecondsEntry(intValue, secondsValues);
+                int index = getIndex(secondsValues, String.valueOf(currentIntValue));
                 findPreference(key).setSummary(seconds[index]);
             } else if (key.equals(res.getString(R.string.preference_ordering_key))) {
                 String[] orderings = res.getStringArray(R.array.orderings);
