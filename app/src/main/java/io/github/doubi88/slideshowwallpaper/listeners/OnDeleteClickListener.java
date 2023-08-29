@@ -18,9 +18,9 @@
  */
 package io.github.doubi88.slideshowwallpaper.listeners;
 
-import android.net.Uri;
+import io.github.doubi88.slideshowwallpaper.utilities.ImageInfo;
 
 public interface OnDeleteClickListener {
 
-    public void onDeleteButtonClicked(Uri uri);
+    public void onDeleteButtonClicked(ImageInfo info);
 }

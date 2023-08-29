@@ -27,8 +27,8 @@
     <string name="delete_button_description">Entfernen</string>
     <string name="preference_seconds">Zeit bis zum Bilderwechsel</string>
     <plurals name="images_selected">
-        <item quantity="one">%d Bild ausgewählt</item>
-        <item quantity="other">%d Bilder ausgewählt</item>
+        <item quantity="one">%d Bild ausgewählt (max %d)</item>
+        <item quantity="other">%d Bilder ausgewählt (max %d)</item>
     </plurals>
     <string name="image_view_description">Bild</string>
     <string name="settings_name">Einstellungen</string>
@@ -48,17 +48,17 @@
         <item>Zoomen</item>
     </string-array>
     <string-array name="seconds">
-        <item>5 Sek.</item>
         <item>10 Sek.</item>
         <item>15 Sek.</item>
         <item>30 Sek.</item>
-        <item>45 Sek.</item>
         <item>1 Min.</item>
-        <item>2 Min.</item>
-        <item>3 Min.</item>
-        <item>4 Min.</item>
         <item>5 Min.</item>
-        <item>10 Min.</item>
         <item>15 Min.</item>
+        <item>1 Std.</item>
+        <item>6 Std.</item>
+        <item>12 Std.</item>
+        <item>1 Tag</item>
+        <item>2 Tage</item>
+        <item>7 Tage</item>
     </string-array>
 </resources>

@@ -36,18 +36,18 @@
         <item>scale_up</item>
     </string-array>
     <string-array name="seconds_values">
-        <item>5</item>
         <item>10</item>
         <item>15</item>
         <item>30</item>
-        <item>45</item>
         <item>60</item>
-        <item>120</item>
-        <item>180</item>
-        <item>240</item>
         <item>300</item>
-        <item>600</item>
         <item>900</item>
+        <item>3600</item>
+        <item>21600</item>
+        <item>43200</item>
+        <item>86400</item>
+        <item>127800</item>
+        <item>604800</item>
     </string-array>
 
 </resources>

@@ -20,6 +20,7 @@ package io.github.doubi88.slideshowwallpaper.preferences.imageList;
 
 import android.app.Activity;
 import android.content.ClipData;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -58,10 +59,10 @@ public class ImageListActivity extends AppCompatActivity {
         List<Uri> uris = manager.getImageUris(SharedPreferencesManager.Ordering.SELECTION);
 
         imageListAdapter = new ImageListAdapter(uris);
-        imageListAdapter.addOnDeleteClickListener(uri -> {
-            manager.removeUri(uri);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && !manager.hasImageUri(uri)) {
-                getContentResolver().releasePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        imageListAdapter.addOnDeleteClickListener(info -> {
+            manager.removeUri(info.getUri());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && info.getSize() > 0 && !manager.hasImageUri(info.getUri())) {
+                getContentResolver().releasePersistableUriPermission(info.getUri(), Intent.FLAG_GRANT_READ_URI_PERMISSION);
             }
         });
         recyclerView.setAdapter(imageListAdapter);
@@ -101,20 +102,16 @@ public class ImageListActivity extends AppCompatActivity {
             if (clipData == null) {
                 Uri uri = data.getData();
                 if (uri != null) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                        getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    }
-                    if (manager.addUri(uri)) {
+                    boolean takePermissionSuccess = takePermission(uri);
+                    if (takePermissionSuccess && manager.addUri(uri)) {
                         uris.add(uri);
                     }
                 }
             } else {
                 for (int index = 0; index < clipData.getItemCount(); index++) {
                     Uri uri = clipData.getItemAt(index).getUri();
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                        getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    }
-                    if (manager.addUri(uri)) {
+                    boolean takePermissionSuccess = takePermission(uri);
+                    if (takePermissionSuccess && manager.addUri(uri)) {
                         uris.add(uri);
                     }
                 }
@@ -122,5 +119,20 @@ public class ImageListActivity extends AppCompatActivity {
 
             imageListAdapter.addUris(uris);
         }
+    }
+
+    private boolean takePermission(Uri uri) {
+        boolean takePermissionSuccess = true;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            ContentResolver res = getContentResolver();
+            int perms = res.getPersistedUriPermissions().size();
+            res.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            // If taking the permission was unsuccessful (e.g. because the limit was reached), Don't add the uri
+            if (res.getPersistedUriPermissions().size() <= perms) {
+                takePermissionSuccess = false;
+            }
+        }
+        return takePermissionSuccess;
     }
 }

@@ -122,12 +122,14 @@ public class ImageLoader {
             if (in != null) {
 
                 int degrees = getRotationDegrees(context, uri);
-                bitmap = readBitmap(readStream(in, info.getSize()), desiredWidth, desiredHeight, considerMemory);
-                Matrix matrix = new Matrix();
-                matrix.setRotate(degrees);
+                if (info.getSize() > 0) {
+                    bitmap = readBitmap(readStream(in, info.getSize()), desiredWidth, desiredHeight, considerMemory);
+                    Matrix matrix = new Matrix();
+                    matrix.setRotate(degrees);
 
-                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
-                info = new ImageInfo(uri, info.getName(), info.getSize(), bitmap);
+                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
+                    info = new ImageInfo(uri, info.getName(), info.getSize(), bitmap);
+                }
 
             }
             else {

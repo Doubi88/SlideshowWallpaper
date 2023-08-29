@@ -27,8 +27,8 @@
     <string name="delete_button_description">Eliminar</string>
     <string name="preference_seconds">Tiempo entre imágenes</string>
     <plurals name="images_selected">
-        <item quantity="one">%d imagen seleccionada</item>
-        <item quantity="other">%d imágenes seleccionadas</item>
+        <item quantity="one">%d imagen seleccionada (max. %d)</item>
+        <item quantity="other">%d imágenes seleccionadas (max. %d)</item>
     </plurals>
     <string name="image_view_description">Imagen</string>
     <string name="settings_name">Ajustes</string>
@@ -48,17 +48,17 @@
         <item>Aumentar para que encaje</item>
     </string-array>
     <string-array name="seconds">
-        <item>5 segundos</item>
         <item>10 segundos</item>
         <item>15 segundos</item>
         <item>30 segundos</item>
-        <item>45 segundos</item>
-        <item>1 minuto</item>
-        <item>2 minutos</item>
-        <item>3 minutos</item>
-        <item>4 minutos</item>
+        <item>1 minutos</item>
         <item>5 minutos</item>
-        <item>10 minutos</item>
         <item>15 minutos</item>
+        <item>1 hora</item>
+        <item>6 horas</item>
+        <item>12 horas</item>
+        <item>1 día</item>
+        <item>2 días</item>
+        <item>7 días</item>
     </string-array>
 </resources>
