@@ -18,12 +18,16 @@
  */
 package io.github.doubi88.slideshowwallpaper;
 
+import android.annotation.TargetApi;
+import android.app.WallpaperColors;
+import android.app.WallpaperManager;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.service.wallpaper.WallpaperService;
@@ -31,6 +35,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.widget.Toast;
 
+import java.io.IOError;
 import java.io.IOException;
 import java.util.List;
 
@@ -161,6 +166,16 @@ public class SlideshowWallpaperService extends WallpaperService {
             }
         }
 
+        @TargetApi(Build.VERSION_CODES.O_MR1)
+        @Override
+        public WallpaperColors onComputeColors () {
+            try {
+                return WallpaperColors.fromBitmap(this.getNextImage());
+            } catch (IOException e) {
+                return super.onComputeColors();
+            }
+        }
+
         private SharedPreferences getSharedPreferences() {
             return SlideshowWallpaperService.this.getSharedPreferences(getPackageName() + "_preferences", MODE_PRIVATE);
         }
@@ -266,6 +281,10 @@ public class SlideshowWallpaperService extends WallpaperService {
                                 canvas.translate(deltaX, 0);
                                 canvas.drawBitmap(bitmap, ImageLoader.calculateMatrixScaleToFit(bitmap, width, height, false), null);
                                 canvas.restore();
+                            }
+
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                                SlideshowWallpaperEngine.this.notifyColorsChanged();
                             }
 
                             if (BuildConfig.DEBUG) {
