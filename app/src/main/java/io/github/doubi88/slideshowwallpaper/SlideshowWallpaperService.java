@@ -268,6 +268,7 @@ public class SlideshowWallpaperService extends WallpaperService {
                     if (canvas != null) {
                         canvas.drawRect(0, 0, width, height, clearPaint);
 
+                        Uri lastUri = lastRenderedImage.getUri();
                         Bitmap bitmap = getNextImage();
                         if (bitmap != null) {
                             currentImageHeight = bitmap.getHeight();
@@ -283,7 +284,8 @@ public class SlideshowWallpaperService extends WallpaperService {
                                 canvas.restore();
                             }
 
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1 && (lastUri == null || (!lastUri.equals(lastRenderedImage.getUri())))) {
+                                // Only notify, if the image changes.
                                 SlideshowWallpaperEngine.this.notifyColorsChanged();
                             }
 
