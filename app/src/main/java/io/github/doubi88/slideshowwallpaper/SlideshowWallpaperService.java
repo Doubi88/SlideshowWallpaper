@@ -18,12 +18,16 @@
  */
 package io.github.doubi88.slideshowwallpaper;
 
+import android.annotation.TargetApi;
+import android.app.WallpaperColors;
+import android.app.WallpaperManager;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.service.wallpaper.WallpaperService;
@@ -31,12 +35,12 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.widget.Toast;
 
+import java.io.IOError;
 import java.io.IOException;
 import java.util.List;
 
-import io.github.doubi88.slideshowwallpaper.BuildConfig;
-import io.github.doubi88.slideshowwallpaper.R;
 import io.github.doubi88.slideshowwallpaper.preferences.SharedPreferencesManager;
+import io.github.doubi88.slideshowwallpaper.utilities.CompatibilityHelpers;
 import io.github.doubi88.slideshowwallpaper.utilities.ImageInfo;
 import io.github.doubi88.slideshowwallpaper.utilities.ImageLoader;
 
@@ -162,6 +166,16 @@ public class SlideshowWallpaperService extends WallpaperService {
             }
         }
 
+        @TargetApi(Build.VERSION_CODES.O_MR1)
+        @Override
+        public WallpaperColors onComputeColors () {
+            try {
+                return WallpaperColors.fromBitmap(this.getNextImage());
+            } catch (IOException e) {
+                return super.onComputeColors();
+            }
+        }
+
         private SharedPreferences getSharedPreferences() {
             return SlideshowWallpaperService.this.getSharedPreferences(getPackageName() + "_preferences", MODE_PRIVATE);
         }
@@ -223,6 +237,8 @@ public class SlideshowWallpaperService extends WallpaperService {
             int seconds = 5;
             try {
                 seconds = manager.getSecondsBetweenImages();
+                String[] entries = getResources().getStringArray(R.array.seconds_values);
+                seconds = CompatibilityHelpers.getNextAvailableSecondsEntry(seconds, entries); // Because of the update of the seconds entries (Issue #14), we have to find the nearest entry here.
             } catch (NumberFormatException e) {
                 Log.e(SlideshowWallpaperEngine.class.getSimpleName(), "Invalid number", e);
                 Toast toast = Toast.makeText(getApplicationContext(), e.getClass().getSimpleName() + " " + e.getMessage(), Toast.LENGTH_LONG);
@@ -252,6 +268,7 @@ public class SlideshowWallpaperService extends WallpaperService {
                     if (canvas != null) {
                         canvas.drawRect(0, 0, width, height, clearPaint);
 
+                        Uri lastUri = lastRenderedImage.getUri();
                         Bitmap bitmap = getNextImage();
                         if (bitmap != null) {
                             currentImageHeight = bitmap.getHeight();
@@ -265,6 +282,11 @@ public class SlideshowWallpaperService extends WallpaperService {
                                 canvas.translate(deltaX, 0);
                                 canvas.drawBitmap(bitmap, ImageLoader.calculateMatrixScaleToFit(bitmap, width, height, false), null);
                                 canvas.restore();
+                            }
+
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1 && (lastUri == null || (!lastUri.equals(lastRenderedImage.getUri())))) {
+                                // Only notify, if the image changes.
+                                SlideshowWallpaperEngine.this.notifyColorsChanged();
                             }
 
                             if (BuildConfig.DEBUG) {

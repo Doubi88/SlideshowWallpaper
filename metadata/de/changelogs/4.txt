@@ -1,0 +1,2 @@
+- Spanische Übersetzung hinzugefügt
+- Keine doppelt ausgewählten Bilder mehr möglich

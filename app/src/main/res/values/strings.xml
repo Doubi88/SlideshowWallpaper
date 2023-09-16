@@ -26,8 +26,8 @@
     <string name="delete_button_description">Remove</string>
     <string name="preference_seconds">Time between images</string>
     <plurals name="images_selected">
-        <item quantity="one">%d image selected</item>
-        <item quantity="other">%d images selected</item>
+        <item quantity="one">%d image selected (max. %d)</item>
+        <item quantity="other">%d images selected (max. %d)</item>
     </plurals>
     <string name="image_view_description">Image</string>
     <string name="settings_name">Settings</string>
@@ -49,17 +49,17 @@
         <item>Scale up to fit</item>
     </string-array>
     <string-array name="seconds">
-        <item>5 sec</item>
         <item>10 sec</item>
         <item>15 sec</item>
         <item>30 sec</item>
-        <item>45 sec</item>
         <item>1 min</item>
-        <item>2 min</item>
-        <item>3 min</item>
-        <item>4 min</item>
         <item>5 min</item>
-        <item>10 min</item>
         <item>15 min</item>
+        <item>1 hour</item>
+        <item>6 hours</item>
+        <item>12 hours</item>
+        <item>1 day</item>
+        <item>2 days</item>
+        <item>7 days</item>
     </string-array>
 </resources>

@@ -46,7 +46,7 @@
             android:orientation="horizontal"
             android:layout_gravity="bottom|center_horizontal"
             android:weightSum="10"
-            android:background="@color/cardview_light_background"
+            android:background="?android:attr/colorBackground"
             android:id="@+id/bottom_bar">
             <TextView
                 android:layout_width="wrap_content"

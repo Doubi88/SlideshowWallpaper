@@ -1,0 +1,1 @@
+Un fondo de pantalla dinámico que permite mostrar una presentación de diapositivas con imágenes seleccionadas por el usuario

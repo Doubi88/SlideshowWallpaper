@@ -1,0 +1,3 @@
+- Zeitintervalle mit sinnvolleren Werten ersetzt
+- Fehlende Bilder können nun ohne Absturz aus der Liste entfernt werden.
+- Android besitzt ein fest einprogrammiertes Limit an offenen Dateiberechtigungen. Dieses Limit wird jetzt angezeigt und Fehler, die passieren, wenn ein Bild hinzugefügt wird, werden korrekt behandelt. In Zukunft wird es eine bessere Lösung hierfür geben, siehe https://github.com/Doubi88/SlideshowWallpaper/issues/19

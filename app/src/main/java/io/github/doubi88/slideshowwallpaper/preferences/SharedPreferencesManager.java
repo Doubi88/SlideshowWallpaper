@@ -140,6 +140,11 @@ public class SharedPreferencesManager {
         return result;
     }
 
+    public boolean hasImageUri(@NonNull Uri uri) {
+        List<Uri> uris = getImageUris(Ordering.SELECTION);
+        return uris.contains(uri);
+    }
+
     private String[] getUriList(Ordering ordering) {
         String list = preferences.getString(ordering.getPreferenceKey(), null);
         if (list == null || list.equals("")) {
@@ -149,12 +154,16 @@ public class SharedPreferencesManager {
         }
     }
 
-    public void addUri(Uri uri) {
+    public boolean addUri(Uri uri) {
         List<Uri> list = getImageUris(Ordering.SELECTION);
-        list.add(uri);
-        for (Ordering ordering : Ordering.values()) {
-            saveUriList(ordering.sort(list), ordering.getPreferenceKey());
+        boolean result = false;
+        if (!list.contains(uri)) {
+            result = list.add(uri);
+            for (Ordering ordering : Ordering.values()) {
+                saveUriList(ordering.sort(list), ordering.getPreferenceKey());
+            }
         }
+        return result;
     }
 
     private void saveUriList(List<Uri> uris, String preferenceKey) {
@@ -207,8 +216,9 @@ public class SharedPreferencesManager {
 
     public int getSecondsBetweenImages() throws NumberFormatException {
         String secondsString = preferences.getString(PREFERENCE_KEY_SECONDS_BETWEEN, "15");
-        return Integer.parseInt(secondsString);
+        int result = Integer.parseInt(secondsString);
 
+        return result;
     }
 
     public void setSecondsBetweenImages(int value) {

@@ -1,0 +1,4 @@
+Lo siento, no hablo español lo suficientemente bien como para traducir esto, pero aquí está la versión en inglés:
+- Replaced time intervals with more useful values
+- Missing images can now be removed from the list without the app crashing
+- Android has a hard coded limit of open file grants. This is now displayed and errors when adding an image are handled correctly. There will be a better solution in the future, see https://github.com/Doubi88/SlideshowWallpaper/issues/19
