@@ -61,4 +61,8 @@
         <item>2 días</item>
         <item>7 días</item>
     </string-array>
+    <string name="preference_info">Información</string>
+    <string name="preference_info_summary">Mostrar información sobre esta app</string>
+    <string name="info_version_caption">Versión</string>
+    <string name="info_authro_caption">Autor</string>
 </resources>

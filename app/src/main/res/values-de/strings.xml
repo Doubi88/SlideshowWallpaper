@@ -63,4 +63,6 @@
         <item>2 Tage</item>
         <item>7 Tage</item>
     </string-array>
+    <string name="info_version_caption">Version</string>
+    <string name="info_authro_caption">Autor</string>
 </resources>
