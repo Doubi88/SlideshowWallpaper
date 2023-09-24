@@ -1,8 +1,10 @@
 package io.github.doubi88.slideshowwallpaper.infoScreen;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,31 +13,41 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.github.doubi88.slideshowwallpaper.R;
 
-public class ListEntryAdapter extends RecyclerView.Adapter<ListEntryAdapter.ViewHolder> {
+public class InfoScreenListAdapter extends RecyclerView.Adapter<InfoScreenListAdapter.ViewHolder> {
+
+    public interface ListItemClickListener {
+        public void itemClicked(int index);
+    }
 
     private CharSequence[] captions;
     private CharSequence[] texts;
     private Drawable[] icons;
     private LayoutInflater inflater;
 
+    private List<ListItemClickListener> clickListeners;
+
     // data is passed into the constructor
-    ListEntryAdapter(Context context) {
+    InfoScreenListAdapter(Context context, CharSequence[] texts, CharSequence[] captions, Drawable[] icons) {
         this.inflater = LayoutInflater.from(context);
-        Resources res = Resources.getSystem();
+        this.texts = texts;
+        this.captions = captions;
+        this.icons = icons;
 
-        captions = new CharSequence[4];
-        captions[0] = res.getString(R.string.info_version_caption);
-        captions[1] = res.getString(R.string.info_author_caption);
-        captions[2] = res.getString(R.string.info_license_caption);
-        captions[3] = res.getString(R.string.info_sourcecode_caption);
+        this.clickListeners = new ArrayList<>(4);
+    }
 
-        texts = new CharSequence[4];
-        texts[0] = BuildConfig
-        texts[1] = res.getString(R.string.author_name); + " <" + res.getString(R.string.author_email) + ">";
+    public void addListItemClickListener(ListItemClickListener listener) {
+        if (!clickListeners.contains(listener)) {
+            clickListeners.add(listener);
+        }
+    }
+    public void removeListItemCLickListener(ListItemClickListener listener) {
+        clickListeners.remove(listener);
     }
 
     // inflates the row layout from xml when needed
@@ -48,14 +60,15 @@ public class ListEntryAdapter extends RecyclerView.Adapter<ListEntryAdapter.View
     // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String animal = mData.get(position);
-        holder.setText(animal);
+        holder.setText(texts[position]);
+        holder.setCaption(captions[position]);
+        //holder.setImage(icons[position]);
     }
 
     // total number of rows
     @Override
     public int getItemCount() {
-        return mData.size();
+        return texts.length;
     }
 
 
@@ -64,11 +77,12 @@ public class ListEntryAdapter extends RecyclerView.Adapter<ListEntryAdapter.View
         private TextView textView;
         private TextView captionView;
         private ImageView imageView;
-        ViewHolder(View itemView) {
+
+        public ViewHolder(View itemView) {
             super(itemView);
             textView = itemView.findViewById(R.id.info_screen_text_view);
             captionView = itemView.findViewById(R.id.info_screen_caption);
-            imageView = itemView.findViewById(R.id.info_screen_image_view)
+            imageView = itemView.findViewById(R.id.info_screen_image_view);
             itemView.setOnClickListener(this);
         }
 
@@ -87,22 +101,10 @@ public class ListEntryAdapter extends RecyclerView.Adapter<ListEntryAdapter.View
 
         @Override
         public void onClick(View view) {
-            if (clickListener != null) clickListener.onItemClick(view, getAdapterPosition());
+            for (ListItemClickListener listener : clickListeners) {
+                listener.itemClicked(getAdapterPosition());
+            }
         }
     }
 
-    // convenience method for getting data at click position
-    String getItem(int id) {
-        return mData.get(id);
-    }
-
-    // allows clicks events to be caught
-    void setClickListener(ItemClickListener itemClickListener) {
-        this.clickListener = itemClickListener;
-    }
-
-    // parent activity will implement this method to respond to click events
-    public interface ItemClickListener {
-        void onItemClick(View view, int position);
-    }
 }

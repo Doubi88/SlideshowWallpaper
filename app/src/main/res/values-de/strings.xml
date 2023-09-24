@@ -39,6 +39,10 @@
     <string name="add_image">Bild(er) hinzufügen</string>
     <string name="preference_info">Info</string>
     <string name="preference_info_summary">Informationen über diese App anzeigen.</string>
+    <string name="info_version_caption">Version</string>
+    <string name="info_author_caption">Autor</string>
+    <string name="info_license_caption">Lizenz</string>
+    <string name="info_sourcecode_caption">Quellcode</string>
     <string-array name="orderings">
         <item>Auswahlreihenfolge</item>
         <item>Zufällig</item>
@@ -63,6 +67,4 @@
         <item>2 Tage</item>
         <item>7 Tage</item>
     </string-array>
-    <string name="info_version_caption">Version</string>
-    <string name="info_authro_caption">Autor</string>
 </resources>

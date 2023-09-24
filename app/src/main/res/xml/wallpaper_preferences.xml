@@ -56,7 +56,7 @@
         android:summary="@string/preference_info_summary"
         android:icon="@drawable/ic_info">
         <intent
-            android:targetClass="io.github.doubi88.slideshowwallpaper.preferences.InfoActivity"
+            android:targetClass="io.github.doubi88.slideshowwallpaper.infoScreen.InfoScreenActivity"
             android:targetPackage="io.github.doubi88.slideshowwallpaper" />
     </Preference>
 </PreferenceScreen>

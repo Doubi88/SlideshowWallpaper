@@ -1,24 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-/*
- * Slideshow Wallpaper: An Android live wallpaper displaying custom images.
- * Copyright (C) 2022  Doubi88 <tobis_mail@yahoo.de>
- *
- * Slideshow Wallpaper is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Slideshow Wallpaper is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- */
--->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
@@ -29,11 +9,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".preferences.InfoActivity"
+            android:name=".infoScreen.InfoScreenActivity"
             android:exported="false" />
 
         <service
-            android:name="io.github.doubi88.slideshowwallpaper.SlideshowWallpaperService"
+            android:name=".SlideshowWallpaperService"
             android:enabled="true"
             android:exported="true"
             android:label="@string/app_name"
@@ -50,7 +30,7 @@
         <activity
             android:name=".preferences.WallpaperPreferencesActivity"
             android:exported="true"
-            android:theme="@style/PreferenceTheme" >
+            android:theme="@style/PreferenceTheme">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
 
@@ -61,7 +41,7 @@
             android:name=".preferences.imageList.ImageListActivity"
             android:exported="false"
             android:label="@string/image_list_name"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme" />
     </application>
 
 </manifest>

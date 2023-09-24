@@ -45,7 +45,7 @@
     <string name="author_name" translatable="false">Doubi88</string>
     <string name="author_email" translatable="false">tobis_mail@yahoo.de</string>
     <string name="license" translatable="false">GNU General Public License, Version 3.0</string>
-    <strnig name="license_url" translatable="false">https://github.com/Doubi88/SlideshowWallpaper/blob/master/LICENSE</strnig>
+    <string name="license_url" translatable="false">https://github.com/Doubi88/SlideshowWallpaper/blob/master/LICENSE</string>
     <string name="source_url" translatable="false">https://github.com/Doubi88/SlideshowWallpaper</string>
     <string-array name="orderings">
         <item>Selection order</item>
