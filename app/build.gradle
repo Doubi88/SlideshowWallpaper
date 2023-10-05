@@ -32,6 +32,10 @@ android {
     productFlavors {
     }
     namespace 'io.github.doubi88.slideshowwallpaper'
+
+    applicationVariants.configureEach { variant ->
+        variant.resValue "string", "versionName", variant.versionName
+    }
 }
 
 if (keystoreProperties != null) {
@@ -45,6 +49,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.legacy:legacy-preference-v14:1.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
