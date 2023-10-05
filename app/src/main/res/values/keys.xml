@@ -26,6 +26,11 @@
     <string name="preference_too_wide_images_rule_key" translatable="false">too_wide_images_rule</string>
     <string name="preference_preview_key" translatable="false">preview</string>
     <string name="preference_info_key" translatable="false">info</string>
+    <string name="info_screen_version_key" translatable="false">info.version</string>
+    <string name="info_screen_author_key" translatable="false">info.author</string>
+    <string name="info_screen_license_key" translatable="false">info.license</string>
+    <string name="info_screen_source_key" translatable="false">info.source</string>
+
     <string-array name="ordering_values">
         <item>selection</item>
         <item>random</item>

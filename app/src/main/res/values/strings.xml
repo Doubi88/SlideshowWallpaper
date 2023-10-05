@@ -44,6 +44,7 @@
     <string name="info_sourcecode_caption">Source Code</string>
     <string name="author_name" translatable="false">Doubi88</string>
     <string name="author_email" translatable="false">tobis_mail@yahoo.de</string>
+    <string name="author_email_url" translatable="false">mailto:tobis_mail@yahoo.de</string>
     <string name="license" translatable="false">GNU General Public License, Version 3.0</string>
     <string name="license_url" translatable="false">https://github.com/Doubi88/SlideshowWallpaper/blob/master/LICENSE</string>
     <string name="source_url" translatable="false">https://github.com/Doubi88/SlideshowWallpaper</string>
