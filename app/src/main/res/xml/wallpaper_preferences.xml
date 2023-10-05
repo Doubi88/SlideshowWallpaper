@@ -24,7 +24,7 @@
     <Preference
         android:key="@string/preference_add_images_key"
         android:title="@string/preference_edit_image_list"
-        app:icon="@drawable/ic_image_list">
+        app:icon="@drawable/outline_image_list_24">
         <intent
             android:targetClass="io.github.doubi88.slideshowwallpaper.preferences.imageList.ImageListActivity"
             android:targetPackage="io.github.doubi88.slideshowwallpaper" />
@@ -33,28 +33,28 @@
         android:title="@string/preference_ordering"
         android:entries="@array/orderings"
         android:entryValues="@array/ordering_values"
-        app:icon="@drawable/ic_ordering"
+        app:icon="@drawable/outline_ordering_24"
         />
     <ListPreference
         android:key="@string/preference_seconds_key"
         android:title="@string/preference_seconds"
         android:entries="@array/seconds"
         android:entryValues="@array/seconds_values"
-        app:icon="@drawable/ic_delay"/>
+        app:icon="@drawable/outline_delay_24"/>
     <ListPreference
         android:key="@string/preference_too_wide_images_rule_key"
         android:title="@string/preference_too_wide_images_rule"
         android:entries="@array/too_wide_images_rules"
         android:entryValues="@array/too_wide_images_rule_values"
-        app:icon="@drawable/ic_wide_handling" />
+        app:icon="@drawable/baseline_wide_handling_24" />
     <Preference android:title="@string/preference_preview"
         android:key="@string/preference_preview_key"
         android:summary="@string/preference_preview_summary"
-        app:icon="@drawable/ic_preview" />
+        app:icon="@drawable/baseline_preview_24" />
     <Preference android:title="@string/preference_info"
         android:key="@string/preference_info_key"
         android:summary="@string/preference_info_summary"
-        android:icon="@drawable/ic_info">
+        android:icon="@drawable/outline_info_24">
         <intent
             android:targetClass="io.github.doubi88.slideshowwallpaper.infoScreen.InfoScreenActivity"
             android:targetPackage="io.github.doubi88.slideshowwallpaper" />

@@ -25,7 +25,7 @@
         android:key="@string/info_screen_version_key"
         android:title="@string/info_version_caption"
         android:summary="@string/versionName"
-        app:icon="@drawable/ic_logo" />
+        app:icon="@drawable/outline_image_list_24" />
     <Preference
         android:key="@string/info_screen_author_key"
         android:title="@string/info_author_caption"
@@ -38,7 +38,7 @@
     <Preference android:title="@string/info_license_caption"
         android:key="@string/info_screen_license_key"
         android:summary="@string/license"
-        app:icon="@drawable/ic_copyright">
+        app:icon="@drawable/baseline_copyright_24">
         <intent
             android:action="android.intent.action.VIEW"
             android:data="@string/license_url" />
@@ -47,7 +47,7 @@
     <Preference android:title="@string/info_sourcecode_caption"
         android:key="@string/info_screen_source_key"
         android:summary="@string/source_url"
-        android:icon="@drawable/ic_info">
+        android:icon="@drawable/outline_info_24">
         <intent
             android:action="android.intent.action.VIEW"
             android:data="@string/source_url" />
