@@ -1,0 +1,3 @@
+- Erstattede tidsintervaler med mere brugbare værdier
+- Slettede billeder kan nu fjernes fra listen, uden at appen crasher
+- Android har en begrænsning på hvor mange filer man kan åbne på samme tid. Dette vises nu, og fejl når man tilføjer et billede håndteres korrekt. Der kommer til at være en bedre løsning i fremtiden, læs https://github.com/Doubi88/SlideshowWallpaper/issues/19

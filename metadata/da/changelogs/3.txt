@@ -1,0 +1,1 @@
+Fixede crash når det viste billede skiftes
