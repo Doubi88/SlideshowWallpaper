@@ -1,0 +1,12 @@
+Med Slideshow Wallpaper kan du lave et slideshow til din hjemme- og låseskærm på en nem måde. Følg blot disse enkle trin:
+1️⃣ Vælg billederne, du gerne vil se.
+2️⃣ Vælg rækkefølgen, intervallet, og fremvisningsmetoden.
+3️⃣ Indstil som baggrundsbillede.
+
+Du kan til enhver tid tilføje- og fjerne billeder.
+
+Fordele ved Slideshow Wallpaper:
+* Ingen tilladelser: Denne app behøver ikke nogen Android-tilladelser. Ikke engang internet. Den får kun rettigheden til at indlæse de billeder, du vælger, og fjerner selv rettigheden til det, når du fjerner billederne.
+* Ingen reklamer
+* Fri software med åben kildekode: Slideshow Wallpaper har GNU General Public License, Version 3 som licens. Kildekoden er tilgængelig ved: https://www.github.com/Doubi88/SlideshowWallpaper (Gerne foreslå nye features, rapportér fejl, eller åbn pull requests der)
+
