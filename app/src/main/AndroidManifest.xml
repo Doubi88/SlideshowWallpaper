@@ -1,24 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-/*
- * Slideshow Wallpaper: An Android live wallpaper displaying custom images.
- * Copyright (C) 2022  Doubi88 <tobis_mail@yahoo.de>
- *
- * Slideshow Wallpaper is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Slideshow Wallpaper is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- */
--->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
@@ -28,7 +8,26 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <receiver
+            android:name=".SlideshowControlWidgetProvider"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
 
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/slideshow_control_info" />
+        </receiver>
+
+        <receiver android:name=".SlideshowControlReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="io.github.doubi88.slideshowwallpaper.PREVIOUS_IMAGE" />
+                <action android:name="io.github.doubi88.slideshowwallpaper.NEXT_IMAGE" />
+                <action android:name="io.github.doubi88.slideshowwallpaper.OPEN_IMAGE" />
+            </intent-filter>
+        </receiver>
         <service
             android:name=".SlideshowWallpaperService"
             android:enabled="true"
@@ -58,7 +57,7 @@
             android:name=".infoScreen.InfoScreenActivity"
             android:exported="false"
             android:label="@string/preference_info"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".preferences.imageList.ImageListActivity"
             android:exported="false"
