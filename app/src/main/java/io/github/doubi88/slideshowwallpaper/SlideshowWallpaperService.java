@@ -20,7 +20,6 @@ package io.github.doubi88.slideshowwallpaper;
 
 import android.annotation.TargetApi;
 import android.app.WallpaperColors;
-import android.app.WallpaperManager;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -35,7 +34,6 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.widget.Toast;
 
-import java.io.IOError;
 import java.io.IOException;
 import java.util.List;
 
@@ -65,6 +63,7 @@ public class SlideshowWallpaperService extends WallpaperService {
 
         private Runnable drawRunner;
         private Paint clearPaint;
+        private Paint imagePaint;
         private Paint textPaint;
         private boolean visible;
         private int textSize;
@@ -90,6 +89,9 @@ public class SlideshowWallpaperService extends WallpaperService {
             clearPaint.setAntiAlias(true);
             clearPaint.setColor(Color.BLACK);
             clearPaint.setStyle(Paint.Style.FILL);
+
+            imagePaint = new Paint();
+            imagePaint.setAntiAlias(true);
 
             textPaint = new Paint();
             textPaint.setAntiAlias(true);
@@ -276,11 +278,11 @@ public class SlideshowWallpaperService extends WallpaperService {
 
                             SharedPreferencesManager.TooWideImagesRule rule = manager.getTooWideImagesRule(getResources());
                             if (rule == SharedPreferencesManager.TooWideImagesRule.SCALE_DOWN) {
-                                canvas.drawBitmap(bitmap, ImageLoader.calculateMatrixScaleToFit(bitmap, width, height, true), null);
+                                canvas.drawBitmap(bitmap, ImageLoader.calculateMatrixScaleToFit(bitmap, width, height, true), imagePaint);
                             } else if (rule == SharedPreferencesManager.TooWideImagesRule.SCALE_UP || rule == SharedPreferencesManager.TooWideImagesRule.SCROLL_FORWARD || rule == SharedPreferencesManager.TooWideImagesRule.SCROLL_BACKWARD) {
                                 canvas.save();
                                 canvas.translate(deltaX, 0);
-                                canvas.drawBitmap(bitmap, ImageLoader.calculateMatrixScaleToFit(bitmap, width, height, false), null);
+                                canvas.drawBitmap(bitmap, ImageLoader.calculateMatrixScaleToFit(bitmap, width, height, false), imagePaint);
                                 canvas.restore();
                             }
 
