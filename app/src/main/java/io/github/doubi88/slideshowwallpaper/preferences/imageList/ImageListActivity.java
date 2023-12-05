@@ -25,6 +25,10 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -43,6 +47,8 @@ public class ImageListActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_FILE = 1;
 
     private ImageListAdapter imageListAdapter;
+
+    private ActivityResultLauncher<PickVisualMediaRequest> launcher = registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(), this::imagePickerCallback);
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,19 +74,10 @@ public class ImageListActivity extends AppCompatActivity {
         recyclerView.setAdapter(imageListAdapter);
 
         findViewById(R.id.add_button).setOnClickListener(view -> {
-            Intent intent = new Intent();
-            intent.setType("image/*");
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-            }
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-            } else {
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-            }
-            startActivityForResult(intent, REQUEST_CODE_FILE);
+            PickVisualMediaRequest request = new PickVisualMediaRequest.Builder()
+                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                    .build();
+            launcher.launch(request);
         });
     }
 
@@ -92,33 +89,14 @@ public class ImageListActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        List<Uri> uris = new LinkedList<>();
-        if (requestCode == REQUEST_CODE_FILE && resultCode == Activity.RESULT_OK) {
-            ClipData clipData = data.getClipData();
-            if (clipData == null) {
-                Uri uri = data.getData();
-                if (uri != null) {
-                    boolean takePermissionSuccess = takePermission(uri);
-                    if (takePermissionSuccess && manager.addUri(uri)) {
-                        uris.add(uri);
-                    }
-                }
-            } else {
-                for (int index = 0; index < clipData.getItemCount(); index++) {
-                    Uri uri = clipData.getItemAt(index).getUri();
-                    boolean takePermissionSuccess = takePermission(uri);
-                    if (takePermissionSuccess && manager.addUri(uri)) {
-                        uris.add(uri);
-                    }
-                }
+    private void imagePickerCallback(List<Uri> uris) {
+        for (Uri uri : uris) {
+            boolean takePermissionSuccess = takePermission(uri);
+            if (takePermissionSuccess && manager.addUri(uri)) {
+                uris.add(uri);
             }
-
-            imageListAdapter.addUris(uris);
         }
+        imageListAdapter.addUris(uris);
     }
 
     private boolean takePermission(Uri uri) {
