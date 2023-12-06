@@ -3,3 +3,5 @@
 - Dunkles Theme wird unterstützt
 - API-Aufruf für Bilderauswahl modernisiert
 - Fehlermeldung anzeigen, wenn der Vorschaubildschirm nicht verfügbar ist.
+- Dänische Übersetzung hinzugefügt
+- Fehlendes Anti-Aliasing (hoffentlich) hinzugefügt
