@@ -8,6 +8,9 @@ if (keystorePropertiesFile.canRead()) {
 }
 
 android {
+    buildFeatures {
+        buildConfig true
+    }
     signingConfigs {
         release {
 
