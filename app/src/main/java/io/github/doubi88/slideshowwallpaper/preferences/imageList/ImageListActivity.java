@@ -18,6 +18,8 @@
  */
 package io.github.doubi88.slideshowwallpaper.preferences.imageList;
 
+import android.app.Activity;
+import android.content.ClipData;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
@@ -29,11 +31,13 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import io.github.doubi88.slideshowwallpaper.R;
@@ -42,9 +46,11 @@ import io.github.doubi88.slideshowwallpaper.preferences.SharedPreferencesManager
 public class ImageListActivity extends AppCompatActivity {
 
     private SharedPreferencesManager manager;
+    private static final int REQUEST_CODE_FILE = 1;
 
     private ImageListAdapter imageListAdapter;
 
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
     private final ActivityResultLauncher<PickVisualMediaRequest> launcher = registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(), this::imagePickerCallback);
 
     @Override
@@ -71,10 +77,20 @@ public class ImageListActivity extends AppCompatActivity {
         recyclerView.setAdapter(imageListAdapter);
 
         findViewById(R.id.add_button).setOnClickListener(view -> {
-            PickVisualMediaRequest request = new PickVisualMediaRequest.Builder()
-                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
-                    .build();
-            launcher.launch(request);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                PickVisualMediaRequest request = new PickVisualMediaRequest.Builder()
+                        .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                        .build();
+                launcher.launch(request);
+            }
+            else {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(intent, REQUEST_CODE_FILE);
+            }
         });
     }
 
@@ -95,6 +111,37 @@ public class ImageListActivity extends AppCompatActivity {
             }
         }
         imageListAdapter.addUris(urisToAdd);
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            List<Uri> uris = new LinkedList<>();
+            if (requestCode == REQUEST_CODE_FILE && resultCode == Activity.RESULT_OK) {
+                ClipData clipData = data.getClipData();
+                if (clipData == null) {
+                    Uri uri = data.getData();
+                    if (uri != null) {
+                        boolean takePermissionSuccess = takePermission(uri);
+                        if (takePermissionSuccess && manager.addUri(uri)) {
+                            uris.add(uri);
+                        }
+                    }
+                } else {
+                    for (int index = 0; index < clipData.getItemCount(); index++) {
+                        Uri uri = clipData.getItemAt(index).getUri();
+                        boolean takePermissionSuccess = takePermission(uri);
+                        if (takePermissionSuccess && manager.addUri(uri)) {
+                            uris.add(uri);
+                        }
+                    }
+                }
+
+                imageListAdapter.addUris(uris);
+            }
+        }
     }
 
     private boolean takePermission(Uri uri) {
