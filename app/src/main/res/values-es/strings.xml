@@ -43,6 +43,8 @@
     <string name="info_author_caption">Autor</string>
     <string name="info_license_caption">Licencia</string>
     <string name="info_sourcecode_caption">Código fuente</string>
+    <string name="error_title">Error</string>
+    <string name="no_wallpaper_activity_text">Lamentablemente, su dispositivo no permite iniciar la vista previa del fondo de pantalla desde aquí. Selecciona \"Slideshow Wallpaper\" como fondo de pantalla en los ajustes del sistema.</string>
     <string-array name="orderings">
         <item>Orden de selección</item>
         <item>Aleatorio</item>

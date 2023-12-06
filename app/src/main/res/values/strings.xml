@@ -42,6 +42,8 @@
     <string name="info_author_caption">Author</string>
     <string name="info_license_caption">License</string>
     <string name="info_sourcecode_caption">Source Code</string>
+    <string name="error_title">Error</string>
+    <string name="no_wallpaper_activity_text">Unfortunately your device does not support starting the wallpaper preview from here. Please select \"Slideshow Wallpaper\" as your live wallpaper in the system settings.</string>
     <string name="author_name" translatable="false">Doubi88</string>
     <string name="author_email" translatable="false">tobis_mail@yahoo.de</string>
     <string name="author_email_url" translatable="false">mailto:tobis_mail@yahoo.de</string>

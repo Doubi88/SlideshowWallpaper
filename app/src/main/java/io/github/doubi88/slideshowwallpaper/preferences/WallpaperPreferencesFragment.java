@@ -19,14 +19,18 @@
 package io.github.doubi88.slideshowwallpaper.preferences;
 
 import android.app.WallpaperManager;
+import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.preference.PreferenceFragmentCompat;
 
 import io.github.doubi88.slideshowwallpaper.R;
@@ -55,7 +59,16 @@ public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
                         WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
                 intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
                         new ComponentName(ctx, SlideshowWallpaperService.class));
-                startActivity(intent);
+                try {
+                    startActivity(intent);
+                } catch (ActivityNotFoundException e) {
+                    new AlertDialog.Builder(ctx)
+                            .setTitle(R.string.error_title)
+                            .setMessage(R.string.no_wallpaper_activity_text)
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setNeutralButton(android.R.string.ok, (DialogInterface dialogInterface, int i) -> {})
+                            .show();
+                }
                 return true;
             } else {
                 return false;
