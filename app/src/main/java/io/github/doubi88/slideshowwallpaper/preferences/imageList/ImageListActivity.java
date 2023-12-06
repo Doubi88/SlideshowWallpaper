@@ -18,13 +18,12 @@
  */
 package io.github.doubi88.slideshowwallpaper.preferences.imageList;
 
-import android.app.Activity;
-import android.content.ClipData;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.MenuItem;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
@@ -33,9 +32,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.view.MenuItem;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import io.github.doubi88.slideshowwallpaper.R;
@@ -44,11 +42,10 @@ import io.github.doubi88.slideshowwallpaper.preferences.SharedPreferencesManager
 public class ImageListActivity extends AppCompatActivity {
 
     private SharedPreferencesManager manager;
-    private static final int REQUEST_CODE_FILE = 1;
 
     private ImageListAdapter imageListAdapter;
 
-    private ActivityResultLauncher<PickVisualMediaRequest> launcher = registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(), this::imagePickerCallback);
+    private final ActivityResultLauncher<PickVisualMediaRequest> launcher = registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(), this::imagePickerCallback);
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -90,13 +87,14 @@ public class ImageListActivity extends AppCompatActivity {
     }
 
     private void imagePickerCallback(List<Uri> uris) {
+        List<Uri> urisToAdd = new ArrayList<>(uris.size());
         for (Uri uri : uris) {
             boolean takePermissionSuccess = takePermission(uri);
             if (takePermissionSuccess && manager.addUri(uri)) {
-                uris.add(uri);
+                urisToAdd.add(uri);
             }
         }
-        imageListAdapter.addUris(uris);
+        imageListAdapter.addUris(urisToAdd);
     }
 
     private boolean takePermission(Uri uri) {
