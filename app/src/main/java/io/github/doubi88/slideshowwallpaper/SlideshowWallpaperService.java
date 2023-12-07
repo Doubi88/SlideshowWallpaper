@@ -18,7 +18,6 @@
  */
 package io.github.doubi88.slideshowwallpaper;
 
-import android.annotation.TargetApi;
 import android.app.WallpaperColors;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -33,6 +32,8 @@ import android.service.wallpaper.WallpaperService;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
 
 import java.io.IOException;
 import java.util.List;
@@ -115,6 +116,8 @@ public class SlideshowWallpaperService extends WallpaperService {
                 Bitmap image = getNextImage();
                 if (image != null) {
                     deltaX = calculateDeltaX(image, lastXOffset, lastXOffsetStep);
+                } else {
+                    deltaX = 0;
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -168,11 +171,16 @@ public class SlideshowWallpaperService extends WallpaperService {
             }
         }
 
-        @TargetApi(Build.VERSION_CODES.O_MR1)
+        @RequiresApi(Build.VERSION_CODES.O_MR1)
         @Override
         public WallpaperColors onComputeColors () {
             try {
-                return WallpaperColors.fromBitmap(this.getNextImage());
+                Bitmap img = this.getNextImage();
+                if (img != null) {
+                    return WallpaperColors.fromBitmap(img);
+                } else {
+                    return super.onComputeColors();
+                }
             } catch (IOException e) {
                 return super.onComputeColors();
             }
@@ -270,7 +278,7 @@ public class SlideshowWallpaperService extends WallpaperService {
                     if (canvas != null) {
                         canvas.drawRect(0, 0, width, height, clearPaint);
 
-                        Uri lastUri = lastRenderedImage.getUri();
+                        Uri lastUri = lastRenderedImage != null ? lastRenderedImage.getUri() : null;
                         Bitmap bitmap = getNextImage();
                         if (bitmap != null) {
                             currentImageHeight = bitmap.getHeight();

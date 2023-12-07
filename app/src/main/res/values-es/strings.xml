@@ -28,7 +28,7 @@
     <string name="preference_seconds">Tiempo entre imágenes</string>
     <plurals name="images_selected">
         <item quantity="one">%d imagen seleccionada (max. %d)</item>
-        <item quantity="other">%d imágenes seleccionadas (max. %d)</item>
+        <item quantity="many">%d imágenes seleccionadas (max. %d)</item>
     </plurals>
     <string name="image_view_description">Imagen</string>
     <string name="settings_name">Ajustes</string>

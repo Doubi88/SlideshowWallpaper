@@ -32,6 +32,7 @@ import androidx.annotation.NonNull;
 import androidx.exifinterface.media.ExifInterface;
 import android.util.Log;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -116,6 +117,8 @@ public class ImageLoader {
                         } catch (Exception e2) {
                             retried = 2; // No longer retry
                         }
+                    } catch (FileNotFoundException e) {
+                        retried = 2; // Don't retry
                     }
                 } while (in == null && retried < 2);
             }
