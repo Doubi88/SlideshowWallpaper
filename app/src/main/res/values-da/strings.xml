@@ -37,6 +37,14 @@
     <string name="preference_preview">Forhåndsvis</string>
     <string name="preference_preview_summary">Forhåndsvis, og indstil som nuværende baggrundsbillede</string>
     <string name="add_image">Tilføj billede(r)</string>
+    <string name="preference_info">Information</string>
+    <string name="preference_info_summary">Vis information om denne app</string>
+    <string name="info_version_caption">Version</string>
+    <string name="info_author_caption">Udvikler</string>
+    <string name="info_license_caption">Licens</string>
+    <string name="info_sourcecode_caption">Kildetekst</string>
+    <string name="error_title">Fejl</string>
+    <string name="no_wallpaper_activity_text">Desværre understøttes det ikke at starte forhåndsvisningen herfra på din enhed. Vælg \"Slideshow Wallpaper\" fra dine systemindstillinger som live wallpaper i stedet.</string>
     <string-array name="orderings">
         <item>Forvalgt rækkefølge</item>
         <item>Tilfældig</item>
