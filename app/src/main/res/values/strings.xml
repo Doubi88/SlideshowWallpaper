@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Slideshow Wallpaper: An Android live wallpaper displaying custom images.
  * Copyright (C) 2022  Doubi88 <tobis_mail@yahoo.de>
@@ -37,6 +36,20 @@
     <string name="preference_preview">Preview</string>
     <string name="preference_preview_summary">Preview and set as current wallpaper.</string>
     <string name="add_image">Add Image(s)</string>
+    <string name="preference_info">Info</string>
+    <string name="preference_info_summary">Display information about this app</string>
+    <string name="info_version_caption">Version</string>
+    <string name="info_author_caption">Author</string>
+    <string name="info_license_caption">License</string>
+    <string name="info_sourcecode_caption">Source Code</string>
+    <string name="error_title">Error</string>
+    <string name="no_wallpaper_activity_text">Unfortunately your device does not support starting the wallpaper preview from here. Please select \"Slideshow Wallpaper\" as your live wallpaper in the system settings.</string>
+    <string name="author_name" translatable="false">Doubi88</string>
+    <string name="author_email" translatable="false">tobis_mail@yahoo.de</string>
+    <string name="author_email_url" translatable="false">mailto:tobis_mail@yahoo.de</string>
+    <string name="license" translatable="false">GNU General Public License, Version 3.0</string>
+    <string name="license_url" translatable="false">https://github.com/Doubi88/SlideshowWallpaper/blob/master/LICENSE</string>
+    <string name="source_url" translatable="false">https://github.com/Doubi88/SlideshowWallpaper</string>
     <string-array name="orderings">
         <item>Selection order</item>
         <item>Random</item>

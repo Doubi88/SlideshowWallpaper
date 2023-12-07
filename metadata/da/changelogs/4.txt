@@ -1,0 +1,2 @@
+- Tilføjede spansk oversættelse
+- Det er ikke længere muligt at vælge billeder mere end en gang

@@ -1,0 +1,7 @@
+- Added support for wallpaper colors API
+- Added an information screen
+- Added a dark theme
+- Modernized API call for image selection
+- Show an error message, if the preview screen is not available
+- Added danish translation
+- (Hopefully) added missing anti aliasing

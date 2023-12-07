@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Slideshow Wallpaper: An Android live wallpaper displaying custom images.
+ * Copyright (C) 2022  Doubi88 <tobis_mail@yahoo.de>
+ *
+ * Slideshow Wallpaper is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Slideshow Wallpaper is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+-->
+<resources>
+    <string name="app_name">Slideshow Wallpaper</string>
+    <string name="preference_edit_image_list">Billeder</string>
+    <string name="preference_ordering">Sortering</string>
+    <string name="error_reading_file">Fejl ved indlæsning af filen</string>
+    <string name="delete_button_description">Fjern</string>
+    <string name="preference_seconds">Tid mellem billeder</string>
+    <plurals name="images_selected">
+        <item quantity="one">%d billede valgt (maks. %d)</item>
+        <item quantity="other">%d billeder valgt (maks. %d)</item>
+    </plurals>
+    <string name="image_view_description">Billede</string>
+    <string name="settings_name">Indstillinger</string>
+    <string name="image_list_name">Billeder</string>
+    <string name="preference_too_wide_images_rule">Fremvisningsmetode</string>
+    <string name="preference_preview">Forhåndsvis</string>
+    <string name="preference_preview_summary">Forhåndsvis, og indstil som nuværende baggrundsbillede</string>
+    <string name="add_image">Tilføj billede(r)</string>
+    <string name="preference_info">Information</string>
+    <string name="preference_info_summary">Vis information om denne app</string>
+    <string name="info_version_caption">Version</string>
+    <string name="info_author_caption">Udvikler</string>
+    <string name="info_license_caption">Licens</string>
+    <string name="info_sourcecode_caption">Kildetekst</string>
+    <string name="error_title">Fejl</string>
+    <string name="no_wallpaper_activity_text">Desværre understøttes det ikke at starte forhåndsvisningen herfra på din enhed. Vælg \"Slideshow Wallpaper\" fra dine systemindstillinger som live wallpaper i stedet.</string>
+    <string-array name="orderings">
+        <item>Forvalgt rækkefølge</item>
+        <item>Tilfældig</item>
+    </string-array>
+    <string-array name="too_wide_images_rules">
+        <item>Scroll med hjemmeskærmen</item>
+        <item>Scroll med hjemmeskærmen i modsat retning</item>
+        <item>Nedskalér så billedet passer</item>
+        <item>Opskalér så billedet passer</item>
+    </string-array>
+    <string-array name="seconds">
+        <item>10 sek</item>
+        <item>15 sek</item>
+        <item>30 sek</item>
+        <item>1 min</item>
+        <item>5 min</item>
+        <item>15 min</item>
+        <item>1 time</item>
+        <item>6 timer</item>
+        <item>12 timer</item>
+        <item>1 dag</item>
+        <item>2 dage</item>
+        <item>7 dage</item>
+    </string-array>
+
+</resources>

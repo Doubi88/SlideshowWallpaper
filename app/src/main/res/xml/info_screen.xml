@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Slideshow Wallpaper: An Android live wallpaper displaying custom images.
+ * Copyright (C) 2022  Doubi88 <tobis_mail@yahoo.de>
+ *
+ * Slideshow Wallpaper is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Slideshow Wallpaper is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+-->
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <Preference
+        android:key="@string/info_screen_version_key"
+        android:title="@string/info_version_caption"
+        android:summary="@string/versionName"
+        app:icon="@drawable/outline_image_list_24" />
+    <Preference
+        android:key="@string/info_screen_author_key"
+        android:title="@string/info_author_caption"
+        android:summary="@string/author_name"
+        app:icon="@drawable/ic_avatar_doubi">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="@string/author_email_url" />
+    </Preference>
+    <Preference android:title="@string/info_license_caption"
+        android:key="@string/info_screen_license_key"
+        android:summary="@string/license"
+        app:icon="@drawable/baseline_copyright_24">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="@string/license_url" />
+    </Preference>
+
+    <Preference android:title="@string/info_sourcecode_caption"
+        android:key="@string/info_screen_source_key"
+        android:summary="@string/source_url"
+        android:icon="@drawable/outline_info_24">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="@string/source_url" />
+    </Preference>
+</PreferenceScreen>
