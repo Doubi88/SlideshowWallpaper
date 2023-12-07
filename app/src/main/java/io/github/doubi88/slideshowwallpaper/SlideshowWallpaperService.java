@@ -115,6 +115,8 @@ public class SlideshowWallpaperService extends WallpaperService {
                 Bitmap image = getNextImage();
                 if (image != null) {
                     deltaX = calculateDeltaX(image, lastXOffset, lastXOffsetStep);
+                } else {
+                    deltaX = 0;
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -172,7 +174,12 @@ public class SlideshowWallpaperService extends WallpaperService {
         @Override
         public WallpaperColors onComputeColors () {
             try {
-                return WallpaperColors.fromBitmap(this.getNextImage());
+                Bitmap img = this.getNextImage();
+                if (img != null) {
+                    return WallpaperColors.fromBitmap(img);
+                } else {
+                    return super.onComputeColors();
+                }
             } catch (IOException e) {
                 return super.onComputeColors();
             }
@@ -270,7 +277,7 @@ public class SlideshowWallpaperService extends WallpaperService {
                     if (canvas != null) {
                         canvas.drawRect(0, 0, width, height, clearPaint);
 
-                        Uri lastUri = lastRenderedImage.getUri();
+                        Uri lastUri = lastRenderedImage != null ? lastRenderedImage.getUri() : null;
                         Bitmap bitmap = getNextImage();
                         if (bitmap != null) {
                             currentImageHeight = bitmap.getHeight();
