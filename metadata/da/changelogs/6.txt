@@ -1,0 +1,7 @@
+- Tilføjede understøttelse for wallpaper-farver API
+- Tilføjede en infoskærm
+- Mørkt tema er nu understøttet
+- Moderniserede API-kald for valg af billede
+- Vis en fejlmeddelelse, hvis forhåndsvisningen ikke er tilgængelig
+- Dansk oversættelse tilføjet
+- Manglende anti-aliasing tilføjet (forhåbentligt)
