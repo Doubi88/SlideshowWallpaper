@@ -51,8 +51,13 @@ public class ImageListActivity extends AppCompatActivity {
     private ImageListAdapter imageListAdapter;
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)
-    private final ActivityResultLauncher<PickVisualMediaRequest> launcher = registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(), this::imagePickerCallback);
+    private ActivityResultLauncher<PickVisualMediaRequest> launcher = null;
 
+    public ImageListActivity() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            this.launcher = registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(), this::imagePickerCallback);
+        }
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
