@@ -38,6 +38,8 @@ public class SharedPreferencesManager {
     private static final String PREFERENCE_KEY_URI_LIST_RANDOM = "uri_list_random";
     private static final String PREFERENCE_KEY_SECONDS_BETWEEN = "seconds";
     private static final String PREFERENCE_KEY_TOO_WIDE_IMAGES_RULE = "too_wide_images_rule";
+    private static final String PREFERENCE_KEY_ANTI_ALIAS = "anti_alias";
+    private static final String PREFERENCE_KEY_ANTI_ALIAS_WHILE_SCROLLING = "anti_alias_scrolling";
 
     public enum Ordering {
         SELECTION(0, PREFERENCE_KEY_URI_LIST) {
@@ -230,5 +232,25 @@ public class SharedPreferencesManager {
     public TooWideImagesRule getTooWideImagesRule(Resources r) {
         String value = preferences.getString(PREFERENCE_KEY_TOO_WIDE_IMAGES_RULE, TooWideImagesRule.SCALE_DOWN.getValue(r));
         return TooWideImagesRule.forValue(value, r);
+    }
+
+    public boolean getAntiAlias() {
+        return preferences.getBoolean(PREFERENCE_KEY_ANTI_ALIAS, true);
+    }
+
+    public void setAntiAlias(boolean value) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(PREFERENCE_KEY_ANTI_ALIAS, value);
+        editor.apply();
+    }
+
+    public boolean getAntiAliasWhileScrolling() {
+        return preferences.getBoolean(PREFERENCE_KEY_ANTI_ALIAS_WHILE_SCROLLING, true);
+    }
+
+    public void setAntiAliasWhileScrolling(boolean value) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(PREFERENCE_KEY_ANTI_ALIAS_WHILE_SCROLLING, value);
+        editor.apply();
     }
 }

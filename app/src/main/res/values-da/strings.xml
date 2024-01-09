@@ -37,6 +37,8 @@
     <string name="preference_preview">Forhåndsvis</string>
     <string name="preference_preview_summary">Forhåndsvis, og indstil som nuværende baggrundsbillede</string>
     <string name="add_image">Tilføj billede(r)</string>
+    <string name="preference_anti_alias">Anti-Aliasing</string>
+    <string name="preference_anti_alias_scroll">Anti-aliasing ved scrollning</string>
     <string name="preference_info">Information</string>
     <string name="preference_info_summary">Vis information om denne app</string>
     <string name="info_version_caption">Version</string>

@@ -47,6 +47,13 @@
         android:entries="@array/too_wide_images_rules"
         android:entryValues="@array/too_wide_images_rule_values"
         app:icon="@drawable/baseline_wide_handling_24" />
+    <CheckBoxPreference android:title="@string/preference_anti_alias"
+        android:key="@string/preference_anti_alias_key"
+        android:defaultValue="true" />
+    <CheckBoxPreference android:title="@string/preference_anti_alias_scroll"
+        android:key="@string/preference_anti_alias_scrolling_key"
+        android:dependency="@string/preference_anti_alias_key"
+        android:defaultValue="true" />
     <Preference android:title="@string/preference_preview"
         android:key="@string/preference_preview_key"
         android:summary="@string/preference_preview_summary"
