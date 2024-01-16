@@ -29,11 +29,12 @@ import android.view.ViewGroup;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
 import io.github.doubi88.slideshowwallpaper.R;
-import io.github.doubi88.slideshowwallpaper.listeners.OnDeleteClickListener;
+import io.github.doubi88.slideshowwallpaper.listeners.OnSelectListener;
 import io.github.doubi88.slideshowwallpaper.utilities.AsyncTaskLoadImages;
 import io.github.doubi88.slideshowwallpaper.utilities.ImageInfo;
 import io.github.doubi88.slideshowwallpaper.utilities.ProgressListener;
@@ -41,11 +42,13 @@ import io.github.doubi88.slideshowwallpaper.utilities.ProgressListener;
 public class ImageListAdapter extends RecyclerView.Adapter<ImageInfoViewHolder> {
 
     private List<Uri> uris;
-    private List<OnDeleteClickListener> listeners;
+    private List<OnSelectListener> listeners;
     private HashMap<Uri, AsyncTaskLoadImages> loading;
+    private HashSet<ImageInfo> selectedImages;
 
 
     public ImageListAdapter(List<Uri> uris) {
+        this.selectedImages = new HashSet<>();
         this.uris = new ArrayList<>(uris);
         listeners = new LinkedList<>();
         loading = new HashMap<>();
@@ -56,24 +59,32 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageInfoViewHolder> 
     public ImageInfoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.image_list_entry, parent, false);
         ImageInfoViewHolder holder = new ImageInfoViewHolder(view);
-        holder.setOnDeleteButtonClickListener(new OnDeleteClickListener() {
+        holder.setOnSelectListener(new OnSelectListener() {
             @Override
-            public void onDeleteButtonClicked(ImageInfo info) {
-                delete(info);
+            public void onImageSelected(ImageInfo info) {
+                select(info);
             }
+
+            @Override
+            public void onImagedDeselected(ImageInfo info) {
+                deselect(info);
+            }
+
+            @Override
+            public void onSelectionChanged(HashSet<ImageInfo> setInfo) {}
         });
         return holder;
     }
 
-    public void addOnDeleteClickListener(OnDeleteClickListener listener) {
+    public void addOnSelectListener(OnSelectListener listener) {
         if (!listeners.contains(listener)) {
             listeners.add(listener);
         }
     }
 
-    private void notifyListeners(ImageInfo info) {
-        for (OnDeleteClickListener listener : listeners) {
-            listener.onDeleteButtonClicked(info);
+    private void notifyListeners() {
+        for (OnSelectListener listener : listeners) {
+            listener.onSelectionChanged(this.selectedImages);
         }
     }
 
@@ -122,12 +133,32 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageInfoViewHolder> 
         return uris.size();
     }
 
-    private void delete(ImageInfo info) {
-        int index = uris.indexOf(info.getUri());
-        uris.remove(index);
-        notifyItemRemoved(index);
+    public void delete(HashSet<ImageInfo> imageInfos) {
+        for (ImageInfo imageInfo : imageInfos){
+            int index = uris.indexOf(imageInfo.getUri());
+            uris.remove(index);
+            notifyItemRemoved(index);
+        }
+        selectedImages.clear();
+        notifyListeners();
+    }
 
-        notifyListeners(info);
+    private void select(ImageInfo info){
+        selectedImages.add(info);
+        for (OnSelectListener listener: this.listeners){
+            listener.onSelectionChanged(this.selectedImages);
+        }
+    }
+
+    private void deselect(ImageInfo info){
+        selectedImages.remove(info);
+        for (OnSelectListener listener: this.listeners){
+            listener.onSelectionChanged(this.selectedImages);
+        }
+    }
+
+    public HashSet<ImageInfo> getSelectedImages(){
+        return this.selectedImages;
     }
 
     public void addUris(List<Uri> uris) {

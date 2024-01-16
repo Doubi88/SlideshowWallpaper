@@ -19,13 +19,17 @@
 package io.github.doubi88.slideshowwallpaper.preferences.imageList;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
@@ -33,15 +37,21 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
 import io.github.doubi88.slideshowwallpaper.R;
+import io.github.doubi88.slideshowwallpaper.listeners.OnSelectListener;
 import io.github.doubi88.slideshowwallpaper.preferences.SharedPreferencesManager;
+import io.github.doubi88.slideshowwallpaper.utilities.ImageInfo;
 
 public class ImageListActivity extends AppCompatActivity {
 
@@ -49,6 +59,8 @@ public class ImageListActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_FILE = 1;
 
     private ImageListAdapter imageListAdapter;
+
+    private FloatingActionButton removeButton;
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     private ActivityResultLauncher<PickVisualMediaRequest> launcher = null;
@@ -58,25 +70,43 @@ public class ImageListActivity extends AppCompatActivity {
             this.launcher = registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(), this::imagePickerCallback);
         }
     }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.image_list);
 
+        this.removeButton = findViewById(R.id.delete_button);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         RecyclerView recyclerView = findViewById(R.id.image_list);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 3);
         recyclerView.setLayoutManager(layoutManager);
         manager = new SharedPreferencesManager(getSharedPreferences(getPackageName() + "_preferences", MODE_PRIVATE));
 
         List<Uri> uris = manager.getImageUris(SharedPreferencesManager.Ordering.SELECTION);
 
         imageListAdapter = new ImageListAdapter(uris);
-        imageListAdapter.addOnDeleteClickListener(info -> {
-            manager.removeUri(info.getUri());
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && info.getSize() > 0 && !manager.hasImageUri(info.getUri())) {
-                getContentResolver().releasePersistableUriPermission(info.getUri(), Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        imageListAdapter.addOnSelectListener(new OnSelectListener() {
+            @Override
+            public void onImageSelected(ImageInfo info) {
+
+            }
+
+            @Override
+            public void onImagedDeselected(ImageInfo info) {
+
+            }
+
+            @Override
+            public void onSelectionChanged(HashSet<ImageInfo> setInfo) {
+                Log.d(ImageListActivity.class.getSimpleName(), setInfo.size() + " image(s) selected");
+                if (setInfo.size() > 0) {
+                    removeButton.setVisibility(View.VISIBLE);
+                } else {
+                    removeButton.setVisibility(View.GONE);
+                }
             }
         });
         recyclerView.setAdapter(imageListAdapter);
@@ -87,8 +117,7 @@ public class ImageListActivity extends AppCompatActivity {
                         .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
                         .build();
                 launcher.launch(request);
-            }
-            else {
+            } else {
                 Intent intent = new Intent();
                 intent.setType("image/*");
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
@@ -96,6 +125,37 @@ public class ImageListActivity extends AppCompatActivity {
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent, REQUEST_CODE_FILE);
             }
+        });
+
+        this.removeButton.setOnClickListener(view -> {
+            HashSet<ImageInfo> selectedImages = imageListAdapter.getSelectedImages();
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(getString(R.string.remove_confirmation_title));
+            builder.setMessage(getString(R.string.remove_confirmation_message, selectedImages.size()));
+            builder.setPositiveButton(getString(R.string.positive_action_text), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    for (ImageInfo imageInfo : selectedImages) {
+                        manager.removeUri(imageInfo.getUri());
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && imageInfo.getSize() > 0 && !manager.hasImageUri(imageInfo.getUri())) {
+                            getContentResolver().releasePersistableUriPermission(imageInfo.getUri(), Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        }
+                    }
+                    imageListAdapter.delete(selectedImages);
+                }
+            });
+
+            builder.setNegativeButton(getString(R.string.cancel_action_text), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+
+            // Créer et afficher l'AlertDialog
+            AlertDialog dialog = builder.create();
+            dialog.show();
         });
     }
 
