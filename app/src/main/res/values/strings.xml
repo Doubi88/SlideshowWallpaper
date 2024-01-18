@@ -38,7 +38,10 @@
     <string name="add_image">Add Image(s)</string>
     <string name="remove_image">Remove Image(s)</string>
     <string name="remove_confirmation_title">Confirm deletion</string>
-    <string name="remove_confirmation_message">Are you sure you want to remove %d image(s) from the wallpapers?</string>
+    <plurals name="remove_confirmation_message">
+        <item quantity="one">Are you sure you want to remove %d image from the wallpapers?</item>
+        <item quantity="other">Are you sure you want to remove %d images from the wallpapers?</item>
+    </plurals>
     <string name="positive_action_text">Yes</string>
     <string name="cancel_action_text">Cancel</string>
     <string name="preference_info">Info</string>

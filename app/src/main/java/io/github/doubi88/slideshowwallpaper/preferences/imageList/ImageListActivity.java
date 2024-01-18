@@ -132,7 +132,7 @@ public class ImageListActivity extends AppCompatActivity {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(getString(R.string.remove_confirmation_title));
-            builder.setMessage(getString(R.string.remove_confirmation_message, selectedImages.size()));
+            builder.setMessage(getResources().getQuantityString(R.plurals.remove_confirmation_message, selectedImages.size(), selectedImages.size()));
             builder.setPositiveButton(getString(R.string.positive_action_text), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -153,7 +153,7 @@ public class ImageListActivity extends AppCompatActivity {
                 }
             });
 
-            // Créer et afficher l'AlertDialog
+            // Create and display the AlertDialog
             AlertDialog dialog = builder.create();
             dialog.show();
         });
