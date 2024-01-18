@@ -18,9 +18,15 @@
  */
 package io.github.doubi88.slideshowwallpaper.listeners;
 
+import java.util.HashSet;
+
 import io.github.doubi88.slideshowwallpaper.utilities.ImageInfo;
 
-public interface OnDeleteClickListener {
+public interface OnSelectListener {
 
-    public void onDeleteButtonClicked(ImageInfo info);
+    public void onImageSelected(ImageInfo info);
+
+    public void onImagedDeselected(ImageInfo info);
+
+    public void onSelectionChanged(HashSet<ImageInfo> setInfo);
 }

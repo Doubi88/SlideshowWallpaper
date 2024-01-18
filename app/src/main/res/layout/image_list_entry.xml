@@ -23,12 +23,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="@dimen/image_preview_height"
-    android:id="@+id/image_card"
     app:cardCornerRadius="4dp"
     android:layout_margin="3dp">
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/frame_layout"
+        android:background="@color/secondaryTextColor"
         android:padding="0dp">
         <ProgressBar
             android:id="@+id/progress_bar"
@@ -38,34 +39,16 @@
         <ImageView
             android:id="@+id/image_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
             android:contentDescription="@string/image_view_description"/>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="bottom|center_horizontal"
-            android:weightSum="10"
-            android:background="?android:attr/colorBackground"
-            android:id="@+id/bottom_bar">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/card_text"
-                android:textAlignment="center"
-                android:textSize="12sp"
-                android:layout_weight="9"
-                android:layout_gravity="center_horizontal"
-                />
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/delete_button_description"
-                android:layout_weight="1"
-                android:id="@+id/delete_button"
-                android:layout_margin="3dp"
-                app:backgroundTint="@color/primaryLightColor"
-                />
-        </LinearLayout>
     </FrameLayout>
+    <ImageView
+        android:id="@+id/check_icon"
+        android:background="@drawable/circle_background"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_margin="5dp"
+        android:src="@drawable/ic_check"
+        android:visibility="gone" />
 </androidx.cardview.widget.CardView>

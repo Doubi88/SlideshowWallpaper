@@ -37,6 +37,13 @@
     <string name="preference_preview">Vorschau</string>
     <string name="preference_preview_summary">Vorschau starten und als aktuellen Hintergrund setzen.</string>
     <string name="add_image">Bild(er) hinzufügen</string>
+    <string name="remove_confirmation_title">Bestätigen Sie die Löschung</string>
+    <plurals name="remove_confirmation_message">
+        <item quantity="one">Sind Sie sicher, dass Sie %d Bild aus den Hintergrundbildern entfernen möchten?</item>
+        <item quantity="other">Sind Sie sicher, dass Sie %d Bilder aus den Hintergrundbildern entfernen möchten?</item>
+    </plurals>
+    <string name="positive_action_text">Ja</string>
+    <string name="cancel_action_text">Abbrechen</string>
     <string name="preference_info">Info</string>
     <string name="preference_info_summary">Informationen über diese App anzeigen.</string>
     <string name="info_version_caption">Version</string>
@@ -69,4 +76,5 @@
         <item>2 Tage</item>
         <item>7 Tage</item>
     </string-array>
+    <string name="remove_image">Bild(er) entfernen</string>
 </resources>

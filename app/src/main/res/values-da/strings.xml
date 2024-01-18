@@ -37,6 +37,13 @@
     <string name="preference_preview">Forhåndsvis</string>
     <string name="preference_preview_summary">Forhåndsvis, og indstil som nuværende baggrundsbillede</string>
     <string name="add_image">Tilføj billede(r)</string>
+    <string name="remove_confirmation_title">Bekræft sletning</string>
+    <plurals name="remove_confirmation_message">
+        <item quantity="one">Er du sikker på, at du vil fjerne %d billede fra baggrundene?</item>
+        <item quantity="other">Er du sikker på, at du vil fjerne %d billeder fra baggrundene?</item>
+    </plurals>
+    <string name="positive_action_text">Ja</string>
+    <string name="cancel_action_text">Annuller</string>
     <string name="preference_info">Information</string>
     <string name="preference_info_summary">Vis information om denne app</string>
     <string name="info_version_caption">Version</string>
@@ -69,5 +76,6 @@
         <item>2 dage</item>
         <item>7 dage</item>
     </string-array>
+    <string name="remove_image">Fjern billede(r)</string>
 
 </resources>
