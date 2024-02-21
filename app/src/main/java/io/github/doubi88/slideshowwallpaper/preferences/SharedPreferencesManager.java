@@ -142,6 +142,16 @@ public class SharedPreferencesManager {
         return result;
     }
 
+    public int getImageUrisCount() {
+        String[] uris = getUriList(Ordering.SELECTION);
+        return uris.length;
+    }
+
+    public Uri getImageUri(@NonNull int index, @NonNull Ordering ordering) {
+        String[] uris = getUriList(ordering);
+        return Uri.parse(uris[index]);
+    }
+
     public boolean hasImageUri(@NonNull Uri uri) {
         List<Uri> uris = getImageUris(Ordering.SELECTION);
         return uris.contains(uri);

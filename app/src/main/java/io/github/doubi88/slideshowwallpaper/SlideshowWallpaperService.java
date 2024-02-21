@@ -217,13 +217,13 @@ public class SlideshowWallpaperService extends WallpaperService {
         private Uri getNextUri() {
             Uri result = null;
             SharedPreferencesManager.Ordering ordering = manager.getCurrentOrdering(getResources());
-            List<Uri> uris = manager.getImageUris(ordering);
+            int countUris = manager.getImageUrisCount();
 
-            if (uris.size() > 0) {
+            if (countUris > 0) {
                 int currentImageIndex = manager.getCurrentIndex();
-                if (currentImageIndex >= uris.size()) {
+                if (currentImageIndex >= countUris) {
                     // If an image was deleted and therefore we are over the end of the list
-                    currentImageIndex -= uris.size();
+                    currentImageIndex -= countUris;
                 }
                 int nextUpdate = calculateNextUpdateInSeconds();
                 if (nextUpdate <= 0) {
@@ -231,7 +231,7 @@ public class SlideshowWallpaperService extends WallpaperService {
                     while (nextUpdate <= 0) {
                         currentImageIndex++;
 
-                        if (currentImageIndex >= uris.size()) {
+                        if (currentImageIndex >= countUris) {
                             currentImageIndex = 0;
                         }
 
@@ -240,9 +240,9 @@ public class SlideshowWallpaperService extends WallpaperService {
                     manager.setCurrentIndex(currentImageIndex);
                     manager.setLastUpdate(System.currentTimeMillis());
                 }
-                result = uris.get(currentImageIndex);
+                result = manager.getImageUri(currentImageIndex, ordering);
                 currentIndex = currentImageIndex;
-                listLength = uris.size();
+                listLength = countUris;
             }
 
             return result;
