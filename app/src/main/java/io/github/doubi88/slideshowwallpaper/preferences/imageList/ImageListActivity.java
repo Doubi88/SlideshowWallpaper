@@ -112,19 +112,19 @@ public class ImageListActivity extends AppCompatActivity {
         recyclerView.setAdapter(imageListAdapter);
 
         findViewById(R.id.add_button).setOnClickListener(view -> {
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                PickVisualMediaRequest request = new PickVisualMediaRequest.Builder()
-                        .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
-                        .build();
-                launcher.launch(request);
-            } else {
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(intent, REQUEST_CODE_FILE);
+                intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
             }
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+            } else {
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+            }
+            startActivityForResult(intent, REQUEST_CODE_FILE);
         });
 
         this.removeButton.setOnClickListener(view -> {
@@ -182,30 +182,28 @@ public class ImageListActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            List<Uri> uris = new LinkedList<>();
-            if (requestCode == REQUEST_CODE_FILE && resultCode == Activity.RESULT_OK) {
-                ClipData clipData = data.getClipData();
-                if (clipData == null) {
-                    Uri uri = data.getData();
-                    if (uri != null) {
-                        boolean takePermissionSuccess = takePermission(uri);
-                        if (takePermissionSuccess && manager.addUri(uri)) {
-                            uris.add(uri);
-                        }
-                    }
-                } else {
-                    for (int index = 0; index < clipData.getItemCount(); index++) {
-                        Uri uri = clipData.getItemAt(index).getUri();
-                        boolean takePermissionSuccess = takePermission(uri);
-                        if (takePermissionSuccess && manager.addUri(uri)) {
-                            uris.add(uri);
-                        }
+        List<Uri> uris = new LinkedList<>();
+        if (requestCode == REQUEST_CODE_FILE && resultCode == Activity.RESULT_OK) {
+            ClipData clipData = data.getClipData();
+            if (clipData == null) {
+                Uri uri = data.getData();
+                if (uri != null) {
+                    boolean takePermissionSuccess = takePermission(uri);
+                    if (takePermissionSuccess && manager.addUri(uri)) {
+                        uris.add(uri);
                     }
                 }
-
-                imageListAdapter.addUris(uris);
+            } else {
+                for (int index = 0; index < clipData.getItemCount(); index++) {
+                    Uri uri = clipData.getItemAt(index).getUri();
+                    boolean takePermissionSuccess = takePermission(uri);
+                    if (takePermissionSuccess && manager.addUri(uri)) {
+                        uris.add(uri);
+                    }
+                }
             }
+
+            imageListAdapter.addUris(uris);
         }
     }
 
