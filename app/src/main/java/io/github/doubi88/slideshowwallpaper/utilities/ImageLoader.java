@@ -217,9 +217,10 @@ public class ImageLoader {
 
         float scale = calculateScaleFactorToFit(bitmap, screenWidth, screenHeight, both);
         float yTranslate = (screenHeight - bitmap.getHeight() * scale) / 2f;
+        float xTranslate = (screenWidth - bitmap.getWidth() * scale) / 2f;
 
         result.setScale(scale, scale);
-        result.postTranslate(0, yTranslate);
+        result.postTranslate(xTranslate, yTranslate);
         return result;
     }
 }
