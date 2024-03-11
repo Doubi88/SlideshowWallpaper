@@ -36,6 +36,8 @@
     <string name="preference_preview">Preview</string>
     <string name="preference_preview_summary">Preview and set as current wallpaper.</string>
     <string name="add_image">Add Image(s)</string>
+    <string name="preference_anti_alias">Anti-aliasing</string>
+    <string name="preference_anti_alias_scroll">Anti-aliasing while scrolling</string>
     <string name="remove_image">Remove Image(s)</string>
     <string name="remove_confirmation_title">Confirm deletion</string>
     <plurals name="remove_confirmation_message">

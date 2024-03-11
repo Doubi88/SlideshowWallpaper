@@ -37,6 +37,8 @@
     <string name="preference_preview">Vorschau</string>
     <string name="preference_preview_summary">Vorschau starten und als aktuellen Hintergrund setzen.</string>
     <string name="add_image">Bild(er) hinzufügen</string>
+    <string name="preference_anti_alias">Anti-aliasing</string>
+    <string name="preference_anti_alias_scroll">Anti-aliasing beim Scrollen</string>
     <string name="remove_confirmation_title">Bestätigen Sie die Löschung</string>
     <plurals name="remove_confirmation_message">
         <item quantity="one">Sind Sie sicher, dass Sie %d Bild aus den Hintergrundbildern entfernen möchten?</item>

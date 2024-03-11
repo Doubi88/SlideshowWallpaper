@@ -77,22 +77,26 @@ public class SlideshowWallpaperService extends WallpaperService {
         private float deltaX;
         private float lastXOffset;
         private float lastXOffsetStep;
+        private boolean isScrolling = false;
 
         private SharedPreferencesManager manager;
 
         public SlideshowWallpaperEngine() {
+            SharedPreferences prefs = getSharedPreferences();
+            manager = new SharedPreferencesManager(prefs);
 
             deltaX = 0;
             handler = new Handler(Looper.getMainLooper());
             drawRunner = new DrawRunner();
 
             clearPaint = new Paint();
-            clearPaint.setAntiAlias(true);
             clearPaint.setColor(Color.BLACK);
             clearPaint.setStyle(Paint.Style.FILL);
 
             imagePaint = new Paint();
-            imagePaint.setAntiAlias(true);
+            if (manager.getAntiAlias()) {
+                imagePaint.setAntiAlias(true);
+            }
 
             textPaint = new Paint();
             textPaint.setAntiAlias(true);
@@ -103,8 +107,6 @@ public class SlideshowWallpaperService extends WallpaperService {
             textSize = (int) (10f * scale + 0.5f);
             textPaint.setTextSize(textSize);
             handler.post(drawRunner);
-
-            manager = new SharedPreferencesManager(getSharedPreferences());
         }
 
         @Override
@@ -123,6 +125,9 @@ public class SlideshowWallpaperService extends WallpaperService {
                 e.printStackTrace();
                 deltaX = 0;
             }
+
+            // When the xOffset is not a whole number, the wallpaper is scrolling
+            isScrolling = (Math.floor(xOffset) != xOffset);
             handler.removeCallbacks(drawRunner);
             handler.post(drawRunner);
         }
@@ -212,13 +217,13 @@ public class SlideshowWallpaperService extends WallpaperService {
         private Uri getNextUri() {
             Uri result = null;
             SharedPreferencesManager.Ordering ordering = manager.getCurrentOrdering(getResources());
-            List<Uri> uris = manager.getImageUris(ordering);
+            int countUris = manager.getImageUrisCount();
 
-            if (uris.size() > 0) {
+            if (countUris > 0) {
                 int currentImageIndex = manager.getCurrentIndex();
-                if (currentImageIndex >= uris.size()) {
+                if (currentImageIndex >= countUris) {
                     // If an image was deleted and therefore we are over the end of the list
-                    currentImageIndex -= uris.size();
+                    currentImageIndex -= countUris;
                 }
                 int nextUpdate = calculateNextUpdateInSeconds();
                 if (nextUpdate <= 0) {
@@ -226,7 +231,7 @@ public class SlideshowWallpaperService extends WallpaperService {
                     while (nextUpdate <= 0) {
                         currentImageIndex++;
 
-                        if (currentImageIndex >= uris.size()) {
+                        if (currentImageIndex >= countUris) {
                             currentImageIndex = 0;
                         }
 
@@ -235,9 +240,9 @@ public class SlideshowWallpaperService extends WallpaperService {
                     manager.setCurrentIndex(currentImageIndex);
                     manager.setLastUpdate(System.currentTimeMillis());
                 }
-                result = uris.get(currentImageIndex);
+                result = manager.getImageUri(currentImageIndex, ordering);
                 currentIndex = currentImageIndex;
-                listLength = uris.size();
+                listLength = countUris;
             }
 
             return result;
@@ -285,6 +290,9 @@ public class SlideshowWallpaperService extends WallpaperService {
                             currentImageWidth = bitmap.getWidth();
 
                             SharedPreferencesManager.TooWideImagesRule rule = manager.getTooWideImagesRule(getResources());
+                            boolean antiAlias = manager.getAntiAlias();
+                            boolean antiAliasScrolling = manager.getAntiAliasWhileScrolling();
+                            imagePaint.setAntiAlias(antiAlias && (!isScrolling || antiAliasScrolling));
                             if (rule == SharedPreferencesManager.TooWideImagesRule.SCALE_DOWN) {
                                 canvas.drawBitmap(bitmap, ImageLoader.calculateMatrixScaleToFit(bitmap, width, height, true), imagePaint);
                             } else if (rule == SharedPreferencesManager.TooWideImagesRule.SCALE_UP || rule == SharedPreferencesManager.TooWideImagesRule.SCROLL_FORWARD || rule == SharedPreferencesManager.TooWideImagesRule.SCROLL_BACKWARD) {
