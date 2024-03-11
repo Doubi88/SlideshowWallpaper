@@ -216,8 +216,14 @@ public class ImageLoader {
         Matrix result = new Matrix();
 
         float scale = calculateScaleFactorToFit(bitmap, screenWidth, screenHeight, both);
-        float yTranslate = (screenHeight - bitmap.getHeight() * scale) / 2f;
-        float xTranslate = (screenWidth - bitmap.getWidth() * scale) / 2f;
+        float yTranslate = 0;
+        if (screenHeight > (bitmap.getHeight() * scale)) {
+            yTranslate = (screenHeight - bitmap.getHeight() * scale) / 2f;
+        }
+        float xTranslate = 0;
+        if (screenWidth > (bitmap.getWidth() * scale)) {
+            xTranslate = (screenWidth - bitmap.getWidth() * scale) / 2f;
+        }
 
         result.setScale(scale, scale);
         result.postTranslate(xTranslate, yTranslate);
