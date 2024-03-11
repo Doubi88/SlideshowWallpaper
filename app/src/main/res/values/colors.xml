@@ -28,4 +28,5 @@
   <color name="secondaryDarkColor">#00867d</color>
   <color name="primaryTextColor">#000000</color>
   <color name="secondaryTextColor">#ffffff</color>
+  <color name="alertColor">#FF0000</color>
 </resources>
