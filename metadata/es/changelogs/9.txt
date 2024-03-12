@@ -1,0 +1,5 @@
+- Redesigned the image list
+- Perfowmance improvements when scrolling
+- Reverted image picker to older version, because of several bugs
+- Small images are always centered
+- Solved black screen on reboot
