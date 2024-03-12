@@ -32,6 +32,17 @@
         android:src="@drawable/ic_baseline_add"
         android:contentDescription="@string/add_image"
         />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/delete_button"
+        android:backgroundTint="@color/alertColor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start|bottom"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_baseline_remove"
+        android:contentDescription="@string/remove_image"
+        android:visibility="gone"
+        />
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"

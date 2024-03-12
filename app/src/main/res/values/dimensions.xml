@@ -20,5 +20,5 @@
  */
 -->
 <resources>
-    <dimen name="image_preview_height">200dp</dimen>
+    <dimen name="image_preview_height">150dp</dimen>
 </resources>

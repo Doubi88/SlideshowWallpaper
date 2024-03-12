@@ -18,28 +18,25 @@
  */
 package io.github.doubi88.slideshowwallpaper.preferences.imageList;
 
-import android.animation.Animator;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.AsyncTask;
+
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewPropertyAnimator;
-import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
 import io.github.doubi88.slideshowwallpaper.R;
-import io.github.doubi88.slideshowwallpaper.listeners.OnDeleteClickListener;
-import io.github.doubi88.slideshowwallpaper.utilities.AsyncTaskLoadImages;
+import io.github.doubi88.slideshowwallpaper.listeners.OnSelectListener;
 import io.github.doubi88.slideshowwallpaper.utilities.ImageInfo;
 import io.github.doubi88.slideshowwallpaper.utilities.ImageLoader;
 import io.github.doubi88.slideshowwallpaper.utilities.ProgressListener;
@@ -50,116 +47,69 @@ public class ImageInfoViewHolder extends RecyclerView.ViewHolder implements Prog
     private final int width;
     private ImageInfo imageInfo;
 
-    private boolean bottomBarDisplaying;
+    private boolean imageIsSelected;
 
-    private ImageView imageView;
-    private TextView textView;
-    private LinearLayout bottomBar;
-    private ProgressBar progressBar;
-    private AsyncTaskLoadImages asyncTask;
+    private final FrameLayout frameLayout;
+    private final ImageView imageView;
+    private final ImageView checkIcon;
+    private final ProgressBar progressBar;
 
-    private LinkedList<OnDeleteClickListener> listeners;
+    private LinkedList<OnSelectListener> listeners;
+
 
     public ImageInfoViewHolder(View itemView) {
         super(itemView);
         listeners = new LinkedList<>();
         imageView = itemView.findViewById(R.id.image_view);
-        textView = itemView.findViewById(R.id.card_text);
+        checkIcon = itemView.findViewById(R.id.check_icon);
+        frameLayout = itemView.findViewById(R.id.frame_layout);
 
-        bottomBar = itemView.findViewById(R.id.bottom_bar);
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                toggleBottomBar();
+                toggleSelection();
             }
         });
         progressBar = itemView.findViewById(R.id.progress_bar);
-        Button deleteButton = itemView.findViewById(R.id.delete_button);
-        deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                notifyListeners();
-            }
-        });
 
         height = imageView.getResources().getDimensionPixelSize(R.dimen.image_preview_height);
         width = itemView.getWidth();
     }
 
     public void setUri(Uri uri) {
+        DeselectImage();
         if (imageInfo == null || !uri.equals(imageInfo.getUri())) {
-            showBottomBar();
-
             imageInfo = ImageLoader.loadFileNameAndSize(uri, imageView.getContext());
-            textView.setText(imageInfo.getName());
-
-      }
+        }
     }
 
-    private void toggleBottomBar() {
-        if (bottomBarDisplaying) {
-            hideBottomBar();
+    private void toggleSelection() {
+        if (imageIsSelected) {
+            DeselectImage();
+            notifyOnImageDeselected();
         } else {
-            showBottomBar();
+            SelectImage();
+            notifyOnImageSelected();
         }
     }
-    private void showBottomBar() {
-        Log.i(ImageInfoViewHolder.class.getSimpleName(), "Show text view");
-        bottomBar.setVisibility(View.VISIBLE);
-        ViewPropertyAnimator anim = bottomBar.animate();
-        anim.translationY(0);
-        anim.setDuration(500);
-        anim.start();
-        bottomBarDisplaying = true;
+    private void DeselectImage() {
+        Log.i(ImageInfoViewHolder.class.getSimpleName(), "Deselect the image");
+
+        this.frameLayout.setPadding(0,0,0,0);
+        this.frameLayout.setBackgroundColor(ContextCompat.getColor(imageView.getContext(), R.color.secondaryTextColor));
+        this.checkIcon.setVisibility(View.GONE);
+
+        imageIsSelected = false;
     }
 
-    private void hideBottomBar() {
-        Log.i(ImageInfoViewHolder.class.getSimpleName(), "Hide text view");
-        ViewPropertyAnimator anim = bottomBar.animate();
-        anim.translationY(bottomBar.getHeight());
-        anim.setDuration(500);
-        anim.setListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animator) {
+    private void SelectImage() {
+        Log.i(ImageInfoViewHolder.class.getSimpleName(), "Select the image");
 
-            }
+        this.frameLayout.setPadding(10,10,10,10);
+        this.frameLayout.setBackgroundColor(ContextCompat.getColor(imageView.getContext(), R.color.primaryLightColor));
+        this.checkIcon.setVisibility(View.VISIBLE);
 
-            @Override
-            public void onAnimationEnd(Animator animator) {
-                Log.i(ImageInfoViewHolder.class.getSimpleName(), "Animation end: gone");
-                bottomBar.setVisibility(View.GONE);
-                bottomBar.clearAnimation();
-                bottomBar.animate().setListener(null);
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animator) {
-                Log.i(ImageInfoViewHolder.class.getSimpleName(), "Animation cancel: gone");
-                bottomBar.setTranslationY(bottomBar.getHeight());
-                bottomBar.setVisibility(View.GONE);
-                bottomBar.clearAnimation();
-                bottomBar.animate().setListener(null);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animator) {
-
-            }
-        });
-
-        anim.start();
-        bottomBarDisplaying = false;
-    }
-    public void setOnDeleteButtonClickListener(OnDeleteClickListener listener) {
-        if (!listeners.contains(listener)) {
-            listeners.add(listener);
-        }
-    }
-
-    private void notifyListeners() {
-        for (OnDeleteClickListener listener : listeners) {
-            listener.onDeleteButtonClicked(imageInfo);
-        }
+        imageIsSelected = true;
     }
 
     public Uri getUri() {
@@ -180,7 +130,6 @@ public class ImageInfoViewHolder extends RecyclerView.ViewHolder implements Prog
                 Matrix matrix = ImageLoader.calculateMatrixScaleToFit(imageInfo.getImage(), width, height, false);
                 imageView.setImageBitmap(Bitmap.createBitmap(imageInfo.getImage(), 0, 0, imageInfo.getImage().getWidth(), imageInfo.getImage().getHeight(), matrix, false));
             }
-            textView.setText(imageInfo.getName());
             progressBar.setVisibility(View.GONE);
 
         }
@@ -192,6 +141,24 @@ public class ImageInfoViewHolder extends RecyclerView.ViewHolder implements Prog
             for (ImageInfo info : imageInfos) {
                 info.getImage().recycle();
             }
+        }
+    }
+
+    public void setOnSelectListener(OnSelectListener listener) {
+        if (!listeners.contains(listener)) {
+            listeners.add(listener);
+        }
+    }
+
+    public void notifyOnImageSelected(){
+        for (OnSelectListener listener : listeners) {
+            listener.onImageSelected(imageInfo);
+        }
+    }
+
+    public void notifyOnImageDeselected(){
+        for (OnSelectListener listener : listeners) {
+            listener.onImagedDeselected(imageInfo);
         }
     }
 }
