@@ -39,7 +39,7 @@
     <string name="preference_anti_alias">Anti-aliasing</string>
     <string name="preference_anti_alias_scroll">Anti-aliasing while scrolling</string>
     <string name="remove_image">Remove Image(s)</string>
-    <string name="remove_confirmation_title">Confirm deletion</string>
+    <string name="remove_confirmation_title">Confirm removal</string>
     <plurals name="remove_confirmation_message">
         <item quantity="one">Are you sure you want to remove %d image from the wallpapers?</item>
         <item quantity="other">Are you sure you want to remove %d images from the wallpapers?</item>
