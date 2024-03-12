@@ -199,7 +199,7 @@ public class SlideshowWallpaperService extends WallpaperService {
         private Bitmap getNextImage() throws IOException {
             Uri uri = getNextUri();
             if (uri != null) {
-                if (lastRenderedImage == null || !uri.equals(lastRenderedImage.getUri())) {
+                if (lastRenderedImage == null || lastRenderedImage.getImage() == null || !uri.equals(lastRenderedImage.getUri())) {
                     lastRenderedImage = ImageLoader.loadImage(uri, SlideshowWallpaperService.this, width, height, false);
                     Bitmap image = lastRenderedImage.getImage();
                     if (image != null) {
