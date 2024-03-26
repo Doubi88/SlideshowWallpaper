@@ -1,0 +1,5 @@
+- Neues Design für die Bilderliste
+- Performaceverbesserung beim Scrolling
+- Aufgrund verschiedener Fehler, die Dateiauswahl vorerst wieder auf den älteren Stand zurückgesetzt
+- Kleinere Bilder werden immer in der Mitte ausgerichtet
+- Schwarzen Hintergrund beim Neustart behoben
