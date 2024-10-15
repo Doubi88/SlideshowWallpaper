@@ -1,0 +1,1 @@
+Improved performance by putting image loading into a thread.
