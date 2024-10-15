@@ -57,23 +57,15 @@ public class SlideshowWallpaperService extends WallpaperService {
         private int width;
         private int height;
 
-        private int currentImageWidth;
-        private int currentImageHeight;
-
         private Runnable drawRunner;
         private Paint clearPaint;
         private Paint imagePaint;
         private Paint textPaint;
-        private boolean visible;
         private int textSize;
-
-        private int listLength;
 
         private ImageInfo lastRenderedImage;
 
         private float deltaX;
-        private float lastXOffset;
-        private float lastXOffsetStep;
         private boolean isScrolling = false;
 
         private SharedPreferencesManager manager;
@@ -113,11 +105,9 @@ public class SlideshowWallpaperService extends WallpaperService {
             if (currentImageHandler != null) {
                 ImageInfo currentImage = currentImageHandler.getCurrentImage();
                 if (currentImage != null) {
-                    lastXOffset = xOffset;
-                    lastXOffsetStep = xOffsetStep;
-                    Bitmap image = currentImageHandler.getCurrentImage().getImage();
+                    Bitmap image = currentImage.getImage();
                     if (image != null) {
-                        deltaXResult = calculateDeltaX(image, lastXOffset, lastXOffsetStep);
+                        deltaXResult = calculateDeltaX(image, xOffset, xOffsetStep);
                     } else {
                         deltaXResult = 0;
                     }
@@ -174,13 +164,11 @@ public class SlideshowWallpaperService extends WallpaperService {
             super.onSurfaceDestroyed(holder);
             currentImageHandler.stop();
             handler.removeCallbacks(drawRunner);
-            visible = false;
         }
 
         @Override
         public void onVisibilityChanged(boolean visible) {
             super.onVisibilityChanged(visible);
-            this.visible = visible;
             if (visible) {
                 handler.post(drawRunner);
                 if (!currentImageHandler.isStarted()) {
@@ -232,9 +220,6 @@ public class SlideshowWallpaperService extends WallpaperService {
                             bitmap = image.getImage();
                         }
                         if (bitmap != null) {
-                            currentImageHeight = bitmap.getHeight();
-                            currentImageWidth = bitmap.getWidth();
-
                             SharedPreferencesManager.TooWideImagesRule rule = manager.getTooWideImagesRule(getResources());
                             boolean antiAlias = manager.getAntiAlias();
                             boolean antiAliasScrolling = manager.getAntiAliasWhileScrolling();
