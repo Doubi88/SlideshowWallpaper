@@ -112,6 +112,13 @@ public class ImageListActivity extends AppCompatActivity {
         recyclerView.setAdapter(imageListAdapter);
 
         findViewById(R.id.add_button).setOnClickListener(view -> {
+            findViewById(R.id.add_photo_button).setVisibility(View.VISIBLE);
+            findViewById(R.id.add_folder_button).setVisibility(View.VISIBLE);
+        });
+        findViewById(R.id.add_photo_button).setOnClickListener(view -> {
+            findViewById(R.id.add_photo_button).setVisibility(View.GONE);
+            findViewById(R.id.add_folder_button).setVisibility(View.GONE);
+
             Intent intent = new Intent();
             intent.setType("image/*");
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
