@@ -1,0 +1,1 @@
+Solved crash on startup with spanish translation
