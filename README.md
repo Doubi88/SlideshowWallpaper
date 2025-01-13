@@ -104,7 +104,8 @@ Distributed under GPL v3. See [`LICENSE`][license-url] for more information.
 <!-- CONTACT -->
 ## Contact
 
-Doubi88 - tobis_mail@yahoo.de
+Doubi88 - tobis_mail@yahoo.de\
+(see https://github.com/Doubi88/.github/blob/master/CONTACT.md)
 
 Project Link: [https://github.com/doubi88/slideshowwallpaper](https://github.com/doubi88/slideshowwallpaper)
 
