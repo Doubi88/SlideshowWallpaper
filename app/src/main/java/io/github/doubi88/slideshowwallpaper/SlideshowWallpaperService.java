@@ -171,7 +171,7 @@ public class SlideshowWallpaperService extends WallpaperService {
             super.onVisibilityChanged(visible);
             if (visible) {
                 handler.post(drawRunner);
-                if (!currentImageHandler.isStarted()) {
+                if (currentImageHandler != null && !currentImageHandler.isStarted()) {
 
                     // First load the current image directly, then start the timer
                     currentImageHandler.updateAfter(getApplicationContext(), 0);
@@ -213,7 +213,6 @@ public class SlideshowWallpaperService extends WallpaperService {
                     if (canvas != null) {
                         canvas.drawRect(0, 0, width, height, clearPaint);
 
-                        Uri lastUri = lastRenderedImage != null ? lastRenderedImage.getUri() : null;
                         ImageInfo image = currentImageHandler.getCurrentImage();
                         Bitmap bitmap = null;
                         if (image != null) {
@@ -233,7 +232,7 @@ public class SlideshowWallpaperService extends WallpaperService {
                                 canvas.restore();
                             }
 
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1 && (lastUri == null || (!lastUri.equals(lastRenderedImage.getUri())))) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1 && (image != null && (lastRenderedImage == null || !image.getUri().equals(lastRenderedImage.getUri())))) {
                                 // Only notify, if the image changes.
                                 SlideshowWallpaperEngine.this.notifyColorsChanged();
                                 lastRenderedImage = image;

@@ -39,7 +39,7 @@
     <string name="preference_preview_summary">Previsualizar y establecer como fondo de pantalla actual.</string>
     <string name="add_image">Add Image(s)</string>
     <string name="preference_anti_alias">Anti-aliasing</string>
-    <string name="preference_anti_alias_scroll">Antialiasing al desplazarse</string>
+    <string name="preference_anti_alias_scroll">Anti-aliasing al desplazarse</string>
     <string name="remove_confirmation_title">Confirmar eliminación</string>
     <plurals name="remove_confirmation_message">
         <item quantity="one">¿Estás seguro de que quieres eliminar %d imagen de los fondos de pantalla?</item>
