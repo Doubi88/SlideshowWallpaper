@@ -72,6 +72,7 @@ public class CurrentImageHandler {
     public void updateAfter(Context context, long delay) {
         if (currentTimer != null) {
             currentTimer.cancel();
+            currentTimer = null;
         }
         if (runnable) {
             currentTimer = new Timer("CurrentImageHandlerTimer");
@@ -83,6 +84,7 @@ public class CurrentImageHandler {
         runnable = false;
         if (currentTimer != null) {
             currentTimer.cancel();
+            currentTimer = null;
         }
     }
 
@@ -99,8 +101,10 @@ public class CurrentImageHandler {
         @Override
         public void run() {
             try {
-                loadNextImage(context);
-                notifyNextImageListeners(currentImage);
+                boolean updated = loadNextImage(context);
+                if (updated) {
+                    notifyNextImageListeners(currentImage);
+                }
             } catch (IOException e) {
                 Log.e(CurrentImageHandler.class.getSimpleName(), "Error loading image", e);
             }
@@ -111,13 +115,16 @@ public class CurrentImageHandler {
         }
     }
 
-    private void loadNextImage(Context context) throws IOException {
+    private boolean loadNextImage(Context context) throws IOException {
         Uri uri = getNextUri(context);
+        boolean result = false;
         if (uri != null) {
             if (currentImage == null || currentImage.getImage() == null || !uri.equals(currentImage.getUri())) {
                 currentImage = ImageLoader.loadImage(uri, context, width, height, false);
+                result = true;
             }
         }
+        return result;
     }
 
     private Uri getNextUri(Context context) {
