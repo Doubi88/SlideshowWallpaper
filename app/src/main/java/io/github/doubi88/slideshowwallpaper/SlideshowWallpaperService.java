@@ -246,6 +246,8 @@ public class SlideshowWallpaperService extends WallpaperService {
                             */
                         }
                     }
+                } catch (Exception e) {
+                    Log.e(getClass().getName(), "Error when drawing", e);
                 } finally {
                     if (canvas != null) {
                         try {
