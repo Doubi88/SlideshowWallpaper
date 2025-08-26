@@ -38,6 +38,10 @@ android {
     productFlavors {
     }
     namespace 'io.github.doubi88.slideshowwallpaper'
+    dependenciesInfo {
+        includeInApk false
+        includeInBundle false
+    }
 
     applicationVariants.configureEach { variant ->
         variant.resValue "string", "versionName", variant.versionName
