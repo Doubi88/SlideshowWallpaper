@@ -21,8 +21,8 @@ android {
         applicationId "io.github.doubi88.slideshowwallpaper"
         minSdkVersion 21
         targetSdk 35
-        versionCode 12
-        versionName '1.2.3'
+        versionCode 13
+        versionName '1.2.4'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -38,6 +38,10 @@ android {
     productFlavors {
     }
     namespace 'io.github.doubi88.slideshowwallpaper'
+    dependenciesInfo {
+        includeInApk false
+        includeInBundle false
+    }
 
     applicationVariants.configureEach { variant ->
         variant.resValue "string", "versionName", variant.versionName
