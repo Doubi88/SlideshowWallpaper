@@ -67,6 +67,8 @@ public class SlideshowWallpaperService extends WallpaperService {
 
         private float deltaX;
         private boolean isScrolling = false;
+        private float xOffset = 0f;
+        private float xOffsetStep = 0f;
 
         private SharedPreferencesManager manager;
 
@@ -101,19 +103,16 @@ public class SlideshowWallpaperService extends WallpaperService {
         @Override
         public void onOffsetsChanged(float xOffset, float yOffset, float xOffsetStep, float yOffsetStep, int xPixelOffset, int yPixelOffset) {
             super.onOffsetsChanged(xOffset, yOffset, xOffsetStep, yOffsetStep, xPixelOffset, yPixelOffset);
-            float deltaXResult = 0;
-            if (currentImageHandler != null) {
-                ImageInfo currentImage = currentImageHandler.getCurrentImage();
-                if (currentImage != null) {
-                    Bitmap image = currentImage.getImage();
-                    if (image != null) {
-                        deltaXResult = calculateDeltaX(image, xOffset, xOffsetStep);
-                    } else {
-                        deltaXResult = 0;
-                    }
-                }
+
+            this.xOffset = xOffset;
+            this.xOffsetStep = xOffsetStep;
+
+            SharedPreferencesManager.TooWideImagesRule rule = manager.getTooWideImagesRule(getResources());
+            if (rule != SharedPreferencesManager.TooWideImagesRule.SCROLL_FORWARD && rule != SharedPreferencesManager.TooWideImagesRule.SCROLL_BACKWARD) {
+                // We don't need to retrigger drawing for scrolling if we don't have one of the scrolling settings enabled
+                return;
             }
-            deltaX = deltaXResult;
+
             // When the xOffset is not a whole number, the wallpaper is scrolling
             isScrolling = (Math.floor(xOffset) != xOffset);
             handler.removeCallbacks(drawRunner);
@@ -220,6 +219,7 @@ public class SlideshowWallpaperService extends WallpaperService {
                         }
                         if (bitmap != null) {
                             SharedPreferencesManager.TooWideImagesRule rule = manager.getTooWideImagesRule(getResources());
+                            deltaX = calculateDeltaX(bitmap, xOffset, xOffsetStep);
                             boolean antiAlias = manager.getAntiAlias();
                             boolean antiAliasScrolling = manager.getAntiAliasWhileScrolling();
                             imagePaint.setAntiAlias(antiAlias && (!isScrolling || antiAliasScrolling));
