@@ -65,8 +65,9 @@ public class SlideshowWallpaperService extends WallpaperService {
 
         private ImageInfo lastRenderedImage;
 
-        private float deltaX;
         private boolean isScrolling = false;
+        private float xOffset = 0f;
+        private float xOffsetStep = 0f;
 
         private SharedPreferencesManager manager;
 
@@ -74,7 +75,6 @@ public class SlideshowWallpaperService extends WallpaperService {
             SharedPreferences prefs = getSharedPreferences();
             manager = new SharedPreferencesManager(prefs);
 
-            deltaX = 0;
             handler = new Handler(Looper.getMainLooper());
             drawRunner = new DrawRunner();
 
@@ -101,23 +101,18 @@ public class SlideshowWallpaperService extends WallpaperService {
         @Override
         public void onOffsetsChanged(float xOffset, float yOffset, float xOffsetStep, float yOffsetStep, int xPixelOffset, int yPixelOffset) {
             super.onOffsetsChanged(xOffset, yOffset, xOffsetStep, yOffsetStep, xPixelOffset, yPixelOffset);
-            float deltaXResult = 0;
-            if (currentImageHandler != null) {
-                ImageInfo currentImage = currentImageHandler.getCurrentImage();
-                if (currentImage != null) {
-                    Bitmap image = currentImage.getImage();
-                    if (image != null) {
-                        deltaXResult = calculateDeltaX(image, xOffset, xOffsetStep);
-                    } else {
-                        deltaXResult = 0;
-                    }
-                }
-            }
-            deltaX = deltaXResult;
+
+            this.xOffset = xOffset;
+            this.xOffsetStep = xOffsetStep;
             // When the xOffset is not a whole number, the wallpaper is scrolling
             isScrolling = (Math.floor(xOffset) != xOffset);
-            handler.removeCallbacks(drawRunner);
-            handler.post(drawRunner);
+
+            SharedPreferencesManager.TooWideImagesRule rule = manager.getTooWideImagesRule(getResources());
+            // We only need to retrigger a redraw on scroll if we have one of the scrolling options enabled
+            if (rule == SharedPreferencesManager.TooWideImagesRule.SCROLL_FORWARD || rule == SharedPreferencesManager.TooWideImagesRule.SCROLL_BACKWARD) {
+                handler.removeCallbacks(drawRunner);
+                handler.post(drawRunner);
+            }
         }
 
         private float calculateDeltaX(Bitmap image, float xOffset, float xOffsetStep) {
@@ -220,6 +215,7 @@ public class SlideshowWallpaperService extends WallpaperService {
                         }
                         if (bitmap != null) {
                             SharedPreferencesManager.TooWideImagesRule rule = manager.getTooWideImagesRule(getResources());
+                            float deltaX = calculateDeltaX(bitmap, xOffset, xOffsetStep);
                             boolean antiAlias = manager.getAntiAlias();
                             boolean antiAliasScrolling = manager.getAntiAliasWhileScrolling();
                             imagePaint.setAntiAlias(antiAlias && (!isScrolling || antiAliasScrolling));
