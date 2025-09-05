@@ -108,7 +108,7 @@ public class SlideshowWallpaperService extends WallpaperService {
             isScrolling = (Math.floor(xOffset) != xOffset);
 
             SharedPreferencesManager.TooWideImagesRule rule = manager.getTooWideImagesRule(getResources());
-            // We only want to retrigger drawing for scrolling if we have one of the scrolling options enabled
+            // We only need to retrigger a redraw on scroll if we have one of the scrolling options enabled
             if (rule == SharedPreferencesManager.TooWideImagesRule.SCROLL_FORWARD || rule == SharedPreferencesManager.TooWideImagesRule.SCROLL_BACKWARD) {
                 handler.removeCallbacks(drawRunner);
                 handler.post(drawRunner);
