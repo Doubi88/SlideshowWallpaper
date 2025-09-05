@@ -108,13 +108,11 @@ public class SlideshowWallpaperService extends WallpaperService {
             isScrolling = (Math.floor(xOffset) != xOffset);
 
             SharedPreferencesManager.TooWideImagesRule rule = manager.getTooWideImagesRule(getResources());
-            if (rule != SharedPreferencesManager.TooWideImagesRule.SCROLL_FORWARD && rule != SharedPreferencesManager.TooWideImagesRule.SCROLL_BACKWARD) {
-                // We don't need to retrigger drawing for scrolling if we don't have one of the scrolling settings enabled
-                return;
+            // We only want to retrigger drawing for scrolling if we have one of the scrolling options enabled
+            if (rule == SharedPreferencesManager.TooWideImagesRule.SCROLL_FORWARD || rule == SharedPreferencesManager.TooWideImagesRule.SCROLL_BACKWARD) {
+                handler.removeCallbacks(drawRunner);
+                handler.post(drawRunner);
             }
-
-            handler.removeCallbacks(drawRunner);
-            handler.post(drawRunner);
         }
 
         private float calculateDeltaX(Bitmap image, float xOffset, float xOffsetStep) {
