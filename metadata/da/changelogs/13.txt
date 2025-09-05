@@ -1,0 +1,2 @@
+Upgrade to Android 15
+Unfortunately, the app can no longer be compatible with lower versions than Android 5.0.
