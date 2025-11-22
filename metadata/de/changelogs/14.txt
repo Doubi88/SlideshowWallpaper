@@ -1,0 +1,2 @@
+- Fehler behoben, durch den manchmal das Bild verschoben dargestellt wurde
+- Fehler behoben, durch den manchmal die Themenfarben nich korrekt aktualisiert wurden
