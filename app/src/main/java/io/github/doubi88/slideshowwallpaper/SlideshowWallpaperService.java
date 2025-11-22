@@ -24,7 +24,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -174,7 +173,6 @@ public class SlideshowWallpaperService extends WallpaperService {
                 }
             } else {
                 handler.removeCallbacks(drawRunner);
-                currentImageHandler.stop();
             }
         }
 
