@@ -1,0 +1,2 @@
+- Fixed an error that caused the wallpaper to be misaligned sometimes
+- Fixed theme colors not always being updated correctly
