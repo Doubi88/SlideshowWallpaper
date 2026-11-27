@@ -19,18 +19,14 @@
 package io.github.doubi88.slideshowwallpaper.utilities;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
-import android.os.Build;
-import android.os.ParcelFileDescriptor;
 import android.provider.OpenableColumns;
 import androidx.annotation.NonNull;
 import androidx.exifinterface.media.ExifInterface;
-import android.util.Log;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -47,160 +43,96 @@ public class ImageLoader {
      * @return An {@link ImageInfo} object, only containing uri, name and size. {@link ImageInfo#getImage()} will be {@code null}
      */
     public static ImageInfo loadFileNameAndSize(@NonNull Uri uri, @NonNull Context context) {
-        String name = null;
+        String name = uri.getLastPathSegment();
         int size = 0;
-        Cursor fileCursor = null;
-        ParcelFileDescriptor descriptor = null;
-        try {
-
-            fileCursor = context.getContentResolver().query(uri, null, null, null, null);
-            if (fileCursor != null) {
-                int nameIndex = fileCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                boolean cursorContainsData = fileCursor.moveToFirst();
-                if (cursorContainsData) {
-                    name = fileCursor.getString(nameIndex);
-                    int sizeIndex = fileCursor.getColumnIndex(OpenableColumns.SIZE);
-                    fileCursor.moveToFirst();
-                    size = Integer.parseInt(fileCursor.getString(sizeIndex));
+        String[] columns = {OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE};
+        try (Cursor cursor = context.getContentResolver().query(uri, columns, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+                if (nameIndex >= 0 && !cursor.isNull(nameIndex)) {
+                    name = cursor.getString(nameIndex);
                 }
-                else {
-                    Log.e("FileCursor error", "FileCursor: " + fileCursor.toString() + " nameIndex: " + String.valueOf(nameIndex));
-                    name = "Error loading filename";
+                if (sizeIndex >= 0 && !cursor.isNull(sizeIndex)) {
+                    size = (int) Math.max(0, Math.min(Integer.MAX_VALUE, cursor.getLong(sizeIndex)));
                 }
-
-            } else {
-                Log.e(ImageLoader.class.getSimpleName(), "Could not load file " + uri.toString());
-                name = context.getResources().getString(R.string.error_reading_file);
             }
-            return new ImageInfo(uri, name, size, null);
-        } catch (SecurityException e) {
-            return new ImageInfo(null, "Cannot access image", 0, null);
-        } catch (IllegalArgumentException e) {
-            return new ImageInfo(null, "Cannot access image", 0, null);
-        } finally {
-            if (fileCursor != null) {
-                fileCursor.close();
-            }
+        } catch (RuntimeException e) {
+            name = context.getString(R.string.error_reading_file);
         }
-    }
-
-    /**
-     * Loads the {@link Bitmap} from the given file Uri. Turns it by 90 degrees, if it is wider than high (horizontal)
-     * The resulting image will have either {@code desiredHeight} as height or {@code desiredWidth} as width
-     *
-     * @param uri The {@link Uri} to load the image from
-     * @param context The current {@link Context}
-     * @param desiredWidth The width of the element displaying the image
-     * @param desiredHeight The height of the element displaying the image
-     * @return A {@link ImageInfo} containing the info of the image. {@link ImageInfo#getImage()} may be {@code null}, if reading the file fails.
-     * @throws IOException If thrown when trying to read the file
-     */
-    @NonNull
-    public static ImageInfo loadImage(@NonNull Uri uri, @NonNull Context context, int desiredWidth, int desiredHeight, boolean considerMemory) throws IOException {
-        Bitmap bitmap = null;
-        ImageInfo info = null;
-        InputStream in = null;
-        try  {
-            info = loadFileNameAndSize(uri, context);
-            int retried = 0;
-            if (info.getUri() != null) {
-                do {
-                    try {
-                        in = context.getContentResolver().openInputStream(uri);
-                    } catch (SecurityException e) {
-                        // Permission denied. Show image as error
-                        try {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                                context.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            }
-                            retried++;
-                        } catch (Exception e2) {
-                            retried = 2; // No longer retry
-                        }
-                    } catch (FileNotFoundException e) {
-                        retried = 2; // Don't retry
-                    }
-                } while (in == null && retried < 2);
-            }
-            if (in != null) {
-
-                int degrees = getRotationDegrees(context, uri);
-                if (info.getSize() > 0) {
-                    bitmap = readBitmap(readStream(in, info.getSize()), desiredWidth, desiredHeight, considerMemory);
-                    Matrix matrix = new Matrix();
-                    matrix.setRotate(degrees);
-
-                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
-                    info = new ImageInfo(uri, info.getName(), info.getSize(), bitmap);
-                }
-
-            }
-            else {
-                info = new ImageInfo(uri, context.getResources().getString(R.string.error_reading_file), 0, null);
-            }
-
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return info;
-    }
-
-    private static int getRotationDegrees(Context context, Uri uri) throws IOException {
-        int result = 0;
-        InputStream inputStream = null;
-        try {
-            inputStream = context.getContentResolver().openInputStream(uri);
-            result = new ExifInterface(inputStream).getRotationDegrees();
-        } finally {
-            if (inputStream != null) {
-                inputStream.close();
-            }
-        }
-        return result;
+        return new ImageInfo(uri, name, size, null);
     }
 
     @NonNull
-    private static byte[] readStream(@NonNull InputStream in, int size) throws IOException {
-        byte[] bytes = new byte[size];
-        in.read(bytes);
-        return bytes;
-    }
-
-    private static Bitmap readBitmap(byte[] bytes, int maxWidth, int maxHeight, boolean considerMemory) {
-        int size = bytes.length;
-
+    public static ImageInfo loadImage(@NonNull Uri uri, @NonNull Context context,
+                                      int desiredWidth, int desiredHeight,
+                                      boolean considerMemory) throws IOException {
+        ImageInfo info = loadFileNameAndSize(uri, context);
+        // Photo Picker providers may omit the encoded file size. Reopen streams for each pass.
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        BitmapFactory.decodeByteArray(bytes,0, size, options);
-        int imageWidth = options.outWidth;
-        int imageHeight = options.outHeight;
-
-        options.inSampleSize = calculateSampleSize(imageWidth, imageHeight, maxWidth, maxHeight);
-        options.inJustDecodeBounds = false;
-        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, size, options);
-        if (considerMemory && Runtime.getRuntime().maxMemory() <= (bitmap.getByteCount() * 2)) {
-            bitmap = null;
+        try (InputStream stream = openImage(uri, context)) {
+            BitmapFactory.decodeStream(stream, null, options);
         }
-        return bitmap;
+        if (options.outWidth <= 0 || options.outHeight <= 0) {
+            throw new IOException("Unsupported or corrupt image");
+        }
+        int rotation = 0;
+        boolean flipped = false;
+        try (InputStream stream = openImage(uri, context)) {
+            ExifInterface exif = new ExifInterface(stream);
+            rotation = exif.getRotationDegrees();
+            flipped = exif.isFlipped();
+        } catch (IOException ignored) {
+            // Some decodable formats do not expose EXIF metadata.
+        }
+        boolean swap = rotation == 90 || rotation == 270;
+        int sample = 1;
+        int targetWidth = Math.max(1, swap ? desiredHeight : desiredWidth);
+        int targetHeight = Math.max(1, swap ? desiredWidth : desiredHeight);
+        while (options.outWidth / (2L * sample) >= targetWidth
+                && options.outHeight / (2L * sample) >= targetHeight) {
+            sample *= 2;
+        }
+        long maxPixels = Math.min(8_000_000L, Runtime.getRuntime().maxMemory() /
+                (considerMemory ? 48 : 32));
+        while (((options.outWidth + (long) sample - 1) / sample)
+                * ((options.outHeight + (long) sample - 1) / sample) > maxPixels) {
+            sample *= 2;
+        }
+        options.inSampleSize = sample;
+        options.inJustDecodeBounds = false;
+        Bitmap bitmap;
+        try (InputStream stream = openImage(uri, context)) {
+            bitmap = BitmapFactory.decodeStream(stream, null, options);
+        }
+        if (bitmap == null) {
+            throw new IOException("Unsupported or corrupt image");
+        }
+        if (rotation != 0 || flipped) {
+            Matrix matrix = new Matrix();
+            matrix.setScale(flipped ? -1f : 1f, 1f);
+            matrix.postRotate(rotation);
+            Bitmap rotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(),
+                    matrix, false);
+            if (rotated != bitmap) {
+                bitmap.recycle();
+            }
+            bitmap = rotated;
+        }
+        return new ImageInfo(uri, info.getName(), info.getSize(), bitmap);
     }
 
-    private static int calculateSampleSize(int width, int height, int desiredWidth, int desiredHeight) {
-        int result = 1;
-
-        if (width > desiredWidth || height > desiredHeight) {
-
-            while ((width / result) >= desiredWidth && (height / result >= desiredHeight)) {
-                result *= 2;
+    private static InputStream openImage(Uri uri, Context context) throws IOException {
+        try {
+            InputStream stream = context.getContentResolver().openInputStream(uri);
+            if (stream == null) {
+                throw new FileNotFoundException();
             }
+            return stream;
+        } catch (SecurityException | IllegalArgumentException e) {
+            throw new IOException("Image unavailable", e);
         }
-        return result;
     }
 
     public static float calculateScaleFactorToFit(Bitmap bitmap, int screenWidth, int screenHeight, boolean both) {

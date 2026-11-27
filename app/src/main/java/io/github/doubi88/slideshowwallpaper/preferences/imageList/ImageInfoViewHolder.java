@@ -125,7 +125,12 @@ public class ImageInfoViewHolder extends RecyclerView.ViewHolder implements Prog
     @Override
     public void onTaskFinished(AsyncTask<Uri, BigDecimal, List<ImageInfo>> task, List<ImageInfo> imageInfos) {
         if (imageInfos.size() == 1) {
-            imageInfo = imageInfos.get(0);
+            ImageInfo result = imageInfos.get(0);
+            if (imageInfo == null || !result.getUri().equals(imageInfo.getUri())) {
+                return;
+            }
+            imageInfo = result;
+            imageView.setImageDrawable(null);
             if (imageInfo.getImage() != null) {
                 Matrix matrix = ImageLoader.calculateMatrixScaleToFit(imageInfo.getImage(), width, height, false);
                 imageView.setImageBitmap(Bitmap.createBitmap(imageInfo.getImage(), 0, 0, imageInfo.getImage().getWidth(), imageInfo.getImage().getHeight(), matrix, false));
@@ -139,7 +144,9 @@ public class ImageInfoViewHolder extends RecyclerView.ViewHolder implements Prog
     public void onTaskCancelled(AsyncTask<Uri, BigDecimal, List<ImageInfo>> task, List<ImageInfo> imageInfos) {
         if (imageInfos != null) {
             for (ImageInfo info : imageInfos) {
-                info.getImage().recycle();
+                if (info.getImage() != null) {
+                    info.getImage().recycle();
+                }
             }
         }
     }

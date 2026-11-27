@@ -79,4 +79,9 @@
         <item>7 Tage</item>
     </string-array>
     <string name="remove_image">Bild(er) entfernen</string>
+    <string name="pick_photos">Fotos hinzufügen</string>
+    <string name="photo_picker_unavailable">Auf diesem Gerät ist keine Fotoauswahl verfügbar.</string>
+    <string name="photo_access_failed">Einige Fotos konnten nicht für den späteren Zugriff gespeichert werden.</string>
+    <string name="preference_unlock">Beim Entsperren wechseln</string>
+    <string name="preference_unlock_summary">Zeigt nach dem Entsperren des Geräts das nächste Foto.</string>
 </resources>

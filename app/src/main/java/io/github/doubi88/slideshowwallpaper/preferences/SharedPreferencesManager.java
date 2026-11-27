@@ -166,48 +166,44 @@ public class SharedPreferencesManager {
         }
     }
 
-    public boolean addUri(Uri uri) {
+    public List<Uri> addUris(List<Uri> uris) {
         List<Uri> list = getImageUris(Ordering.SELECTION);
-        boolean result = false;
-        if (!list.contains(uri)) {
-            result = list.add(uri);
-            for (Ordering ordering : Ordering.values()) {
-                saveUriList(ordering.sort(list), ordering.getPreferenceKey());
+        java.util.Set<Uri> known = new java.util.HashSet<>(list);
+        List<Uri> added = new ArrayList<>();
+        for (Uri uri : uris) {
+            if (known.add(uri)) {
+                added.add(uri);
             }
         }
-        return result;
+        if (!added.isEmpty()) {
+            list.addAll(added);
+            saveUriLists(list);
+        }
+        return added;
     }
 
-    private void saveUriList(List<Uri> uris, String preferenceKey) {
-        StringBuilder listBuilder = new StringBuilder();
-        for (int i = 0; i < uris.size(); i++) {
-            Uri uri = uris.get(i);
-            listBuilder.append(uri.toString());
-
-            if (i + 1 < uris.size()) {
-                listBuilder.append(";");
-            }
-        }
+    private void saveUriLists(List<Uri> uris) {
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(preferenceKey, listBuilder.toString());
+        for (Ordering ordering : Ordering.values()) {
+            editor.putString(ordering.getPreferenceKey(), android.text.TextUtils.join(";", ordering.sort(uris)));
+        }
         editor.apply();
     }
 
     public void removeUri(Uri uri) {
         List<Uri> uris = getImageUris(Ordering.SELECTION);
-        uris.remove(uri);
-        for (Ordering ordering : Ordering.values()) {
-            saveUriList(ordering.sort(uris), ordering.getPreferenceKey());
+        if (uris.remove(uri)) {
+            saveUriLists(uris);
         }
     }
 
     public int getCurrentIndex() {
-        int result = preferences.getInt(PREFERENCE_KEY_LAST_INDEX, 0);
-        String[] uris = getUriList(Ordering.SELECTION);
-        while (result >= uris.length) {
-            result -= uris.length;
-        }
-        return result;
+        int count = getImageUrisCount();
+        return count == 0 ? 0 : Math.max(0, preferences.getInt(PREFERENCE_KEY_LAST_INDEX, 0)) % count;
+    }
+
+    public boolean changesOnUnlock() {
+        return preferences.getBoolean("change_on_unlock", false);
     }
 
     public void setCurrentIndex(int index) {

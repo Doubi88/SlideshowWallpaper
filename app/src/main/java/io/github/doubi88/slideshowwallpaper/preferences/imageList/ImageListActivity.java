@@ -18,34 +18,30 @@
  */
 package io.github.doubi88.slideshowwallpaper.preferences.imageList;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ClipData;
+import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 
 import io.github.doubi88.slideshowwallpaper.R;
@@ -56,20 +52,14 @@ import io.github.doubi88.slideshowwallpaper.utilities.ImageInfo;
 public class ImageListActivity extends AppCompatActivity {
 
     private SharedPreferencesManager manager;
-    private static final int REQUEST_CODE_FILE = 1;
 
     private ImageListAdapter imageListAdapter;
 
     private FloatingActionButton removeButton;
 
-    @RequiresApi(Build.VERSION_CODES.KITKAT)
-    private ActivityResultLauncher<PickVisualMediaRequest> launcher = null;
-
-    public ImageListActivity() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            this.launcher = registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(), this::imagePickerCallback);
-        }
-    }
+    private final ActivityResultLauncher<PickVisualMediaRequest> launcher =
+            registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(),
+                    this::imagePickerCallback);
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -78,7 +68,9 @@ public class ImageListActivity extends AppCompatActivity {
 
         this.removeButton = findViewById(R.id.delete_button);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
         RecyclerView recyclerView = findViewById(R.id.image_list);
 
         GridLayoutManager layoutManager = new GridLayoutManager(this, 3);
@@ -111,21 +103,11 @@ public class ImageListActivity extends AppCompatActivity {
         });
         recyclerView.setAdapter(imageListAdapter);
 
-        findViewById(R.id.add_button).setOnClickListener(view -> {
-            Intent intent = new Intent();
-            intent.setType("image/*");
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-            }
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-            } else {
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-            }
-            startActivityForResult(intent, REQUEST_CODE_FILE);
-        });
+        View addButton = findViewById(R.id.add_button);
+        addButton.setOnClickListener(view -> openPicker());
+        if (savedInstanceState == null && uris.isEmpty()) {
+            addButton.post(this::openPicker);
+        }
 
         this.removeButton.setOnClickListener(view -> {
             HashSet<ImageInfo> selectedImages = imageListAdapter.getSelectedImages();
@@ -138,8 +120,11 @@ public class ImageListActivity extends AppCompatActivity {
                 public void onClick(DialogInterface dialog, int which) {
                     for (ImageInfo imageInfo : selectedImages) {
                         manager.removeUri(imageInfo.getUri());
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && imageInfo.getSize() > 0 && !manager.hasImageUri(imageInfo.getUri())) {
-                            getContentResolver().releasePersistableUriPermission(imageInfo.getUri(), Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        try {
+                            getContentResolver().releasePersistableUriPermission(
+                                    imageInfo.getUri(), Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        } catch (SecurityException | IllegalArgumentException ignored) {
+                            // The provider may already have removed the grant.
                         }
                     }
                     imageListAdapter.delete(selectedImages);
@@ -167,58 +152,47 @@ public class ImageListActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void imagePickerCallback(List<Uri> uris) {
-        List<Uri> urisToAdd = new ArrayList<>(uris.size());
-        for (Uri uri : uris) {
-            boolean takePermissionSuccess = takePermission(uri);
-            if (takePermissionSuccess && manager.addUri(uri)) {
-                urisToAdd.add(uri);
-            }
+    private void openPicker() {
+        if (isFinishing() || isDestroyed()) {
+            return;
         }
-        imageListAdapter.addUris(urisToAdd);
+        try {
+            launcher.launch(new PickVisualMediaRequest.Builder()
+                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                    .build());
+        } catch (ActivityNotFoundException | SecurityException e) {
+            Toast.makeText(this, R.string.photo_picker_unavailable, Toast.LENGTH_LONG).show();
+        }
     }
 
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        List<Uri> uris = new LinkedList<>();
-        if (requestCode == REQUEST_CODE_FILE && resultCode == Activity.RESULT_OK) {
-            ClipData clipData = data.getClipData();
-            if (clipData == null) {
-                Uri uri = data.getData();
-                if (uri != null) {
-                    boolean takePermissionSuccess = takePermission(uri);
-                    if (takePermissionSuccess && manager.addUri(uri)) {
-                        uris.add(uri);
-                    }
-                }
-            } else {
-                for (int index = 0; index < clipData.getItemCount(); index++) {
-                    Uri uri = clipData.getItemAt(index).getUri();
-                    boolean takePermissionSuccess = takePermission(uri);
-                    if (takePermissionSuccess && manager.addUri(uri)) {
-                        uris.add(uri);
-                    }
-                }
+    private void imagePickerCallback(List<Uri> uris) {
+        List<Uri> accessible = new ArrayList<>(uris.size());
+        for (Uri uri : uris) {
+            if (takePermission(uri)) {
+                accessible.add(uri);
             }
-
-            imageListAdapter.addUris(uris);
+        }
+        imageListAdapter.addUris(manager.addUris(accessible));
+        if (accessible.size() < uris.size()) {
+            Toast.makeText(this, R.string.photo_access_failed, Toast.LENGTH_LONG).show();
         }
     }
 
     private boolean takePermission(Uri uri) {
-        boolean takePermissionSuccess = true;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            ContentResolver res = getContentResolver();
-            int perms = res.getPersistedUriPermissions().size();
-            res.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-            // If taking the permission was unsuccessful (e.g. because the limit was reached), Don't add the uri
-            if (res.getPersistedUriPermissions().size() <= perms) {
-                takePermissionSuccess = false;
-            }
+        if (uri == null) {
+            return false;
         }
-        return takePermissionSuccess;
+        try {
+            ContentResolver resolver = getContentResolver();
+            resolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            for (android.content.UriPermission grant : resolver.getPersistedUriPermissions()) {
+                if (grant.isReadPermission() && uri.equals(grant.getUri())) {
+                    return true;
+                }
+            }
+        } catch (SecurityException | IllegalArgumentException ignored) {
+            // An unavailable URI cannot be added for later use.
+        }
+        return false;
     }
 }
