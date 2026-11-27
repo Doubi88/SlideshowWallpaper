@@ -7,24 +7,25 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.List;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import io.github.doubi88.slideshowwallpaper.R;
 import io.github.doubi88.slideshowwallpaper.preferences.SharedPreferencesManager;
 
 public class CurrentImageHandler {
 
-    private int currentIndex;
-    private ImageInfo currentImage;
+    private volatile ImageInfo currentImage;
 
     private SharedPreferencesManager manager;
     private int width;
     private int height;
 
-    private boolean runnable;
-
-    private Timer currentTimer;
+    private final ScheduledThreadPoolExecutor worker = new ScheduledThreadPoolExecutor(1);
+    private ScheduledFuture<?> update;
+    private long generation;
 
     private ArrayList<NextImageListener> nextImageListeners;
 
@@ -32,7 +33,7 @@ public class CurrentImageHandler {
         this.manager = manager;
         this.width = width;
         this.height = height;
-        this.runnable = true;
+        worker.setRemoveOnCancelPolicy(true);
         nextImageListeners = new ArrayList<>(1);
     }
 
@@ -53,112 +54,88 @@ public class CurrentImageHandler {
         return currentImage;
     }
 
-    public int getCurrentIndex() {
-        return currentIndex;
-    }
-
-    public void setDimensions(int width, int height, Context context) {
+    public synchronized void setDimensions(int width, int height) {
         this.width = width;
         this.height = height;
-        updateAfter(context, 0);
     }
 
-    public void startTimer(Context context) {
-        runnable = true;
-        long update = calculateNextUpdateInSeconds(context);
-        updateAfter(context, update);
+    public synchronized void start(Context context) {
+        stop();
+        schedule(context, generation, 0);
     }
 
-    public void updateAfter(Context context, long delay) {
-        if (currentTimer != null) {
-            currentTimer.cancel();
-            currentTimer = null;
-        }
-        if (runnable) {
-            currentTimer = new Timer("CurrentImageHandlerTimer");
-            currentTimer.schedule(new Runner(context), delay < 0 ? 0 : delay);
-        }
+    private void schedule(Context context, long request, long seconds) {
+        update = worker.schedule(() -> update(context, request), seconds, TimeUnit.SECONDS);
     }
 
-    public void stop() {
-        runnable = false;
-        if (currentTimer != null) {
-            currentTimer.cancel();
-            currentTimer = null;
+    public synchronized void stop() {
+        generation++;
+        if (update != null) {
+            update.cancel(false);
+            update = null;
         }
     }
 
-    public boolean isStarted() {
-        return currentTimer != null && runnable;
+    public synchronized void destroy() {
+        stop();
+        worker.shutdown();
     }
 
-    public class Runner extends TimerTask {
-        private Context context;
-
-        public Runner(Context context) {
-            this.context = context;
-        }
-        @Override
-        public void run() {
-            try {
-                boolean updated = loadNextImage(context);
-                if (updated) {
-                    notifyNextImageListeners(currentImage);
-                }
-            } catch (IOException e) {
-                Log.e(CurrentImageHandler.class.getSimpleName(), "Error loading image", e);
+    private void update(Context context, long request) {
+        Uri uri;
+        int targetWidth;
+        int targetHeight;
+        synchronized (this) {
+            if (request != generation) {
+                return;
             }
-
-            if (runnable) {
-                startTimer(context);
-            }
+            targetWidth = width;
+            targetHeight = height;
+            uri = getNextUri(context);
         }
-    }
-
-    private boolean loadNextImage(Context context) throws IOException {
-        Uri uri = getNextUri(context);
-        boolean result = false;
-        if (uri != null) {
-            if (currentImage == null || currentImage.getImage() == null || !uri.equals(currentImage.getUri())) {
-                currentImage = ImageLoader.loadImage(uri, context, width, height, false);
-                result = true;
+        ImageInfo next = null;
+        try {
+            if (uri != null && (currentImage == null || currentImage.getImage() == null
+                    || !uri.equals(currentImage.getUri()))) {
+                next = ImageLoader.loadImage(uri, context, targetWidth, targetHeight, false);
+            }
+        } catch (IOException | RuntimeException e) {
+            Log.w(CurrentImageHandler.class.getSimpleName(), "Error loading image", e);
+        }
+        synchronized (this) {
+            if (request != generation) {
+                return;
+            }
+            if (next != null || (uri == null && currentImage != null)) {
+                currentImage = next;
+                notifyNextImageListeners(currentImage);
+            }
+            if (uri != null && !manager.changesOnUnlock()) {
+                schedule(context, request, Math.max(1, calculateNextUpdateInSeconds(context)));
             }
         }
-        return result;
     }
 
     private Uri getNextUri(Context context) {
-        Uri result = null;
-        Resources resources = context.getResources();
-        SharedPreferencesManager.Ordering ordering = manager.getCurrentOrdering(resources);
-        int countUris = manager.getImageUrisCount();
-
-        if (countUris > 0) {
-            int currentImageIndex = manager.getCurrentIndex();
-            if (currentImageIndex >= countUris) {
-                // If an image was deleted and therefore we are over the end of the list
-                currentImageIndex -= countUris;
-            }
-            long nextUpdate = calculateNextUpdateInSeconds(context);
-            if (nextUpdate <= 0) {
-                int delay = getDelaySeconds(context);
-                while (nextUpdate <= 0) {
-                    currentImageIndex++;
-
-                    if (currentImageIndex >= countUris) {
-                        currentImageIndex = 0;
-                    }
-
-                    nextUpdate += delay;
-                }
-                manager.setCurrentIndex(currentImageIndex);
+        SharedPreferencesManager.Ordering ordering = manager.getCurrentOrdering(context.getResources());
+        if (ordering == null) {
+            ordering = SharedPreferencesManager.Ordering.SELECTION;
+        }
+        List<Uri> images = manager.getImageUris(ordering);
+        if (images.isEmpty()) {
+            return null;
+        }
+        int index = manager.getCurrentIndex() % images.size();
+        if (!manager.changesOnUnlock()) {
+            long remaining = calculateNextUpdateInSeconds(context);
+            if (remaining <= 0) {
+                long steps = 1 - remaining / getDelaySeconds(context);
+                index = (int) ((index + steps) % images.size());
+                manager.setCurrentIndex(index);
                 manager.setLastUpdate(System.currentTimeMillis());
             }
-            result = manager.getImageUri(currentImageIndex, ordering);
-            currentIndex = currentImageIndex;
         }
-
-        return result;
+        return images.get(index);
     }
 
     private long calculateNextUpdateInSeconds(Context context) {

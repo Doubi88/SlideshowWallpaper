@@ -81,4 +81,9 @@
         <item>7 días</item>
     </string-array>
     <string name="remove_image">Eliminar imagen(es)</string>
+    <string name="pick_photos">Añadir fotos</string>
+    <string name="photo_picker_unavailable">Este dispositivo no tiene un selector de fotos disponible.</string>
+    <string name="photo_access_failed">No se pudo guardar el acceso a algunas fotos.</string>
+    <string name="preference_unlock">Cambiar al desbloquear</string>
+    <string name="preference_unlock_summary">Muestra la siguiente foto al desbloquear el dispositivo.</string>
 </resources>

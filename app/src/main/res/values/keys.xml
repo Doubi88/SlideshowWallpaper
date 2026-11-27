@@ -21,6 +21,7 @@
 -->
 <resources>
     <string name="preference_add_images_key" translatable="false">pick_images</string>
+    <string name="preference_unlock_key" translatable="false">change_on_unlock</string>
     <string name="preference_seconds_key" translatable="false">seconds</string>
     <string name="preference_ordering_key" translatable="false">ordering</string>
     <string name="preference_too_wide_images_rule_key" translatable="false">too_wide_images_rule</string>

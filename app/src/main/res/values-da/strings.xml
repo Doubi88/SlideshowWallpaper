@@ -80,4 +80,9 @@
     </string-array>
     <string name="remove_image">Fjern billede(r)</string>
 
+    <string name="pick_photos">Tilføj billeder</string>
+    <string name="photo_picker_unavailable">Der er ingen billedvælger på denne enhed.</string>
+    <string name="photo_access_failed">Nogle billeder kunne ikke gemmes til senere brug.</string>
+    <string name="preference_unlock">Skift ved oplåsning</string>
+    <string name="preference_unlock_summary">Viser det næste billede, når du låser enheden op.</string>
 </resources>

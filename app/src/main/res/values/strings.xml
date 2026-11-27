@@ -84,4 +84,9 @@
         <item>2 days</item>
         <item>7 days</item>
     </string-array>
+    <string name="pick_photos">Add photos</string>
+    <string name="photo_picker_unavailable">A photo picker is unavailable on this device.</string>
+    <string name="photo_access_failed">Some photos could not be saved for later access.</string>
+    <string name="preference_unlock">Change on unlock</string>
+    <string name="preference_unlock_summary">Advance to the next photo after you unlock the device.</string>
 </resources>

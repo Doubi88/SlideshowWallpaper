@@ -19,6 +19,10 @@
 package io.github.doubi88.slideshowwallpaper;
 
 import android.app.WallpaperColors;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -32,6 +36,8 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
+
 
 import io.github.doubi88.slideshowwallpaper.preferences.SharedPreferencesManager;
 import io.github.doubi88.slideshowwallpaper.utilities.CurrentImageHandler;
@@ -40,6 +46,35 @@ import io.github.doubi88.slideshowwallpaper.utilities.ImageLoader;
 
 
 public class SlideshowWallpaperService extends WallpaperService {
+
+    private final BroadcastReceiver unlockReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (!Intent.ACTION_USER_PRESENT.equals(intent.getAction())) {
+                return;
+            }
+            SharedPreferencesManager manager = new SharedPreferencesManager(
+                    getSharedPreferences(getPackageName() + "_preferences", MODE_PRIVATE));
+            int count = manager.getImageUrisCount();
+            if (manager.changesOnUnlock() && count > 1) {
+                // Update the shared selection once, even if both wallpaper engines are attached.
+                manager.setCurrentIndex((manager.getCurrentIndex() + 1) % count);
+            }
+        }
+    };
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        ContextCompat.registerReceiver(this, unlockReceiver,
+                new IntentFilter(Intent.ACTION_USER_PRESENT), ContextCompat.RECEIVER_NOT_EXPORTED);
+    }
+
+    @Override
+    public void onDestroy() {
+        unregisterReceiver(unlockReceiver);
+        super.onDestroy();
+    }
 
     @Override
     public Engine onCreateEngine() {
@@ -52,6 +87,21 @@ public class SlideshowWallpaperService extends WallpaperService {
         private Handler handler;
 
         private CurrentImageHandler currentImageHandler;
+        private boolean visible;
+        private boolean surfaceReady;
+        private SharedPreferencesManager manager;
+        private final SharedPreferences.OnSharedPreferenceChangeListener settingsListener =
+                (preferences, key) -> {
+                    if (key == null || "change_on_unlock".equals(key)
+                            || "pick_images".equals(key) || "seconds".equals(key)
+                            || "ordering".equals(key)
+                            || ("last_index".equals(key) && manager.changesOnUnlock())) {
+                        if ("change_on_unlock".equals(key)) {
+                            manager.setLastUpdate(System.currentTimeMillis());
+                        }
+                        refresh();
+                    }
+                };
 
         private int width;
         private int height;
@@ -68,7 +118,6 @@ public class SlideshowWallpaperService extends WallpaperService {
         private float xOffset = 0f;
         private float xOffsetStep = 0f;
 
-        private SharedPreferencesManager manager;
 
         public SlideshowWallpaperEngine() {
             SharedPreferences prefs = getSharedPreferences();
@@ -94,7 +143,12 @@ public class SlideshowWallpaperService extends WallpaperService {
             float scale = getResources().getDisplayMetrics().density;
             textSize = (int) (10f * scale + 0.5f);
             textPaint.setTextSize(textSize);
-            handler.post(drawRunner);
+        }
+
+        @Override
+        public void onCreate(SurfaceHolder holder) {
+            super.onCreate(holder);
+            getSharedPreferences().registerOnSharedPreferenceChangeListener(settingsListener);
         }
 
         @Override
@@ -137,59 +191,63 @@ public class SlideshowWallpaperService extends WallpaperService {
             super.onSurfaceChanged(holder, format, width, height);
             this.width = width;
             this.height = height;
+            surfaceReady = width > 0 && height > 0;
             if (currentImageHandler == null) {
                 currentImageHandler = new CurrentImageHandler(manager, width, height);
-                currentImageHandler.addNextImageListener((i) -> {
+                currentImageHandler.addNextImageListener(image -> {
                     handler.removeCallbacks(drawRunner);
                     handler.post(drawRunner);
                 });
-
-                // First load the current image directly, then start the timer
-                currentImageHandler.updateAfter(getApplicationContext(), 0);
-                currentImageHandler.startTimer(getApplicationContext());
             } else {
-                currentImageHandler.setDimensions(width, height, getApplicationContext());
+                currentImageHandler.setDimensions(width, height);
             }
-            handler.post(drawRunner);
+            refresh();
         }
 
         @Override
         public void onSurfaceDestroyed(SurfaceHolder holder) {
+            surfaceReady = false;
+            refresh();
             super.onSurfaceDestroyed(holder);
-            currentImageHandler.stop();
-            handler.removeCallbacks(drawRunner);
         }
 
         @Override
         public void onVisibilityChanged(boolean visible) {
             super.onVisibilityChanged(visible);
-            if (visible) {
-                handler.post(drawRunner);
-                if (currentImageHandler != null && !currentImageHandler.isStarted()) {
+            this.visible = visible;
+            refresh();
+        }
 
-                    // First load the current image directly, then start the timer
-                    currentImageHandler.updateAfter(getApplicationContext(), 0);
-                    currentImageHandler.startTimer(getApplicationContext());
-                }
-            } else {
-                handler.removeCallbacks(drawRunner);
+        private void refresh() {
+            handler.removeCallbacks(drawRunner);
+            if (currentImageHandler == null) {
+                return;
             }
+            if (visible && surfaceReady) {
+                currentImageHandler.start(getApplicationContext());
+                handler.post(drawRunner);
+            } else {
+                currentImageHandler.stop();
+            }
+        }
+
+        @Override
+        public void onDestroy() {
+            visible = false;
+            getSharedPreferences().unregisterOnSharedPreferenceChangeListener(settingsListener);
+            handler.removeCallbacks(drawRunner);
+            if (currentImageHandler != null) {
+                currentImageHandler.destroy();
+            }
+            super.onDestroy();
         }
 
         @RequiresApi(Build.VERSION_CODES.O_MR1)
         @Override
         public WallpaperColors onComputeColors () {
-            WallpaperColors result = null;
-            if (currentImageHandler != null && currentImageHandler.getCurrentImage() != null) {
-                Bitmap img = currentImageHandler.getCurrentImage().getImage();
-                if (img != null) {
-                    result = WallpaperColors.fromBitmap(img);
-                }
-            }
-            if (result == null) {
-                result = super.onComputeColors();
-            }
-            return result;
+            ImageInfo image = currentImageHandler == null ? null : currentImageHandler.getCurrentImage();
+            Bitmap bitmap = image == null ? null : image.getImage();
+            return bitmap == null ? super.onComputeColors() : WallpaperColors.fromBitmap(bitmap);
         }
 
         private SharedPreferences getSharedPreferences() {
@@ -199,6 +257,9 @@ public class SlideshowWallpaperService extends WallpaperService {
         private class DrawRunner implements Runnable {
             @Override
             public void run() {
+                if (!visible || !surfaceReady || currentImageHandler == null) {
+                    return;
+                }
                 SurfaceHolder holder = getSurfaceHolder();
                 Canvas canvas = null;
                 try {

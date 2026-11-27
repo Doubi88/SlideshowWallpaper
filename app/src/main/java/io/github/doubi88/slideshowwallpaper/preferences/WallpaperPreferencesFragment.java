@@ -36,6 +36,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import io.github.doubi88.slideshowwallpaper.R;
 import io.github.doubi88.slideshowwallpaper.SlideshowWallpaperService;
 import io.github.doubi88.slideshowwallpaper.utilities.CompatibilityHelpers;
+import io.github.doubi88.slideshowwallpaper.preferences.imageList.ImageListActivity;
 
 public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
     public static int DEFAULT_SECONDS = 60;
@@ -43,6 +44,8 @@ public class WallpaperPreferencesFragment extends PreferenceFragmentCompat {
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.wallpaper_preferences);
+        findPreference(getString(R.string.preference_add_images_key)).setIntent(
+                new Intent(requireContext(), ImageListActivity.class));
     }
 
     @Override
