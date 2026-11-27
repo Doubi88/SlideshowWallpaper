@@ -66,8 +66,9 @@ public class SlideshowWallpaperService extends WallpaperService {
     @Override
     public void onCreate() {
         super.onCreate();
+        // USER_PRESENT is protected and can be sent by System UI under its own UID.
         ContextCompat.registerReceiver(this, unlockReceiver,
-                new IntentFilter(Intent.ACTION_USER_PRESENT), ContextCompat.RECEIVER_NOT_EXPORTED);
+                new IntentFilter(Intent.ACTION_USER_PRESENT), ContextCompat.RECEIVER_EXPORTED);
     }
 
     @Override
